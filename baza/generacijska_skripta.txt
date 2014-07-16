@@ -1,0 +1,103 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+
+CREATE SCHEMA IF NOT EXISTS `Task Manager App` ;
+USE `Task Manager App` ;
+
+-- -----------------------------------------------------
+-- Table `Task Manager App`.`tabela_projektov`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `Task Manager App`.`tabela_projektov` (
+  `id_projekt` INT NOT NULL AUTO_INCREMENT ,
+  `Projekt` VARCHAR(45) NOT NULL ,
+  `Opis` VARCHAR(500) NULL ,
+  `Datum začetka` DATE NULL ,
+  `Datum konca` DATE NULL ,
+  `id_koordinator` INT NULL ,
+  `komentar` VARCHAR(500) NULL ,
+  PRIMARY KEY (`id_projekt`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Task Manager App`.`tabela_members`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `Task Manager App`.`tabela_members` (
+  `idtabela_members` INT NOT NULL AUTO_INCREMENT ,
+  `Ime memberja` VARCHAR(45) NULL ,
+  PRIMARY KEY (`idtabela_members`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Task Manager App`.`tabela_threads`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `Task Manager App`.`tabela_threads` (
+  `id_thread` INT NOT NULL ,
+  `nekineki` VARCHAR(45) NULL ,
+  PRIMARY KEY (`id_thread`) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Task Manager App`.`tabela_zadolžitev`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `Task Manager App`.`tabela_zadolžitev` (
+  `id_zadolzitev_primarni` INT NOT NULL AUTO_INCREMENT ,
+  `id_zadolzitev_sekundarni` INT NOT NULL ,
+  `id_projekt` INT NULL ,
+  `id_member` INT NULL ,
+  `Zadolžitev` VARCHAR(45) NULL ,
+  `Datum vnosa` TIMESTAMP NULL ,
+  `Čas začetka` DATE NULL ,
+  `Rok` DATE NULL ,
+  `Čas konca` DATE NULL ,
+  `Skupen porabljen čas` DECIMAL(6) NULL ,
+  `Opis` VARCHAR(500) NULL ,
+  `Pomembnost` INT NULL ,
+  `Predvideno trajanje` DECIMAL(6) NULL ,
+  `Vidnost` INT NULL ,
+  `Stanje` INT NULL ,
+  `Komentar` VARCHAR(500) NULL ,
+  `id_thread` INT NULL ,
+  PRIMARY KEY (`id_zadolzitev_primarni`) ,
+  INDEX `id_projekt` (`id_projekt` ASC) ,
+  INDEX `id_member` (`id_member` ASC) ,
+  INDEX `id_thread` (`id_thread` ASC) ,
+  CONSTRAINT `id_projekt`
+    FOREIGN KEY (`id_projekt` )
+    REFERENCES `Task Manager App`.`tabela_projektov` (`id_projekt` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_member`
+    FOREIGN KEY (`id_member` )
+    REFERENCES `Task Manager App`.`tabela_members` (`idtabela_members` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_thread`
+    FOREIGN KEY (`id_thread` )
+    REFERENCES `Task Manager App`.`tabela_threads` (`id_thread` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Placeholder table for view `Task Manager App`.`view1`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Task Manager App`.`view1` (`id_projekt` INT);
+
+-- -----------------------------------------------------
+-- View `Task Manager App`.`view1`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Task Manager App`.`view1`;
+USE `Task Manager App`;
+CREATE  OR REPLACE VIEW `Task Manager App`.`view1` AS
+SELECT id_projekt FROM tabela_projektov;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+

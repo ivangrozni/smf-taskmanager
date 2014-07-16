@@ -1,0 +1,438 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
+<modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
+<id>vbgamer45:Tags</id>
+<version>2.5</version>
+<file name="$languagedir/Modifications.english.php">
+	<operation error="ignore">
+		<search position="after"><![CDATA[
+?>]]></search>
+		<add><![CDATA[
+//Begin Tagging System Text Strings
+$txt['smftags_menu'] = 'Tags';
+$txt['smftags_admin'] = 'Tags Configuration';
+$txt['smftags_settings'] = 'Settings';
+
+$txt['smftags_addtag'] = '[Add Tag]';
+$txt['smftags_addtag2'] = 'Add Tag';
+$txt['smftags_seperate'] = 'Seperate each tag by a comma';
+
+$txt['smftags_topic'] = 'Tags: ';
+$txt['permissiongroup_smftags'] = 'SMF Tags';
+$txt['permissiongroup_simple_smftags'] = 'SMF Tags';
+$txt['permissionname_smftags_suggest'] = 'Suggest Tags';
+$txt['permissionhelp_smftags_suggest'] = 'Users can suggest tags to add';
+$txt['cannot_smftags_suggest'] = 'You are not allowed to suggest tags.';
+
+$txt['permissionname_smftags_add'] = 'Add Tags to Own Topics';
+$txt['permissionhelp_smftags_add'] = 'Users can add tags';
+$txt['cannot_smftags_add'] = 'You are not allowed to add tags to topics';
+
+$txt['permissionname_smftags_del'] = 'Delete Tags to Own Topics';
+$txt['permissionhelp_smftags_del'] = 'Users can delete tags from topics they open';
+$txt['cannot_smftags_del'] = 'You are not allowed to delete this tags';
+
+$txt['permissionname_smftags_manage'] = 'Manage Tags';
+$txt['permissionhelp_smftags_manage'] = 'Users can modify the tag settings and add and remove ANY tags. This permission is normally given to forum admins only!';
+$txt['cannot_smftags_manage'] = 'You are not allowed to manage tags.';
+//END  Tagging System Strings			
+]]></add>
+	</operation>
+</file>
+<file name="$languagedir/Modifications.english-utf8.php" error="skip">
+	<operation error="ignore">
+		<search position="after"><![CDATA[
+?>]]></search>
+		<add><![CDATA[
+//Begin Tagging System Text Strings
+$txt['smftags_menu'] = 'Tags';
+$txt['smftags_admin'] = 'Tags Configuration';
+$txt['smftags_settings'] = 'Settings';
+
+$txt['smftags_addtag'] = '[Add Tag]';
+$txt['smftags_addtag2'] = 'Add Tag';
+$txt['smftags_seperate'] = 'Seperate each tag by a comma';
+
+$txt['smftags_topic'] = 'Tags: ';
+$txt['permissiongroup_smftags'] = 'SMF Tags';
+$txt['permissiongroup_simple_smftags'] = 'SMF Tags';
+$txt['permissionname_smftags_suggest'] = 'Suggest Tags';
+$txt['permissionhelp_smftags_suggest'] = 'Users can suggest tags to add';
+$txt['cannot_smftags_suggest'] = 'You are not allowed to suggest tags.';
+
+$txt['permissionname_smftags_add'] = 'Add Tags to Own Topics';
+$txt['permissionhelp_smftags_add'] = 'Users can add tags';
+$txt['cannot_smftags_add'] = 'You are not allowed to add tags to topics';
+
+$txt['permissionname_smftags_del'] = 'Delete Tags to Own Topics';
+$txt['permissionhelp_smftags_del'] = 'Users can delete tags from topics they open';
+$txt['cannot_smftags_del'] = 'You are not allowed to delete this tags';
+
+$txt['permissionname_smftags_manage'] = 'Manage Tags';
+$txt['permissionhelp_smftags_manage'] = 'Users can modify the tag settings and add and remove ANY tags. This permission is normally given to forum admins only!';
+$txt['cannot_smftags_manage'] = 'You are not allowed to manage tags.';
+//END  Tagging System Strings			
+]]></add>
+	</operation>
+</file>
+
+<file name="$boarddir/index.php">
+	<operation>
+		<search position="before"><![CDATA['sticky' => array('LockTopic.php', 'Sticky'),]]></search>
+		<add><![CDATA[
+		'tags' => array('Tags2.php', 'TagsMain'),]]></add>
+	</operation>
+</file>
+<file name="$themedir/Post.template.php">
+	<operation>
+		<search position="before"><![CDATA[<input type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80" class="input_text" />
+						</dd>]]></search>
+		<add><![CDATA[
+		';
+		// Tagging system Mod
+		if(!isset($context['num_replies']) && allowedTo('smftags_add') )
+		{
+		echo '
+		<dt>
+											<b>', $txt['smftags_topic'], '</b>
+		</dt>
+		<dd>
+											<input type="text" name="tags"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80" />
+											<br /><span class="smalltext">', $txt['smftags_seperate'], '</span>
+		</dd>';
+							
+		}
+		
+		
+		//End Tagging system mod
+		echo '
+		
+		
+		]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/ManagePermissions.php">
+	<operation>
+		<search position="before"><![CDATA['profile_remote_avatar' => array(false, 'profile', 'use_avatar'),]]></search>
+		<add><![CDATA['smftags_add' => array(false, 'smftags', 'smftags'),
+			      'smftags_del' => array(false, 'smftags', 'smftags'),
+			      'smftags_manage' => array(false, 'smftags', 'smftags'),
+		]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Subs.php">
+	<operation>
+		<search position="replace"><![CDATA['calendar' => array(]]></search>
+	<add><![CDATA[
+			'tags' => array(
+				'title' => $txt['smftags_menu'],
+				'href' => $scripturl . '?action=tags',
+				'show' => true,
+				'sub_buttons' => array(
+				),
+			),
+	'calendar' => array(
+]]></add>
+</operation>
+	<operation>
+		<search position="replace"><![CDATA['permissions' => array(
+						'title' => $txt['edit_permissions'],
+						'href' => $scripturl . '?action=admin;area=permissions',
+						'show' => allowedTo('manage_permissions'),
+						'is_last' => true,
+					),]]></search>
+	<add><![CDATA[
+					'permissions' => array(
+											'title' => $txt['edit_permissions'],
+											'href' => $scripturl . '?action=admin;area=permissions',
+											'show' => allowedTo('manage_permissions'),
+											'is_last' => true,
+					),
+					'tags_settings' => array(
+						'title' => $txt['smftags_admin'],
+						'href' => $scripturl . '?action=admin;area=tags;sa=admin',
+						'show' => allowedTo('admin_forum'),
+					),
+]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Post.php">
+	<operation>
+		<search position="replace"><![CDATA[$topic = $topicOptions['id'];]]></search>
+	<add><![CDATA[$topic = $topicOptions['id'];
+	
+	
+//Tagging System
+
+	
+	if(isset($_REQUEST['tags']) && !isset($_REQUEST['num_replies']))
+	{
+		global $user_info;
+		//Get how many tags there have been for the topic
+		$dbresult = $smcFunc['db_query']('', "
+		SELECT 
+			COUNT(*) as total 
+		FROM {db_prefix}tags_log 
+		WHERE ID_TOPIC = " . $topic);
+		$row = $smcFunc['db_fetch_assoc']($dbresult);
+		$totaltags = $row['total'];
+		$smcFunc['db_free_result']($dbresult);
+
+		// Check Tag restrictions
+		$tags = explode(',',htmlspecialchars($_REQUEST['tags'],ENT_QUOTES));
+
+		if($totaltags < $modSettings['smftags_set_maxtags'])
+		{
+			$tagcount = 0;
+			foreach($tags as $tag)
+			{
+			
+				$tag = trim($tag);
+				$tag = strtolower($tag);
+				
+				if($tagcount >= $modSettings['smftags_set_maxtags'])
+					continue;
+
+
+				if(empty($tag))
+					continue;
+
+				//Check min tag length	
+				if (strlen($tag) < $modSettings['smftags_set_mintaglength'])
+					continue;
+				//Check max tag length
+				if (strlen($tag) > $modSettings['smftags_set_maxtaglength'])
+					continue;
+
+				//Insert The tag
+				$dbresult = $smcFunc['db_query']('', "
+				SELECT 
+					ID_TAG 
+				FROM {db_prefix}tags 
+				WHERE tag = '$tag'");
+				
+				if ($smcFunc['db_affected_rows']() == 0)
+				{
+					//Insert into Tags table
+					$smcFunc['db_query']('', "INSERT INTO {db_prefix}tags
+						(tag, approved)
+					VALUES ('$tag',1)");	
+					$ID_TAG = $smcFunc['db_insert_id']("{db_prefix}tags",'ID_TAG');
+					//Insert into Tags log
+					$smcFunc['db_query']('', "INSERT INTO {db_prefix}tags_log
+						(ID_TAG,ID_TOPIC, ID_MEMBER)
+					VALUES ($ID_TAG,$topic,$user_info[id])");
+
+					$tagcount++;
+				}
+				else 
+				{
+					$row = $smcFunc['db_fetch_assoc']($dbresult);
+					$ID_TAG = $row['ID_TAG'];
+					$dbresult2= $smcFunc['db_query']('', "
+					SELECT 
+						ID FROM {db_prefix}tags_log 
+					WHERE ID_TAG  =  $ID_TAG  AND ID_TOPIC = $topic");
+					if ($smcFunc['db_affected_rows']() != 0)
+					{
+						continue;
+
+					}
+					$smcFunc['db_free_result']($dbresult2);
+					//Insert into Tags log
+
+					$smcFunc['db_query']('', "INSERT INTO {db_prefix}tags_log
+						(ID_TAG,ID_TOPIC, ID_MEMBER)
+					VALUES ($ID_TAG,$topic,$user_info[id])");
+					$tagcount++;
+
+				}
+				$smcFunc['db_free_result']($dbresult);
+			}
+		}
+	}
+	
+	//End Tagging System
+	
+	
+]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Display.php">
+	<operation>
+		<search position="before"><![CDATA[// Add 1 to the number of views of this topic.
+	if (empty($_SESSION['last_read_topic']) || $_SESSION['last_read_topic'] != $topic)
+	{
+		$smcFunc['db_query']('', '
+			UPDATE {db_prefix}topics
+			SET num_views = num_views + 1
+			WHERE id_topic = {int:current_topic}',
+			array(
+				'current_topic' => $topic,
+			)
+		);
+
+		$_SESSION['last_read_topic'] = $topic;
+	}]]></search>
+	<add><![CDATA[
+	//Tagging System
+	$dbresult= $smcFunc['db_query']('', "
+	SELECT 
+		t.tag,l.ID,t.ID_TAG 
+	FROM {db_prefix}tags_log as l, {db_prefix}tags as t 
+	WHERE t.ID_TAG = l.ID_TAG && l.ID_TOPIC = $topic");
+		$context['topic_tags'] = array();
+		 while($row = $smcFunc['db_fetch_assoc']($dbresult))
+			{
+				$context['topic_tags'][] = array(
+				'ID' => $row['ID'],
+				'ID_TAG' => $row['ID_TAG'],
+				'tag' => $row['tag'],
+				);
+		}
+	$smcFunc['db_free_result']($dbresult);
+	//End Tagging System
+]]></add>
+	</operation>
+</file>
+<file name="$themedir/Display.template.php">
+	<operation>
+		<search position="replace"><![CDATA[// Show the lower breadcrumbs.]]></search>
+		<add><![CDATA[
+		
+		
+		// Tagging System
+			echo '
+			<div class="clearfix windowbg largepadding">
+
+
+				<b>', $txt['smftags_topic'], '</b>';
+
+
+
+				foreach ($context['topic_tags'] as $i => $tag)
+				{
+					echo '<a href="' . $scripturl . '?action=tags;tagid=' . $tag['ID_TAG']  . '">' . $tag['tag'] . '</a>&nbsp;';
+					if(!$context['user']['is_guest'] && allowedTo('smftags_del'))
+					echo '<a href="' . $scripturl . '?action=tags;sa=deletetag;tagid=' . $tag['ID']  . '"><font color="#FF0000">[X]</font></a>&nbsp;';
+
+				}
+
+				global $topic;
+				if(!$context['user']['is_guest'] && allowedTo('smftags_add'))
+				echo '
+				&nbsp;<a href="' . $scripturl . '?action=tags;sa=addtag;topic=',$topic, '">' . $txt['smftags_addtag'] . '</a>';
+
+			echo '
+				</div>';
+		
+		
+		
+		
+		// End Tagging System
+		
+		// Show the lower breadcrumbs.
+		
+		]]></add>
+	</operation>
+</file>
+<file name="$sourcedir/Admin.php">
+	<operation>
+		<search position="after"><![CDATA[				'current_theme' => array(
+					'label' => $txt['theme_current_settings'],]]></search>
+		<add><![CDATA[
+				'tags' => array(
+					'label' => $txt['smftags_admin'],
+					'file' => 'Tags2.php',
+					'function' => 'TagsMain',
+					'custom_url' => $scripturl . '?action=admin;area=tags;sa=admin',
+					'icon' => 'server.gif',
+					'subsections' => array(
+						'admin' => array($txt['smftags_settings']),
+					),
+				),
+]]></add>
+	</operation>
+</file>
+
+<file name="$sourcedir/RemoveTopic.php">
+	<operation>
+		<search position="after"><![CDATA[$smcFunc['db_query']('', '
+		DELETE FROM {db_prefix}log_search_subjects
+		WHERE id_topic IN ({array_int:topics})',
+		array(
+			'topics' => $topics,
+		)
+	);]]></search>
+		<add><![CDATA[
+		
+		// Tagging System for Topics
+				$smcFunc['db_query']('', '
+						DELETE FROM {db_prefix}tags_log 
+						WHERE id_topic IN ({array_int:topics})',
+						array(
+							'topics' => $topics,
+						)
+		// End Tagging System for Topics
+	);
+]]></add>
+	</operation>
+</file>
+
+<file name="$sourcedir/Subs-Editor.php">
+	<operation>
+		<search position="replace"><![CDATA[// These are all registered types.
+	$searchTypes = array(]]></search>
+		<add><![CDATA[// These are all registered types.
+	$searchTypes = array(
+		'tags' => 'Tags',
+		
+]]></add>
+	</operation>
+	<operation>
+		<search position="after"><![CDATA[
+?>]]></search>
+<add><![CDATA[
+function AutoSuggest_Search_Tags()
+{
+	global $user_info, $txt, $smcFunc;
+
+	$_REQUEST['search'] = trim($smcFunc['strtolower']($_REQUEST['search'])) . '*';
+	$_REQUEST['search'] = strtr($_REQUEST['search'], array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
+
+	// Find tags
+	$request = $smcFunc['db_query']('', '
+		SELECT id_member, real_name
+		FROM {db_prefix}tags
+		WHERE tag LIKE {string:search} 
+		LIMIT ' . (strlen($_REQUEST['search']) <= 2 ? '100' : '800'),
+		array(
+			'search' => $_REQUEST['search'],
+		)
+	);
+	$xml_data = array(
+		'tags' => array(
+			'identifier' => 'tag',
+			'children' => array(),
+		),
+	);
+	while ($row = $smcFunc['db_fetch_assoc']($request))
+	{
+		$xml_data['tags']['children'][] = array(
+			'attributes' => array(
+				'id' => $row['id_tag'],
+			),
+			'value' => $row['tag'],
+		);
+	}
+	$smcFunc['db_free_result']($request);
+
+	return $xml_data;
+}
+		
+]]></add>
+	</operation>
+
+
+</file>
+</modification>
