@@ -21,26 +21,26 @@ Predlagam, da se instalira testni forum, na katerem bomo lahko testirali app.
 
 Spet lahko ustanovimo torke zvecer - najmanj 4h - da se projekt spelje do konca. Pavsalna ocena je 150 ur skupnega programiranja vseh programerjev.
 
-Verzija 1.0 taskmanager:
+===Verzija 1.0 taskmanager:===
 
 BAZA - urejena kronolosko 
+<table>
+ <tr> <td> id_todo     </td> <td> INT(10) PRIM auto_incr      </td> <td> </td> </tr>
+ <tr> <td>id_todo_sec  </td> <td> INT(10)                     </td> <td>  default = 0 poveca se s st izvrsevalcev </td> </tr>
+ <tr> <td>id_autor     </td> <td>INT(10)                      </td> <td>  avtor naloge </td> </tr>
+ <tr> <td>task         </td> <td>CHAR(50)                     </td> <td>  ime naloge</td> </tr>
+ <tr> <td>project      </td> <td>CHAR(50)                     </td> <td>  h kateremu projektu pase</td> </tr>
+ <tr> <td>description  </td> <td>CHAR(250)                    </td> <td>  opis naloge</td> </tr>
+ <tr> <td>start_date   </td> <td>DATE                         </td> <td>  kdaj je treba nalogo zaceti izvrsevati</td> </tr>
+ <tr> <td>duedate      </td> <td>DATE                         </td> <td>  rok </td></tr>
+ <tr> <td>priority     </td> <td>TINYINT(2)                   </td> <td>  0 - low, 1 - normal, 2 - high </td></tr>
 
- id_todo       INT(10) PRIM auto_increment   |  
- id_todo_sec   INT(10)                       |  default = 0 poveca se s st izvrsevalcev
- id_autor      INT(10)                       |  avtor naloge
- task          CHAR(50)                      |  ime naloge
- project       CHAR(50)                      |  h kateremu projektu pase
- description   CHAR(250)                     |  opis naloge
- start_date    DATE                          |  kdaj je treba nalogo zaceti izvrsevati
- duedate       DATE                          |  rok
- priority      TINYINT(2)                    |  0 - low, 1 - normal, 2 - high
+ <tr> <td>is_did       </td> <td>TINYINT(2)                   </td> <td>  stanje: 0prazno,1vteku,2zakljuceno,3preklic</td> </tr>
+ <tr> <td>id_member    </td> <td>INT(10)                      </td> <td>  izvrsevalec naloge </td></tr>
 
- is_did        TINYINT(2)                    |  stanje: 0prazno,1vteku,2zakljuceno,3preklic
- id_member     INT(10)                       |  izvrsevalec naloge
-
- end_date      DATE                          |  datum zakljucka naloge
- end_comment   CHAR(250)                     |  komentar ob zakljucku naloge
-
+ <tr> <td>end_date     </td> <td>DATE                         </td> <td>  datum zakljucka naloge</td> </tr>
+ <tr> <td>end_comment  </td> <td>CHAR(250)                    </td> <td>  komentar ob zakljucku naloge</td> </tr>
+</table>
 AKCIJE
 
  add_task
@@ -59,11 +59,11 @@ Verzija 2.0
 
 DONE
 
-  datebase.php  - ustvarjena je baza
+ - datebase.php  - ustvarjena je baza
 
 TO DO
   
-  package-info.xml
-  modification.xml
-  TaskList.xml      (akcije)
-  TaskList.template.php   (views)
+ - package-info.xml
+ - modification.xml
+ - TaskList.xml      (akcije)
+ - TaskList.template.php   (views)
