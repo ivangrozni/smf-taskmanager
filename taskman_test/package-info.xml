@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>iskra:TaskManager</id>
+	<name>TaskManager</name>
+	<version>1.0</version>
+	<type>modification</type>
+
+	<install for="2.0 RC3, 2.0 - 2.0.99">
+		<readme parsebbc="true" type="file">readme.txt</readme>
+		<modification>modification.xml</modification>
+		<require-file name="TaskManList.php" destination="$sourcedir" />
+		<require-file name="TaskManList.template.php" destination="$themedir" />
+		<database>database.php</database>
+		<redirect url="$scripturl?action=todo" timeout="3000">redirect.txt</redirect>
+	</install>
+
+	<uninstall for="2.0 RC3, 2.0 - 2.0.99">
+		<readme type="inline">This will uninstall To-Do List. Do you understand me? :( Are you sure?</readme>
+		<modification reverse="true">modification.xml</modification>
+		<remove-file name="$sourcedir/TaskManList.php" />
+		<remove-file name="$themedir/TaskManList.template.php" />
+	</uninstall>
+</package-info>
