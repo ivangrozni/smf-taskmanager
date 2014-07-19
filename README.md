@@ -25,21 +25,21 @@ Verzija 1.0 taskmanager:
 
 BAZA - urejena kronolosko 
 
-id_todo       INT(10) PRIM auto_increment   |  
-id_todo_sec   INT(10)                       |  default = 0 poveca se s st izvrsevalcev
-id_autor      INT(10)                       |  avtor naloge
-task          CHAR(50)                      |  ime naloge
-project       CHAR(50)                      |  h kateremu projektu pase
-description   CHAR(250)                     |  opis naloge
-start_date    DATE                          |  kdaj je treba nalogo zaceti izvrsevati
-duedate       DATE                          |  rok
-priority      TINYINT(2)                    |  0 - low, 1 - normal, 2 - high
+ id_todo       INT(10) PRIM auto_increment   |  
+ id_todo_sec   INT(10)                       |  default = 0 poveca se s st izvrsevalcev
+ id_autor      INT(10)                       |  avtor naloge
+ task          CHAR(50)                      |  ime naloge
+ project       CHAR(50)                      |  h kateremu projektu pase
+ description   CHAR(250)                     |  opis naloge
+ start_date    DATE                          |  kdaj je treba nalogo zaceti izvrsevati
+ duedate       DATE                          |  rok
+ priority      TINYINT(2)                    |  0 - low, 1 - normal, 2 - high
 
-is_did        TINYINT(2)                    |  stanje: 0prazno,1vteku,2zakljuceno,3preklic
-id_member     INT(10)                       |  izvrsevalec naloge
+ is_did        TINYINT(2)                    |  stanje: 0prazno,1vteku,2zakljuceno,3preklic
+ id_member     INT(10)                       |  izvrsevalec naloge
 
-end_date      DATE                          |  datum zakljucka naloge
-end_comment   CHAR(250)                     |  komentar ob zakljucku naloge
+ end_date      DATE                          |  datum zakljucka naloge
+ end_comment   CHAR(250)                     |  komentar ob zakljucku naloge
 
 AKCIJE
 
