@@ -1,0 +1,142 @@
+Taskmanager:
+============
+
+tables: - Tasks
+	- Projects
+
+ Tasks: 01 id_prim !     INT       AUTO_INC
+ 	02 id_sec  	 INT                   # DEFAULT id_sek=id_prim - iste zadolzitve, ki jih opravljajo razlicni ljudje imajo enak id_sec
+	03 id_proj	 INT
+	04 id_author	 INT
+	05 t_name	 CHAR(50)
+	06 t_desc	 CHAR(250)
+	07 in_date	 TIMESTAMP
+	08 deadline	 DATETIME
+	09 priority	 INT
+
+	10 state	 INT	DEFAULT=0
+
+	11 start_date	 DATETIME
+	12 id_member	 INT
+	
+	13 end_date	DATETIME
+	14 end_comment	CHAR(250)
+
+ Projects: 01 id_proj	INT
+ 	   02 p_name	CHAR(50)
+	   03 p_desc	CHAR(250)
+	   04 id_coord	INT			# koordinator
+	   05 start	DATE
+	   06 deadline	DATE
+	   07 end	DATE
+
+Actions: - add_project
+	 - add_task
+	 - acc_task
+	 - end_task
+
+Views: - show_free_tasks
+       - show_my_tasks
+       - show_proj
+       - show_proj_tasks
+       - show_timeline               # Vprasanje kaj bo
+
+
+######
+AKCIJE
+######
+
+
+ add_project
+ ===========
+
+ INSERT INTO Projects (p_name, p_desc, id_coord, start, deadline) VALUES ( "ime", "opis", id_uporobnika, datum_zacetka, rok);
+
+ add_task
+ ========
+
+ INSERT INTO Tasks (id_proj, id_author*, t_name, t_desc, deadline, priority) VALUES ( NULL ali proj, avtor, ime, opis, rok, pomembnost);
+
+ # avtor je določen z uporabnikom, ki vnaša, in_date pa je timestamp. Stanje je DEFAULT = 0, tako da je ok.
+       
+ acc_task
+ ========
+
+ 1) IF state == 0:
+
+    UPDATE Tasks SET start_date = ...
+    	   	     id_member = Y        # Y določen z uporabnikom, ki je izbral zadolzitev
+		     state = 1
+        WHERE id_prim = X;                # X določen z zadolžitvijo, ki je izbrana
+
+ 2) ELSE IF state == 1:
+   
+    INSERT INTO Tasks (id_sec*, id_proj*, id_author*, t_name*, t_desc*, in_date*, deadline*, priority*, state, id_member, start_date) VALUES
+        ( ... );
+    # id_sec = id_sec kliknjene zadolžitve, * se skopira, state = 1, id_member - kdor je kliknil, start_date = timestamp
+
+ 3) ELSE: Zadolžitev je zaključena
+
+ end_task
+ ========
+
+ UPDATE Tasks SET state = 2, 3, 4...
+ 	      	  end_date = timestamp
+		  end_comment = "komentar"
+      WHERE id_prim == X AND id_member == Y;                 # X Določen s klikom, Y določen z uporabnikom (ne moreš zaključiti taska koga drugega)
+
+
+#####
+VIEWS
+#####
+
+ show_all_tasks
+ ==============
+
+ SELECT (t_name, p_name, deadline, state, priority, author) FROM Tasks T1
+    INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj
+    INNER JOIN Members T3 IN T1.id_author = T3.id_member
+    GROUP BY id_sec;
+
+ show_free_tasks
+ ===============
+
+ SELECT (t_name, p_name, deadline, state, priority, author) FROM Tasks T1 
+     INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj
+     INNER JOIN Members T3 IN T1.id_author = T3.id_member
+     	   WHERE state = 0 OR state = 1
+	   GROUP BY id_sec;
+
+ # Tukaj še ni potrebe, da veš kdo task izvaja. To izveš v podrobnostih zadolžitve/taska.
+ # Če klikneš na task, se morajo izpisati podrobnosti za samo ta task.
+
+ show_task
+ =========
+
+ SELECT (t_name, p_name, t_desc, deadline, state, author) FROM Tasks
+     WHERE id_prim = X;                   # X določen glede na to, kateri task klikneš
+
+ SELECT COUNT(*) FROM Tasks WHERE id_sec = X;   # presteje koliko uporabnikov dela na nekem tasku
+ 		      	    	  	   	# Tole se more izpisat k prejšnjemu querry-ju
+
+ SELECT member FROM Tasks WHERE id_sec = X;     # Izpiše ljudi, ki izvajajo zadolžitev
+
+  # nr_members mora sešteti zadolžitve z enakim id_sec
+
+ show_my_tasks
+ =============
+
+ SELECT (t_name, p_name, deadline) FROM Tasks T1
+     INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj
+     	   WHERE id_member = X;                        # X določen z uporabnikom, SORT BY ?
+
+ show_proj
+ =========
+ SELECT (p_name, start_date, koordinator, deadline) FROM Projects T1
+ 	INNER JOIN Members T2 ON T1.coord = T2.member;
+
+ # V tabeli mora biti Project kot link. Klik nanj odpre okno, ki pokaze njegov description in zadolžitve tega projekta.
+
+ show_proj_tasks
+ ===============
+
