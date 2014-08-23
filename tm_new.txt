@@ -96,6 +96,7 @@ VIEWS
  SELECT (t_name, p_name, deadline, state, priority, author) FROM Tasks T1
     INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj
     INNER JOIN Members T3 IN T1.id_author = T3.id_member
+    ORDER BY deadline ASC
     GROUP BY id_sec;
 
  show_free_tasks
@@ -113,6 +114,8 @@ VIEWS
  show_task
  =========
 
+ 1) IF state < 2:
+
  SELECT (t_name, p_name, t_desc, deadline, state, author) FROM Tasks
      WHERE id_prim = X;                   # X določen glede na to, kateri task klikneš
 
@@ -123,6 +126,11 @@ VIEWS
 
   # nr_members mora sešteti zadolžitve z enakim id_sec
 
+ 2) ELSE IF state >= 2:
+
+ SELECT (t_name, p_name, t_desc, start_date, deadline, state, author, end_date, end_comment) FROM Tasks
+     WHERE id_prim = X;                   # X določen glede na to, kateri task klikneš
+
  show_my_tasks
  =============
 
@@ -132,6 +140,7 @@ VIEWS
 
  show_proj
  =========
+
  SELECT (p_name, start_date, koordinator, deadline) FROM Projects T1
  	INNER JOIN Members T2 ON T1.coord = T2.member;
 
@@ -139,4 +148,9 @@ VIEWS
 
  show_proj_tasks
  ===============
+ 
+ SELECT (t_name, deadline, priority, state, author) FROM Tasks
+    INNER JOIN Members T3 IN T1.id_author = T3.id_member
+       GROUP BY id_sec;
 
+ # Spet klik na task pomeni execute show_task();
