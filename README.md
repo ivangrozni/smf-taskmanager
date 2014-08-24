@@ -2,6 +2,22 @@ Taskmanager app za iskrin forum
 
 http://wiki.studentska-iskra.org/index.php?title=TaskManagerApp
 
+______________________________________________________________
+
+DONE:
+ - zasnova baze (tm_new.txt)
+ - zasnova querry-jev (tm_new.txt)
+
+TO DO:
+ - Ustvari bazo in jo populiraj (3 tabele - Tasks, Projects, Members)
+ - Preveri Querry-je
+ - Popravi Querry-je
+ - Vgradi Querry-je v PHP funkcije
+ - Uvozi PHP funkcije v smf-mod
+
+______________________________________________________________
+
+
 DONE:
    - baza je ustvarjena in populirana
 
@@ -65,5 +81,5 @@ TO DO
   
  - package-info.xml
  - modification.xml
- - TaskList.xml      (akcije)
+ - TaskList.php      (akcije)
  - TaskList.template.php   (views)
