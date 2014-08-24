@@ -91,6 +91,8 @@ AKCIJE
  # se vrednosti iz prve naloge (id_sec, projekt, avtor, ime, opis, datum_vnosa, rok, pomembnost in stanje), doda pa se nov datum začetka
  # in uporabnika, ki nalogo izvršuje.
 
+ # Torej, koordinator projekta ima možnost, da dodaja uporabnikom določa naloge (da iskraše javlja na naloge:).
+
  end_task
  ========
 
