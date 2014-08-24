@@ -134,6 +134,9 @@ VIEWS
  # Zraven vseh so gumbki za sprejetje nadloge, ki te najprej pripeljejo na show_task,
  # torej podrobnosti naloge.
 
+ # Delujoč Querry:
+ SELECT t_name AS zadolzitev, deadline AS rok, state AS stanje, priority AS pomembnost, name AS avtor, p_name AS projekt FROM Tasks T1 INNER JOIN Members T3 ON T1.id_author=T3.id_member INNER JOIN Projects T2 ON T1.id_proj=T2.id_proj;
+
  show_task
  =========
 
