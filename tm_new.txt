@@ -5,7 +5,7 @@ tables: - Tasks
 	- Projects
 
  Tasks: 01 id_prim !     INT       AUTO_INC
- 	02 id_sec  	 INT                   # DEFAULT id_sek=id_prim - iste zadolzitve, ki jih opravljajo razlicni ljudje imajo enak id_sec
+ 	02 id_sec  	 INT       TRIGGER            # DEFAULT id_sek=id_prim - iste zadolzitve, ki jih opravljajo razlicni ljudje imajo enak id_sec
 	03 id_proj	 INT
 	04 id_author	 INT
 	05 t_name	 CHAR(50)
@@ -17,7 +17,7 @@ tables: - Tasks
 	10 state	 INT	DEFAULT=0
 
 	11 start_date	 DATETIME
-	12 id_member	 INT
+	12 id_worker	 INT
 	
 	13 end_date	DATETIME
 	14 end_comment	CHAR(250)
@@ -48,23 +48,32 @@ AKCIJE
 ######
 
 
- add_project
+ add_project    - OK!
  ===========
 
  INSERT INTO Projects (p_name, p_desc, id_coord, start, end) VALUES ( "ime", "opis", id_uporobnika, datum_zacetka, rok);
 
- # Ustvari nov projekt!
+ # Ustvari nov projekt! DELA!
 
- add_task
+ add_task      - OK!
  ========
 
- INSERT INTO Tasks (id_proj, id_author*, t_name, t_desc, deadline, priority) VALUES ( NULL ali proj, avtor, ime, opis, rok, pomembnost);
+ INSERT INTO Tasks (id_proj, id_author*, t_name, t_desc, in_date*, deadline, priority) VALUES ( NULL ali proj, avtor, ime, opis, datum_vnosa, rok, pomembnost);
 
  # avtor je določen z uporabnikom, ki vnaša, in_date pa je timestamp. Stanje je DEFAULT = 0, tako da je ok.
+ # in_date nisem dal na timestamp, ker menim, da bi imel s tem samo tezave.
+ # Sigurno ima php funkcijo trenutnega časa in gre to pač notri...
  # Ob ustbvaritvi se ne zapolnejo mesta start_date, id_member, end_date, end_comment. start_date in id_member se zapolnita ob 
  # sprejetju naloge, zadnja dva pa ob zaključku. Izpolni jih oseba, ki nalogo razrešuje.
+
+ # Delujoč:
+ INSERT INTO Tasks (id_proj, id_author, t_name, t_desc, in_date, deadline, priority) VALUES ( 1, 6, 'airsoft', 'oprema, koordiancija', '2014-05-01', '2014-08-04', 1);
+
+ SELECT state FROM Tasks WHERE id_prim = X;                   # To bo potem spremenljivka, ki bo sla v php-jev if!
+ # if state=0:
+ UPDATE Tasks SET id_sec = id_prim WHERE id_prim = X;
        
- acc_task
+ acc_task       - OK!
  ========
 
  SELECT state FROM Tasks WHERE id_prim = X;      # id_prim je določen glede na izbrano (kliknjeni gumb accept) zadolžitev.
@@ -76,9 +85,12 @@ AKCIJE
 		     state = 1
         WHERE id_prim = X;                # X določen z zadolžitvijo, ki je izbrana
 
+    UPDATE Tasks SET start_date = '2014-08-25', id_worker=9, state=1 WHERE id_prim=5;
+
  2) ELSE IF state == 1:
-   
-    INSERT INTO Tasks (id_sec*, id_proj*, id_author*, t_name*, t_desc*, in_date*, deadline*, priority*, state, id_member, start_date) VALUES
+    
+    SELECT id_sec, id_proj, id_author, t_name, t_desc, in_date, deadline, priority, state FROM Tasks WHERE id_prim=X;      # Php spremenljivke dobije te vrednosti
+    INSERT INTO Tasks (id_sec*, id_proj*, id_author*, t_name*, t_desc*, in_date*, deadline*, priority*, state, id_worker, start_date) VALUES
         ( ... );
     # id_sec = id_sec kliknjene zadolžitve, * se skopira, state = 1, id_member - kdor je kliknil, start_date = timestamp
 
@@ -103,6 +115,25 @@ AKCIJE
 
  # Zaključek naloge. Izpolni uporabik, ki je zadolžitev delal. Izpolni samo komentar, datum zaključka se izpolni sam.
 
+ adm_del_task
+ ============
+ # funkcija za admina, da bo odstanjeval napake
+ 
+ DELETE FROM Tasks WHERE id_prim = X;
+
+ adm_del_proj
+ ============
+ # funkcija za admina foruma, da bo lahko pobrisal napačne vnose
+
+ DELETE FROM Projects WHERE id_proj = X;
+
+ adm_edit_task
+ =============
+ # funkcija za admina, da lahko popravi karkoli v tabeli
+ # a se da to že kako drugače v forumu na splošno narest (z dostopom do baze)
+ adm_edit_proj
+ =============
+ # funkcija za admina, da lahko popravi karkoli v projektu
 
 #####
 VIEWS
@@ -120,10 +151,13 @@ VIEWS
  # Prikaže vse zadolžitve (ne glede na stanje). Istih zadolžitev z razlićnimi izvrševalci ne prikaže. 
  # Zraven je še gumbek za podrobnosti naloge - show_task() funkcija.
 
+ # ! GROUP BY id_sec NE DELA ! Ker ni AUTO_INCREMENT, je DEFAULT vrednost 0.
+ SELECT t_name AS zadolzitev, deadline AS rok, state AS stanje, priority AS pomembnost, name AS avtor, p_name AS projekt FROM Tasks T1 INNER JOIN Members T3 ON T1.id_author=T3.id_member INNER JOIN Projects T2 ON T1.id_proj=T2.id_proj;
+
  show_free_tasks
  ===============
 
- SELECT (t_name, p_name, deadline, state, priority, author) FROM Tasks T1 
+ SELECT (t_name, p_name, deadline, state, priority, name) FROM Tasks T1 
      INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj
      INNER JOIN Members T3 IN T1.id_author = T3.id_member
      	   WHERE state = 0 OR state = 1
@@ -135,9 +169,9 @@ VIEWS
  # torej podrobnosti naloge.
 
  # Delujoč Querry:
- SELECT t_name AS zadolzitev, deadline AS rok, state AS stanje, priority AS pomembnost, name AS avtor, p_name AS projekt FROM Tasks T1 INNER JOIN Members T3 ON T1.id_author=T3.id_member INNER JOIN Projects T2 ON T1.id_proj=T2.id_proj;
+ SELECT t_name AS zadolzitev, p_name AS projekt, deadline AS rok, state AS stanje, priority AS pomembnost, name AS avtor FROM Tasks T1 INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj INNER JOIN Members T3 ON T1.id_author = T3.id_member WHERE state<2 GROUP BY id_sec ORDER BY deadline;
 
- show_task
+ show_task    - OK!
  =========
 
  1) IF state < 2:
@@ -160,7 +194,9 @@ VIEWS
  # Prikaže posamezen podrobnosti izbrane zadolžitve. Če je stanje 0 ali 1, mora biti zraven gumbek za sprejetje naloge.
  # acc_task() funkcija. Argument acc_task(id_prim) je primarni id zadolžitve. 
 
- show_my_tasks
+ SELECT t_name AS zadolzitev, p_name AS projekt, t_desc AS opis, deadline AS rok, state AS stanje, name AS avtor FROM Tasks T1 INNER JOIN Projects T2 ON T1.id_proj=T2.id_proj INNER JOIN Members T3 ON T1.id_author=T3.id_member WHERE id_prim=X;
+
+ show_my_tasks    - OK!
  =============
 
  SELECT (t_name, p_name, deadline) FROM Tasks T1
@@ -170,15 +206,26 @@ VIEWS
  # Prikaže zadolžitve posameznega uporabnika.
  # Pri tistih s stanjem 0 ali 1 mora biti zraven še gumb za zaključek naloge.
 
- show_proj
+ SELECT t_name AS zadolzitev, p_name AS projekt, deadline AS rok FROM Tasks T1 INNER JOIN Projects T2 ON T1.id_proj=T2.id_proj WHERE id_worker=X;
+
+ show_proj    - OK!
  =========
 
  SELECT (p_name, start_date, koordinator, deadline) FROM Projects T1
- 	INNER JOIN Members T2 ON T1.coord = T2.member;
+  INNER JOIN Members T2 ON T1.coord = T2.member;
 
  # V tabeli mora biti Project kot link. Klik nanj odpre okno, ki pokaže njegov description in zadolžitve tega projekta.
+ 
+ # Delujoč Querry:
+ SELECT p_name AS projekt, start AS zacetek, name AS koordinator, end AS rok FROM Projects T1 INNER JOIN Members T2 ON T1.id_coord = T2.id_member;
 
- show_proj_tasks
+ # Tukaj bi bilo dobro vstavit še število taskov pri posameznem projektu.
+ SELECT COUNT(*) FROM Tasks WHERE id_proj=X;
+
+ # Delujoč:
+ SELECT p_name AS projekt, p_desc AS opis, start, end AS rok, name AS koordinator FROM Projects T1 INNER JOIN Members T2 ON T1.id_coord=T2.id_member;
+
+ show_proj_tasks   - OK!
  ===============
  
  SELECT (t_name, deadline, priority, state, author) FROM Tasks
@@ -188,8 +235,36 @@ VIEWS
  # Prikaže zadolžitve posameznega projekta.
  # Spet klik na task pomeni execute show_task();
 
+ SELECT t_name AS zadolzitev, p_name AS projekt, deadline AS rok, state AS stanje, priority AS pomembnost, name AS avtor FROM Tasks T1 INNER JOIN Projects T2 ON T1.id_proj = T2.id_proj INNER JOIN Members T3 ON T1.id_author = T3.id_member WHERE T1.id_proj=X GROUP BY id_sec ORDER BY deadline;
 
 ____________________________________________________
+
+# Na tabeli Tasks je ustvarjen trigger:
+# Ob vnosu v tabelo preveri ali je stanje 0, in če je, poveča sekundarni id za 1.
+
+# Ob sprejetju naloge, ki jo je že prej sprejel nekdo drug state ostane enak :)
+# Upam samo, da se bo triger dalo incorporirat v smf forum.
+
+mysql> DELIMITER //
+mysql> CREATE TRIGGER ai_id_sec
+    -> AFTER INSERT ON Tasks
+    -> FOR EACH ROW BEGIN
+    -> IF NEW.state=0 THEN
+    -> UPDATE Tasks SET id_sec=id_sec+1;
+    -> END IF;
+    -> END;//
+Query OK, 0 rows affected (0.52 sec)
+mysql> DELIMITER ;
+
+ # AHA - pa najbrž je v trigger bolje dodati, da je enak id_prim kot pa id_sec + 1,
+ # ker bodo potem id_sec poravnani s prvim id_prim
+
+ # Lahko bi dodal tudi ELSE v triger, ki INSERT-a v Tasks
+ # nov event s prepisanimi vrednostmi id_sec, avtor, projekt...
+
+
+
+
 
   created_on TIMESTAMP DEFAULT 0,
   changed_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP
