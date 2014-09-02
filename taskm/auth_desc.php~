@@ -1,0 +1,21 @@
+<?php include 'header.php'?>
+<?php
+$id_member = $_GET['id_member'];
+
+//podatki o memberju (kasneje bo vec kot samo ime)
+$q_basic_info = "SELECT name FROM Members WHERE id_member = $id_member";
+$qr_basic_info = mysqli_query($con, $q_basic_info);
+while ($row = mysqli_fetch_array($qr_basic_info)) {
+    $member_name = $row['name'];
+}
+
+echo "<h2>Epska zgodovina osebe " .$member_name ."</h2>";
+
+$q_worker_open = "SELECT "
+
+
+
+
+
+?>
+<?php include 'footer.php'?>
