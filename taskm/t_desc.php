@@ -21,18 +21,16 @@ while($row = mysqli_fetch_array($t_result)){
     echo "<h3>Opis: </h3>" .$row['t_desc'] . "<br>";
 
     if ($state == 0){
-        
+
+        $q_mem = "SELECT * FROM Members "; // Tukaj bo potem samo name in id_prim
+        $result_member = mysqli_query($con, $q_mem);
         echo "<form method=\"post\" action=\"acc_task0.php\">";
-        echo "<select name=\"id_worker\">";
-        echo "<option value=\"1\">Marx</option>";
-        echo "<option value=\"2\">Lenin</option>";
-        echo "<option value=\"3\">Rosa</option>";
-        echo "<option value=\"4\">Kautsky</option>";
-        echo "<option value=\"5\">Castro</option>";
-        echo "<option value=\"6\">Marko P</option>";
-        echo "<option value=\"7\">K Stane</option>";
-        echo "<option value=\"12\">Novelli</option>";
-        echo "</select>";
+        echo "Delavec: <select name=\"id_worker\">"; // izberi avtorja
+        while ($mem_row = mysqli_fetch_array($result_member)) {
+            echo "<option value=\"".$mem_row['id_member']."\"> ".$mem_row['name']."</option>";
+        }
+        echo "</select><br><br>";//SVEDER
+       
         // tole bo potem hidden, ker doloca userja oz workerja
         echo "<input type=\"hidden\" name=\"id_prim\" value=$id_prim >";
         echo "<input type=\"hidden\" name=\"t_name\" value=$t_name >";
@@ -52,22 +50,20 @@ while($row = mysqli_fetch_array($t_result)){
         //echo $num_rows; // debuged
         echo "<h4>Izvajalci (".$num_rows."): </h4> <ul>";
         while ($inrow = mysqli_fetch_array($result_nr)) {
-            echo "<li>" . $inrow['name'] . " ( ".$inrow['start_date']." )</li>";
+            $id_member = $inrow['id_member'];
+            echo "<li><a href=\"auth_desc.php?id_member=$id_member\"> " . $inrow['name'] . "</a> (Zacetek: ".$inrow['start_date']." )</li>";
         }
         echo "</ul>";
 
         // FORMA za vnos podatkov
         echo "<form method=\"post\" action=\"acc_task1.php\">";
-        echo "<select name=\"id_worker\">";
-        echo "<option value=\"1\">Marx</option>";
-        echo "<option value=\"2\">Lenin</option>";
-        echo "<option value=\"3\">Rosa</option>";
-        echo "<option value=\"4\">Kautsky</option>";
-        echo "<option value=\"5\">Castro</option>";
-        echo "<option value=\"6\">Marko P</option>";
-        echo "<option value=\"7\">K Stane</option>";
-        echo "<option value=\"12\">Novelli</option>";
-        echo "</select>";
+        $q_mem = "SELECT * FROM Members "; // Tukaj bo potem samo name in id_prim
+        $result_member = mysqli_query($con, $q_mem);
+        echo "Delavec: <select name=\"id_worker\">"; // izberi avtorja
+        while ($mem_row = mysqli_fetch_array($result_member)) {
+            echo "<option value=\"".$mem_row['id_member']."\"> ".$mem_row['name']."</option>";
+        }
+        echo "</select><br><br>";//SVEDER
         // tole bo potem hidden, ker doloca userja oz workerja
         //echo "<input type=\"hidden\" name=\"id_prim\" value=$id_prim >"; // tale je auto inc...
         echo "<input type=\"hidden\" name=\"id_sec\" value=".$row['id_sec']." >";
@@ -81,35 +77,29 @@ while($row = mysqli_fetch_array($t_result)){
         echo "<input type=\"submit\"  value=\"Sprejmem\">";
         echo "</form>";
         //echo "Sprejmi zadolzitev - link/gumb, ki pripelje do forme stanje = 1";
+        // End task for all:
+
     }
     elseif ($state>=2){ // izpise se izvajalce in njihove commente in kdaj so zakljucili
         $id_sec = $row['id_sec']; //
         $result_nr = mysqli_query($con, "SELECT * FROM Tasks T1 INNER JOIN Members T2 ON T1.id_worker=T2.id_member WHERE id_sec= $id_sec " );
         $num_rows = mysqli_num_rows($result_nr);
 
-        echo "<h4>Izvajalci (".$num_rows."): </h4> <ul>";
+        echo "<h4>Izvajalci (".$num_rows."): </h4> <ul>"; // Tukaj izpise izvajalce
         while ($inrow = mysqli_fetch_array($result_nr)) {
-            echo "<li>" . $inrow['name'] . " ( od: ".$inrow['start_date']." do: ".$inrow['end_date'].") - ".$inrow['end_comment']."  </li>";
+            $id_member = $inrow['id_member'];
+            echo "<li><a href=\"auth_desc.php?id_member=$id_member\" >" . $inrow['name'] . "</a> ( od: ".$inrow['start_date']." do: ".$inrow['end_date'].") - ".$inrow['end_comment']."  </li>";
         }
         echo "</ul>";
-        
-
-
     }
-    
-
 }
 
 echo "<br><br>Fajn bi bilo imeti se koordinatorja projekta zravn LEFT JOIN?";
-
-
 
 //echo "Zacetak projekta:\t". $row['start']."<br>";
 //echo "Konec projekta:\t" . $row['end']."<br>";
 //echo "Koordinator:\t" . $row['name']."<br>";
 //echo "<h3>Opis</h3>\n" . $row['p_desc']."<br>";
 
-
 ?>
-
 <?php include 'footer.php'?>

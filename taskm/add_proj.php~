@@ -1,0 +1,4 @@
+<?php include 'header.php'?>
+
+<?php
+echo "<h2> Nova Projekt </h2>";

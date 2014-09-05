@@ -1,7 +1,7 @@
 <?php include 'header.php'?>
 
 <?php
-echo "<h2> Nova Zadolzitev</h3>";
+echo "<h2> Nova Zadolzitev</h2>";
 
 $id_sec = $_POST['id_sec'];
 $id_proj = $_POST['id_proj'];
@@ -21,7 +21,7 @@ if (mysqli_query($con, $q_str)) {
     if ($rowsAffected == 0){
         echo "Ni sprememb";
     } elseif ($rowsAffected == 1){
-        echo "Uspesno sprejetje naloge.";
+        echo "Uspesno sprejetje ustvarjena naloga $t_name.";
     } elseif ($rowsAffected > 1){
         echo "Spremenjenih je bilo $rowsAffected vrstic. Kontaktiraj administratorja.";
     }

@@ -27,7 +27,7 @@ $num_rows = mysqli_num_rows($result_nr);
    echo "<td><a href=\"proj_desc.php?proj_id=".$id_proj."\">". $row['p_name'] ." </a></td>";
    echo "<td>" .$row['start'] . "</td>";
    echo "<td>" .$row['end'] . "</td>";
-   echo "<td>" .$row['name'] . "</td>";
+   echo "<td><a href=\"auth_desc.php?id_member=".$id_member."\">" .$row['name'] . "</a></td>";
    echo "<td>" .$num_rows . "</td>";
    echo "</tr>";
 }
@@ -44,6 +44,7 @@ echo "<tr> <td><b> id_prim </b></td> <td><b> id_sec </b></td> <td><b>zadolzitev<
 
 while($row = mysqli_fetch_array($result2)) {
     $id_proj = $row['id_proj'];
+$id_member = $row['id_member'];
     $t_id=$row['id_prim'];
     echo "<tr>";
     echo "<td>".$row['id_prim']." </td>";   // debug
@@ -55,7 +56,7 @@ while($row = mysqli_fetch_array($result2)) {
     echo "<td>" .$row['deadline'] . "</td>";
     echo "<td>" .$row['state'] . "</td>";
     echo "<td>" .$row['priority'] . "</td>";
-    echo "<td>" .$row['name'] . "</td>";
+   echo "<td><a href=\"auth_desc.php?id_member=".$id_member."\">" .$row['name'] . "</a></td>";
     echo "</tr>";
 }
 echo "</table>";
