@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.simplemachines.org/xml/package-info">
+<package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
+	<id>Iskra:Delegator</id>
+	<name>Delegator</name>
+	<version>0.1</version>
+	<type>modification</type>
+
+	<install for="2.0 RC3, 2.0 - 2.0.99">
+		<readme parsebbc="true" type="file">readme.txt</readme>
+		<modification>modification.xml</modification>
+		<require-file name="Delegator.php" destination="$sourcedir" />
+		<require-file name="Delegator.template.php" destination="$themedir" />
+		<database>database.php</database>
+		<redirect url="$scripturl?action=todo" timeout="3000">redirect.txt</redirect>
+	</install>
+
+	<uninstall for="2.0 RC3, 2.0 - 2.0.99">
+		<readme type="inline">This will uninstall the Delegator</readme>
+		<modification reverse="true">modification.xml</modification>
+		<remove-file name="$sourcedir/Delegator.php" />
+		<remove-file name="$themedir/Delegator.template.php" />
+	</uninstall>
+</package-info>
