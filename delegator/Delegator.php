@@ -1,12 +1,15 @@
 <?php
 /**********************************************************************************
-* ToDo.php                                                                        *
+* Delegator.php                                                                   *
 ***********************************************************************************
-* To-Do List                                                                      *
+* Delegator                                                                       *
 * =============================================================================== *
-* Software Version:           To-Do List 2.0                                      *
-* Software by:                grafitus (beratdogan@hileci.org)                    *
-* Copyright 2009-? by:        grafitus (beratdogan@hileci.org)                    *
+* Software Version:           Delegator 0.1                                       *
+* Software by:				  Iskra												  *
+*																				  *
+* Original software: 	      To-Do list         								  *
+* Original software by:       grafitus (beratdogan@hileci.org)                    *
+* Copyright 2009-2014 by:     grafitus (beratdogan@hileci.org)                    *
 * Support, News, Updates at:  http://www.simplemachines.org                       *
 ***********************************************************************************
 * This program is free software; you may redistribute it and/or modify it under   *
@@ -20,18 +23,18 @@
 * The latest version can always be found at http://www.simplemachines.org.        *
 **********************************************************************************/
 
-function ToDo()
+function Delegator()
 {
 	global $context, $txt, $scripturl;
 
-	isAllowedTo('view_todo');
+	//isAllowedTo('view_todo');
 
-	loadTemplate('To-DoList');
+	loadTemplate('Delegator');
 
-	$context['page_title'] = $txt['to_do'];
+	$context['page_title'] = $txt['delegator'];
 
 	$subActions = array(
-		'ToDo' => 'ToDoMain',
+		'Delegator' => 'DelegatorMain',
 		'add' => 'add',
 		'add2' => 'add2',
 		'delete' => 'delete',
@@ -39,28 +42,28 @@ function ToDo()
 	);
 
 	if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		$sub_action = 'ToDo';
+		$sub_action = 'Delegator';
 	else
 		$sub_action = $_REQUEST['sa'];
 
 	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=todo',
-		'name' => $txt['to_do']
+		'url' => $scripturl . '?action=delegator',
+		'name' => $txt['delegator']
 	);
 
 	$subActions[$sub_action]();
 }
 
-function ToDoMain()
+function DelegatorMain()
 {
 	global $context, $scripturl, $sourcedir, $smcFunc, $txt;
 
-	isAllowedTo('view_todo');
+	//isAllowedTo('view_todo');
 
 	$list_options = array(
-		'id' => 'list_todos',
+		'id' => 'list_delegator',
 		'items_per_page' => 30,
-		'base_href' => $scripturl . '?action=todo',
+		'base_href' => $scripturl . '?action=delegator',
 		'default_sort_col' => 'duedate',
 		'get_items' => array(
 			'function' => create_function('$start, $items_per_page, $sort, $id_member', '
@@ -189,7 +192,7 @@ function add()
 {
 	global $smcFunc, $scripturl, $context, $txt;
 
-	isAllowedTo('add_new_todo');
+	//isAllowedTo('add_new_todo');
 
 	$context['sub_template'] = 'add';
 	$context['linktree'][] = array(
@@ -233,7 +236,7 @@ function add2()
 {
 	global $smcFunc, $context;
 
-	isAllowedTo('add_new_todo');
+	//isAllowedTo('add_new_todo');
 
 	checkSession();
 
@@ -255,7 +258,7 @@ function add2()
 		array('id_todo')
 	);
 
-	redirectexit('action=todo');
+	redirectexit('action=delegator');
 }
 
 function didChange()
@@ -289,7 +292,7 @@ function didChange()
 		);
 	}
 
-	redirectexit('action=todo');
+	redirectexit('action=delegator');
 }
 
 function delete()
@@ -311,7 +314,7 @@ function delete()
 		)
 	);
 	
-	redirectexit('action=todo');
+	redirectexit('action=delegator');
 }
 
 is_not_guest();

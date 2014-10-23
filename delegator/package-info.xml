@@ -12,7 +12,7 @@
 		<require-file name="Delegator.php" destination="$sourcedir" />
 		<require-file name="Delegator.template.php" destination="$themedir" />
 		<database>database.php</database>
-		<redirect url="$scripturl?action=todo" timeout="3000">redirect.txt</redirect>
+		<redirect url="$scripturl?action=delegator" timeout="3000">redirect.txt</redirect>
 	</install>
 
 	<uninstall for="2.0 RC3, 2.0 - 2.0.99">
