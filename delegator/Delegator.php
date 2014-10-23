@@ -4,9 +4,11 @@
 ***********************************************************************************
 * Delegator                                                                       *
 * =============================================================================== *
-* Software Version:           Delegator 1.0                                       *
+* Software Version:           Delegator 0.1                                       *
 * Software by:                iskra dot@studentska-iskra.org                      *
-* Copyright 2009-? by:                                                            *
+* Original software: 	      To-Do list          				  *
+* Original software by:       grafitus (beratdogan@hileci.org)                    *
+* Copyright 2009-2014 by:     grafitus (beratdogan@hileci.org)                    *
 * Support, News, Updates at:  http://www.simplemachines.org                       *
 ***********************************************************************************
 * This program is free software; you may redistribute it and/or modify it under   *
@@ -30,7 +32,7 @@ function ToDo()
 {
     global $context, $txt, $scripturl; // potrebne variable
     
-    isAllowedTo('view_todo'); // kaj bomo s tem?
+    //isAllowedTo('view_todo'); // kaj bomo s tem?
     
     loadTemplate('Delegator');
     //Fourth, Come up with a page title for the main page
@@ -79,7 +81,7 @@ function delegator_main()
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
     global $context, $scripturl, $sourcedir, $smcFunc, $txt;
     
-    isAllowedTo('view_todo'); // kaj bomo s tem?
+    //isAllowedTo('view_todo'); // kaj bomo s tem?
     
     $list_options = array(
         //'id' => 'list_todos',
@@ -217,7 +219,7 @@ function add()
 {
     global $smcFunc, $scripturl, $context, $txt;
 
-    isAllowedTo('add_new_todo');
+    //isAllowedTo('add_new_todo');
     
     $context['sub_template'] = 'add';
     $context['linktree'][] = array(
@@ -261,7 +263,7 @@ function add2()
 {
     global $smcFunc, $context;
     
-    isAllowedTo('add_new_todo');
+    //isAllowedTo('add_new_todo');
     
     checkSession();
     
@@ -273,7 +275,7 @@ function add2()
     if ($smcFunc['htmltrim']($_POST['subject']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
         fatal_lang_error('to_do_empty_fields', false);
 
-    $smcFunc['db_insert']('', '{db_prefix}to_dos',
+    $smcFunc['db_insert']('', '{db_prefix}tasks',
     array(
         'id_member' => 'int', 'subject' => 'string', 'duedate' => 'date', 'priority' => 'int', 'is_did' => 'int',
     ),
@@ -283,7 +285,7 @@ function add2()
     array('id_todo')
     );
     
-    redirectexit('action=todo');
+    redirectexit('action=delegator');
 }
 
 function didChange()
@@ -317,7 +319,7 @@ function didChange()
             );
 	}
     
-    redirectexit('action=todo');
+    redirectexit('action=delegator');
 }
 
 function delete()
@@ -339,7 +341,7 @@ function delete()
     )
     );
     
-    redirectexit('action=todo');
+    redirectexit('action=delegator');
 }
 
 is_not_guest();
