@@ -76,7 +76,7 @@ function Delegator()
 }
 
 
-function delegator_main() 
+function delegator_main()  
 {
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
     global $context, $scripturl, $sourcedir, $smcFunc, $txt;
@@ -88,7 +88,7 @@ function delegator_main()
         'id' => 'list_tasks',
         'items_per_page' => 30,
         'base_href' => $scripturl . '?action=delegator',
-        'default_sort_col' => 'duedate',
+        'default_sort_col' => 'deadline',
         'get_items' => array(
             // FUNKCIJE !!! uredi querry
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
@@ -138,6 +138,9 @@ function delegator_main()
         ),
         'no_items_label' => $txt['tasks_empty'],
         'columns' => array(
+            // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
+            // name, deadline, priority - so ze narejeni
+            // avtor, worker(s), projekt, stanje - se manjkajo
             'name' => array(
                 'header' => array(
                     'value' => $txt['name'],
@@ -155,23 +158,23 @@ function delegator_main()
                     'reverse' => 'subject DESC',
                 ),
             ),
-            'duedate' => array(
+            'deadline' => array(
                 'header' => array(
                     'value' => $txt['task_due_time'],
                 ),
 				'data' => array(
                                     'function' => create_function('$row', '
-						$row[\'duedate\'] = strtotime($row[\'duedate\']);
-						return timeformat($row[\'duedate\'], \'%d %B %Y, %A\');
+						$row[\'deadline\'] = strtotime($row[\'deadline\']);
+						return timeformat($row[\'deadline\'], \'%d %B %Y, %A\');
 					'),
                                     'style' => 'width: 20%; text-align: center;',
 				),
                 'sort' =>  array(
-					'default' => 'duedate',
+					'default' => 'deadline',
 ######################################
 # Subs-List.php 64. satýr is wrong!!!
 ######################################
-					'reverse' => 'duedate DESC',
+					'reverse' => 'deadline DESC',
                 ),
             ),
             'priority' => array(
@@ -196,7 +199,7 @@ function delegator_main()
             ),
             'actions' => array(
                 'header' => array(
-                    'value' => $txt['to_do_actions'],
+                    'value' => $txt['task_actions'],
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -277,7 +280,7 @@ function add2()
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
     array(
-        'id_member' => 'int', 'subject' => 'string', 'duedate' => 'date', 'priority' => 'int', 'is_did' => 'int',
+        'id_member' => 'int', 'subject' => 'string', 'deadline' => 'date', 'priority' => 'int', 'is_did' => 'int',
     ),
     array(
         $id_member, $subject, $due_date, $_POST['priority'], 0,
