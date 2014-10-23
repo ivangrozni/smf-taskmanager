@@ -28,7 +28,7 @@
 if (!defined('SMF'))
     die('Hack Attempt...');
 
-function ToDo()
+function Delegator()
 {
     global $context, $txt, $scripturl; // potrebne variable
     
@@ -223,8 +223,8 @@ function add()
     
     $context['sub_template'] = 'add';
     $context['linktree'][] = array(
-        'url' => $scripturl . '?action=todo;sa=add',
-        'name' => $txt['to_do_add']
+        'url' => $scripturl . '?action=delegator;sa=add',
+        'name' => $txt['delegator_add']
     );
     $context['html_headers'] .= '
 	<style type="text/css">

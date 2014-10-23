@@ -33,7 +33,7 @@
 			<search position="replace"><![CDATA['mlist' => array(]]></search>
 			<add><![CDATA['delegator' => array(
 				'title' => function_exists('get_today_todos') ? get_today_todos() :  'DELEGATOR TODAY PLACEHOLDER',
-				'href' => $scripturl . '?action=todo',
+				'href' => $scripturl . '?action=delegator',
 				'show' => $context['allow_memberlist'], // @TODO: proper permission
 				'sub_buttons' => array(
 					'add' => array(
