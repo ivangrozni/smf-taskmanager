@@ -18,6 +18,7 @@ echo "Opis: <textarea name=\"p_desc\" rows=\"5\" cols=\"50\" > </textarea> <br><
 $q_mem = "SELECT * FROM Members "; // Tukaj bo potem samo name in id_prim
 $result_member = mysqli_query($con, $q_mem);
 echo "Koordinator: <select name=\"id_coord\">"; // izberi avtorja
+
 while ($mem_row = mysqli_fetch_array($result_member)) {
     echo "<option value=\"".$mem_row['id_member']."\"> ".$mem_row['name']."</option>";
 }

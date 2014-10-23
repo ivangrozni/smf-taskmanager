@@ -3,7 +3,7 @@
 <?php
 // Ni preverjanj in preprecevanja praznih polj!!!
 
-echo "<h2> Nova Zadolzitev</h3>";
+echo "<h2> Nova Zadolzitev</h2>";
 
 $in_date = date("Y-m-d");
 echo $in_date."<br><br>";//rrrr SVEDER
