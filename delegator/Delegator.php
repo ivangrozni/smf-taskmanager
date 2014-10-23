@@ -1,12 +1,12 @@
 <?php
 /**********************************************************************************
-* ToDo.php                                                                        *
+* Delegator.php                                                                   *
 ***********************************************************************************
-* To-Do List                                                                      *
+* Delegator                                                                       *
 * =============================================================================== *
-* Software Version:           To-Do List 2.0                                      *
-* Software by:                grafitus (beratdogan@hileci.org)                    *
-* Copyright 2009-? by:        grafitus (beratdogan@hileci.org)                    *
+* Software Version:           Delegator 1.0                                       *
+* Software by:                iskra dot@studentska-iskra.org                      *
+* Copyright 2009-? by:                                                            *
 * Support, News, Updates at:  http://www.simplemachines.org                       *
 ***********************************************************************************
 * This program is free software; you may redistribute it and/or modify it under   *
@@ -18,58 +18,84 @@
 *                                                                                 *
 * See the "license.txt" file for details of the Simple Machines license.          *
 * The latest version can always be found at http://www.simplemachines.org.        *
+***********************************************************************************
+* Delegator is continued work from To Do list created by grafitus - slava mu      *                
 **********************************************************************************/
+
+// First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. 
+if (!defined('SMF'))
+    die('Hack Attempt...');
 
 function ToDo()
 {
-	global $context, $txt, $scripturl;
+    global $context, $txt, $scripturl; // potrebne variable
+    
+    isAllowedTo('view_todo'); // kaj bomo s tem?
+    
+    loadTemplate('Delegator');
+    //Fourth, Come up with a page title for the main page
+    $context['page_title'] = $txt['delegator'];
+    
+    $subActions = array(
+        'delegator' => 'delegator_main', //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
+        'personal_view' => 'personal_view', //zadolzitve uporabnika
+        'add_proj' => 'add_proj',
+        'add_task' => 'add_task',
+        'acc_task' => 'acc_task',
+        'end_task' => 'end_task',
+        'edit_task' => 'edit_task',
+        'edit_proj' => 'edit_proj',
+        'view_task' => 'view_task',
+        'view_proj' => 'view_proj',
+            // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
+            //'ToDo' => 'ToDoMain',
+            //'add' => 'add',
+            //'add2' => 'add2',
+            //'delete' => 'delete',
+            //'did' => 'didChange',
+    );
+    
+    if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
+        $sub_action = 'delegator';
+    else
+        $sub_action = $_REQUEST['sa'];
+    
+    //Fifth, define the navigational link tree to be shown at the top of the page.
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator',
+        'name' => $txt['delegator']
+    );
 
-	isAllowedTo('view_todo');
+    $subActions[$sub_action]();
+//Sixth, begin doing all the stuff that we want this action to display 
+// Store the results of this stuff in the $context array. 
+// This action's template(s) will display the contents of $context.
 
-	loadTemplate('To-DoList');
-
-	$context['page_title'] = $txt['to_do'];
-
-	$subActions = array(
-		'ToDo' => 'ToDoMain',
-		'add' => 'add',
-		'add2' => 'add2',
-		'delete' => 'delete',
-		'did' => 'didChange',
-	);
-
-	if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-		$sub_action = 'ToDo';
-	else
-		$sub_action = $_REQUEST['sa'];
-
-	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=todo',
-		'name' => $txt['to_do']
-	);
-
-	$subActions[$sub_action]();
 }
 
-function ToDoMain()
+
+function delegator_main() 
 {
-	global $context, $scripturl, $sourcedir, $smcFunc, $txt;
-
-	isAllowedTo('view_todo');
-
-	$list_options = array(
-		'id' => 'list_todos',
-		'items_per_page' => 30,
-		'base_href' => $scripturl . '?action=todo',
-		'default_sort_col' => 'duedate',
-		'get_items' => array(
-			'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+    // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
+    global $context, $scripturl, $sourcedir, $smcFunc, $txt;
+    
+    isAllowedTo('view_todo'); // kaj bomo s tem?
+    
+    $list_options = array(
+        //'id' => 'list_todos',
+        'id' => 'list_tasks',
+        'items_per_page' => 30,
+        'base_href' => $scripturl . '?action=delegator',
+        'default_sort_col' => 'duedate',
+        'get_items' => array(
+            // FUNKCIJE !!! uredi querry
+            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT *
-					FROM {db_prefix}to_dos
-					WHERE id_member = {int:id_member}
+					FROM {db_prefix}tasks
+					WHERE state = 0 OR state = 1
 					ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
@@ -79,77 +105,79 @@ function ToDoMain()
 						\'per_page\' => $items_per_page,
 					)
 				);
-				$todos = array();
+				$tasks = array();
 				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
-					$todos[] = $row;
+					$tasks[] = $row;
 				$smcFunc[\'db_free_result\']($request);
 
-				return $todos;
-			'),
-			'params' => array(
-				'id_member' => $context['user']['id'],
-			),
-		),
-		'get_count' => array(
-			'function' => create_function('', '
+				return $tasks;
+                                '), 
+            'params' => array(
+                'id_member' => $context['user']['id'],
+                 ), 
+        ),
+
+        'get_count' => array(
+            'function' => create_function('', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT COUNT(*)
-					FROM {db_prefix}to_dos\',
+					FROM {db_prefix}tasks
+                                        WHERE state = 0 OR state = 1\',
 					array(
 					)
 				);
-				list($total_todos) = $smcFunc[\'db_fetch_row\']($request);
+				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
 				$smcFunc[\'db_free_result\']($request);
 
-				return $total_todos;
+				return $total_tasks;
 			'),
-		),
-		'no_items_label' => $txt['to_do_empty'],
-		'columns' => array(
-			'subject' => array(
-				'header' => array(
-					'value' => $txt['to_do_subject'],
-				),
-				'data' => array(
-					'function' => create_function('$row', '
+        ),
+        'no_items_label' => $txt['tasks_empty'],
+        'columns' => array(
+            'name' => array(
+                'header' => array(
+                    'value' => $txt['name'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
 						if (strtolower($row[\'subject\']) == \'i love grafitus\')
 							return parse_bbc($row[\'subject\']) . \' <br /><em>grafitus said: "Me too you... :)))"</em>\';
 
 						return parse_bbc($row[\'subject\']);
 					'),
-				),
-				'sort' =>  array(
-					'default' => 'subject',
-					'reverse' => 'subject DESC',
-				),
-			),
-			'duedate' => array(
-				'header' => array(
-					'value' => $txt['to_do_due_time'],
-				),
+                ),
+                'sort' =>  array(
+                    'default' => 'subject',
+                    'reverse' => 'subject DESC',
+                ),
+            ),
+            'duedate' => array(
+                'header' => array(
+                    'value' => $txt['task_due_time'],
+                ),
 				'data' => array(
-					'function' => create_function('$row', '
+                                    'function' => create_function('$row', '
 						$row[\'duedate\'] = strtotime($row[\'duedate\']);
 						return timeformat($row[\'duedate\'], \'%d %B %Y, %A\');
 					'),
-					'style' => 'width: 20%; text-align: center;',
+                                    'style' => 'width: 20%; text-align: center;',
 				),
-				'sort' =>  array(
+                'sort' =>  array(
 					'default' => 'duedate',
 ######################################
 # Subs-List.php 64. satýr is wrong!!!
 ######################################
 					'reverse' => 'duedate DESC',
-				),
-			),
-			'priority' => array(
-				'header' => array(
-					'value' => $txt['to_do_priority'],
-				),
-				'data' => array(
-					'function' => create_function('$row', '
+                ),
+            ),
+            'priority' => array(
+                'header' => array(
+                    'value' => $txt['priority'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
 						global $settings, $txt;
 						
 						if ($row[\'priority\'] == 0)
@@ -161,42 +189,42 @@ function ToDoMain()
 
 						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" alt="" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
 					'),
-					'style' => 'width: 10%; text-align: center;',
-				),
-			),
-			'actions' => array(
-				'header' => array(
-					'value' => $txt['to_do_actions'],
-				),
-				'data' => array(
-					'function' => create_function('$row', '
+                    'style' => 'width: 10%; text-align: center;',
+                ),
+            ),
+            'actions' => array(
+                'header' => array(
+                    'value' => $txt['to_do_actions'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=todo;sa=did;id=\'. $row[\'id_todo\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'is_did\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=todo;sa=delete;id=\'. $row[\'id_todo\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'is_did\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
 					'),
-					'style' => 'width: 10%; text-align: center;',
-				),
-			),
-		),
-	);
-
-	require_once($sourcedir . '/Subs-List.php');
-
-	createList($list_options);
+                    'style' => 'width: 10%; text-align: center;',
+                ),
+            ),
+        ),
+    );
+    
+    require_once($sourcedir . '/Subs-List.php');
+    
+    createList($list_options);
 }
 
 function add()
 {
-	global $smcFunc, $scripturl, $context, $txt;
+    global $smcFunc, $scripturl, $context, $txt;
 
-	isAllowedTo('add_new_todo');
-
-	$context['sub_template'] = 'add';
-	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=todo;sa=add',
-		'name' => $txt['to_do_add']
-	);
-	$context['html_headers'] .= '
+    isAllowedTo('add_new_todo');
+    
+    $context['sub_template'] = 'add';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=todo;sa=add',
+        'name' => $txt['to_do_add']
+    );
+    $context['html_headers'] .= '
 	<style type="text/css">
 		dl.todo_add
 		{
@@ -231,87 +259,87 @@ function add()
 
 function add2()
 {
-	global $smcFunc, $context;
+    global $smcFunc, $context;
+    
+    isAllowedTo('add_new_todo');
+    
+    checkSession();
+    
+    $id_member = $context['user']['id'];
+    
+    $subject = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+    $due_date = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
 
-	isAllowedTo('add_new_todo');
+    if ($smcFunc['htmltrim']($_POST['subject']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+        fatal_lang_error('to_do_empty_fields', false);
 
-	checkSession();
-
-	$id_member = $context['user']['id'];
-
-	$subject = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-	$due_date = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
-
-	if ($smcFunc['htmltrim']($_POST['subject']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
-		fatal_lang_error('to_do_empty_fields', false);
-
-	$smcFunc['db_insert']('', '{db_prefix}to_dos',
-		array(
-			'id_member' => 'int', 'subject' => 'string', 'duedate' => 'date', 'priority' => 'int', 'is_did' => 'int',
-		),
-		array(
-			$id_member, $subject, $due_date, $_POST['priority'], 0,
-		),
-		array('id_todo')
-	);
-
-	redirectexit('action=todo');
+    $smcFunc['db_insert']('', '{db_prefix}to_dos',
+    array(
+        'id_member' => 'int', 'subject' => 'string', 'duedate' => 'date', 'priority' => 'int', 'is_did' => 'int',
+    ),
+    array(
+        $id_member, $subject, $due_date, $_POST['priority'], 0,
+    ),
+    array('id_todo')
+    );
+    
+    redirectexit('action=todo');
 }
 
 function didChange()
 {
-	global $smcFunc;
+    global $smcFunc;
 
-	checkSession('get');
+    checkSession('get');
 
-	$request = $smcFunc['db_query']('', '
+    $request = $smcFunc['db_query']('', '
 		SELECT id_todo, is_did
 		FROM {db_prefix}to_dos
 		WHERE id_todo = {int:id_todo}
 		LIMIT 1',
-		array(
-			'id_todo' => (int) $_GET['id'],
-		)
-	);
-	list ($id_todo, $is_did) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	if (!empty($id_todo))
+    array(
+        'id_todo' => (int) $_GET['id'],
+    )
+    );
+    list ($id_todo, $is_did) = $smcFunc['db_fetch_row']($request);
+    $smcFunc['db_free_result']($request);
+    
+    if (!empty($id_todo))
 	{
-		$smcFunc['db_query']('', '
+            $smcFunc['db_query']('', '
 			UPDATE {db_prefix}to_dos
 			SET is_did = {int:is_did}
 			WHERE id_todo = {int:id_todo}',
-			array(
-				'id_todo' => $id_todo,
-				'is_did' => $is_did ? 0 : 1,
-			)
-		);
+            array(
+                'id_todo' => $id_todo,
+                'is_did' => $is_did ? 0 : 1,
+            )
+            );
 	}
-
-	redirectexit('action=todo');
+    
+    redirectexit('action=todo');
 }
 
 function delete()
 {
-	global $smcFunc, $context;
+    global $smcFunc, $context;
 
-	checkSession('get');
+    checkSession('get');
 
-	$todo_id = (int) $_GET['id'];
-	$id_member = $context['user']['id'];
-
-	$smcFunc['db_query']('', '
+    $todo_id = (int) $_GET['id'];
+    $id_member = $context['user']['id'];
+    
+    $smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}to_dos
 		WHERE id_todo = {int:todo_id}
 			AND id_member = {int:id_member}',
-		array(
-			'todo_id' => $todo_id,
-			'id_member' => $id_member,
-		)
-	);
-	
-	redirectexit('action=todo');
+    array(
+        'todo_id' => $todo_id,
+        'id_member' => $id_member,
+    )
+    );
+    
+    redirectexit('action=todo');
 }
 
 is_not_guest();
