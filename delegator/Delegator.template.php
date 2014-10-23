@@ -2,12 +2,14 @@
 
 function template_main()
 {
-	global $scripturl;
+    global $scripturl;
 
 	//if (allowedTo('add_new_todo'))
-		template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
+    echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
+    template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
 
-	template_show_list('list_delegator');
+    template_show_list('list_tasks');
+                //template_show_list('list_delegator');
 }
 
 function template_add()
