@@ -151,7 +151,7 @@ $tables = array(
 
 foreach ($tables as $table => $data)
 	$smcFunc['db_create_table']($db_prefix . $table, $data['columns'], $data['indexes']);
-	
+
 if (SMF == 'SSI')
 	echo 'I created the table ! ;)';
 
