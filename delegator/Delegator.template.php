@@ -104,8 +104,5 @@ function template_add_proj()
 		</div>
 		</form>
 	</div><br />';
-
-
-
-
+}
 ?>
