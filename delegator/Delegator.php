@@ -77,7 +77,7 @@ function Delegator()
 }
 
 
-function delegator_main()  
+function delegator_main()
 {
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
     global $context, $scripturl, $sourcedir, $smcFunc, $txt;
@@ -206,7 +206,7 @@ function delegator_main()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'is_did\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'state\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
@@ -265,6 +265,7 @@ function add()
 
 // Kaj se vpise v bazo, ko se ustvari task?
 //id, id_proj, id_author, name, description, creation_date, deadline, priority, state
+// MANJKA: description
 function add_task()
 {
     global $smcFunc, $context;
@@ -273,10 +274,11 @@ function add_task()
     
     checkSession();
     
-    $id_member = $context['user']['id'];
+    $id_author = $context['user']['id'];
     
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
-    $due_date = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
+    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
+    $deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
 
     if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
         fatal_lang_error('to_do_empty_fields', false);
@@ -286,13 +288,47 @@ function add_task()
         'id_author' => 'int', 'name' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
     ),
     array(
-        $id_member, $subject, $due_date, $_POST['priority'], 0,
+        $id_author, $name, $description, $deadline, $_POST['priority'], 0,
     ),
     array('id')
     );
     
-    redirectexit('action=delegator');
+    redirectexit('action=delegator'); //ali moram tole spremeniti???
 }
+
+// add_project: id, id_coord, name, description, start, end
+function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
+{
+    global $smcFunc, $context;
+    
+    //isAllowedTo('add_new_todo');
+    
+    checkSession();
+    
+    $id_coord = $context['user']['id'];
+    
+    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
+    $start = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
+    $end = $smcFunc['htmlspecialchars']($_POST['dend3'] . '-' . $_POST['dend1'] . '-' . $_POST['dend2']);
+
+    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+        fatal_lang_error('delegator_empty_fields', false);
+// description manjka
+    $smcFunc['db_insert']('', '{db_prefix}projects',
+    array(
+        'id_coord' => 'int', 'name' => 'string', 'start' => 'date', 'end' => 'date', 
+    ),
+    array(
+        $id_author, $subject, $due_date, $_POST['priority'], 0,
+    ),
+    array('id')
+    );
+    
+    redirectexit('action=delegator'); // redirect exit - logicno
+}
+
+
+
 
 // To bomo smotrno preuredili!!!
 function didChange()
