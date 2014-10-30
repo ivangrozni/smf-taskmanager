@@ -56,12 +56,12 @@
 	$day = date('j');
 
 	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(duedate)
+		SELECT COUNT(deadline)
 		FROM {db_prefix}to_dos
 		WHERE is_did = {int:is_did}
-			AND MONTH(duedate) = {int:month}
-			AND DAYOFMONTH(duedate) = {int:day}
-			AND YEAR(duedate) > {int:year}',
+			AND MONTH(deadline) = {int:month}
+			AND DAYOFMONTH(deadline) = {int:day}
+			AND YEAR(deadline) > {int:year}',
 		array(
 			'is_did' => 0,
 			'year' => 1,
