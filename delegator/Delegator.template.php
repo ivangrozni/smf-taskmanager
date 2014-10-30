@@ -21,7 +21,7 @@ function template_add()
 		<h3 class="catbg"><span class="left"></span>
 			', $context['page_title'], '
 		</h3>
-		<form action="', $scripturl, '?action=delegator;sa=add2" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
+		<form action="', $scripturl, '?action=delegator;sa=add_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">

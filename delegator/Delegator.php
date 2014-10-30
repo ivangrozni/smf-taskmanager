@@ -42,6 +42,7 @@ function Delegator()
         'delegator' => 'delegator_main', //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
         'personal_view' => 'personal_view', //zadolzitve uporabnika
         'add_proj' => 'add_proj',
+        'add' => 'add',
         'add_task' => 'add_task',
         'acc_task' => 'acc_task',
         'end_task' => 'end_task',
@@ -147,15 +148,15 @@ function delegator_main()
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
-						if (strtolower($row[\'subject\']) == \'i love grafitus\')
-							return parse_bbc($row[\'subject\']) . \' <br /><em>grafitus said: "Me too you... :)))"</em>\';
+						if (strtolower($row[\'name\']) == \'i love grafitus\')
+							return parse_bbc($row[\'name\']) . \' <br /><em>grafitus said: "Me too you... :)))"</em>\';
 
-						return parse_bbc($row[\'subject\']);
+						return parse_bbc($row[\'name\']);
 					'),
                 ),
                 'sort' =>  array(
-                    'default' => 'subject',
-                    'reverse' => 'subject DESC',
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
                 ),
             ),
             'deadline' => array(
@@ -231,24 +232,24 @@ function add()
     );
     $context['html_headers'] .= '
 	<style type="text/css">
-		dl.todo_add
+		dl.delegator_add
 		{
 			margin: 0;
 			clear: right;
 			overflow: auto;
 		}
-		dl.todo_add dt
+		dl.delegator_add dt
 		{
 			float: left;
 			clear: both;
 			width: 30%;
 			margin: 0.5em 0 0 0;
 		}
-		dl.todo_add label
+		dl.delegator_add label
 		{
 			font-weight: bold;
 		}
-		dl.todo_add dd
+		dl.delegator_add dd
 		{
 			float: left;
 			width: 69%;
@@ -262,7 +263,9 @@ function add()
 	</style>';
 }
 
-function add2()
+// Kaj se vpise v bazo, ko se ustvari task?
+//id, id_proj, id_author, name, description, creation_date, deadline, priority, state
+function add_task()
 {
     global $smcFunc, $context;
     
@@ -272,25 +275,26 @@ function add2()
     
     $id_member = $context['user']['id'];
     
-    $subject = strtr($smcFunc['htmlspecialchars']($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $due_date = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
 
-    if ($smcFunc['htmltrim']($_POST['subject']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
         fatal_lang_error('to_do_empty_fields', false);
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
     array(
-        'id_member' => 'int', 'subject' => 'string', 'deadline' => 'date', 'priority' => 'int', 'is_did' => 'int',
+        'id_author' => 'int', 'name' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
     ),
     array(
         $id_member, $subject, $due_date, $_POST['priority'], 0,
     ),
-    array('id_todo')
+    array('id')
     );
     
     redirectexit('action=delegator');
 }
 
+// To bomo smotrno preuredili!!!
 function didChange()
 {
     global $smcFunc;
