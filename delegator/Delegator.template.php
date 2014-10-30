@@ -38,7 +38,8 @@ function template_add()
                                                 <dt>
                   <label for="description>"', $txt['task_description'],' </label> </dt>
                                <dd>
-           <input type="text" name="description" value="" size="250" maxlength="250" class="input_text" />
+           <!-- <input type="text" name="description" value="" ROW=3 COL=30 maxlength="250" class="input_text" /> -->
+                <textarea name="description" rows="3" cols="30"> </textarea>
                                 </dd>
 						<dt>
 							<label for="duet3">', $txt['delegator_deadline'], '</label><br />

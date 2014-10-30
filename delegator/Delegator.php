@@ -285,7 +285,7 @@ function add_task()
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
     array(
-        'id_author' => 'int', 'name' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
+        'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
     ),
     array(
         $id_author, $name, $description, $deadline, $_POST['priority'], 0,
