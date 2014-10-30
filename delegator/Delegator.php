@@ -296,6 +296,52 @@ function add_task()
     redirectexit('action=delegator'); //ali moram tole spremeniti???
 }
 
+
+function proj()
+{
+    global $smcFunc, $scripturl, $context, $txt;
+
+    //isAllowedTo('add_new_todo');
+    
+    $context['sub_template'] = 'add_proj';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=add_proj',
+        'name' => $txt['delegator_add_proj']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_add_proj
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_add_proj dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_add_proj label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_add_proj dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+}
+
+
 // add_project: id, id_coord, name, description, start, end
 function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
 {

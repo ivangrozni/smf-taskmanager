@@ -30,13 +30,16 @@ function template_add()
 			<div class="content">
 					<dl class="delegator_add">
 						<dt>
-							<label for="name">', $txt['task_name'], '</label>
+						<!--	<label for="name">', $txt['task_name'], '</label> --> <!-- pusti prazno, ker nimamo definiranega texta tas_name -->
+                                   <label for="name"> Zadolžitev </label> 
 						</dt>
 						<dd>
 							<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
 						</dd>
                                                 <dt>
-                  <label for="description>"', $txt['task_description'],' </label> </dt>
+              <!-- <label for="description>"', $txt['task_description'],' </label> -->
+                    <label for="description>" opis:  </label>
+ </dt>
                                <dd>
            <!-- <input type="text" name="description" value="" ROW=3 COL=30 maxlength="250" class="input_text" /> -->
                 <textarea name="description" rows="3" cols="30"> </textarea>
