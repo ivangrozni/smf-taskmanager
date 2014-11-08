@@ -42,9 +42,37 @@
 						'show' => allowedTo('add_new_todo'),	// @TODO: proper permission
 						'is_last' => true,
 					),
+                                        'add_proj' => array(
+                                            'title' => $txt['delegator_add_proj'],
+                                            'href' => $scripturl . '?action=delegator;sa=add_proj',
+                                            'show' => allowedTo('add_new_todo'),
+                                            'is_last' => true
+                                        ),
 				),
 			),
 'mlist' => array(]]></add>
+<!-- 
+kje se naredi dropdown menu - na neki tocki je izginila opcija Add 
+edina, ki je delala za dodajanje...
+Na starem testforumu dela, na novem forum_kopija pa ne!
+Zelel sem sam popravit 
+-->               
+
+<!--    <add><![CDATA['delegator' => array(
+				'title' => function_exists('get_today_todos') ? get_today_todos() :  'DELEGATOR TODAY PLACEHOLDER',
+				'href' => $scripturl . '?action=delegator',
+				'show' => $context['allow_memberlist'], // @TODO: proper permission
+				'sub_buttons' => array(
+					'add' => array(
+						'title' => $txt['delegator_add_proj'],
+						'href' => $scripturl . '?action=delegator;sa=add_proj',
+						'show' => allowedTo('add_new_todo'),	// @TODO: proper permission
+						'is_last' => true,
+					),
+				),
+			),
+'mlist' => array(]]></add> -->
+
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[?>]]></search>
@@ -87,7 +115,8 @@ $txt['delegator_actions'] = 'Actions';
 $txt['delegator_empty'] = !$context['user']['is_admin'] ? 'To-Do List is empty!' : 'To-Do List is empty! Are you free man? :)';
 $txt['delegator_del'] = 'Delete';
 $txt['delegator_subject'] = 'Subject';
-$txt['delegator_due_time'] = 'Due date';
+$txt['delegator_due_time'] = 'Due date'; <!-- ven se mi zdi -->
+$txt['delegator_deadline'] = 'Deadline';
 $txt['delegator_due_year'] = 'Year (YYYY)';
 $txt['delegator_due_month'] = 'Month (MM)';
 $txt['delegator_due_day'] = 'Day (DD)';
@@ -95,7 +124,10 @@ $txt['delegator_priority'] = 'Priority';
 $txt['delegator_priority0'] = 'Low';
 $txt['delegator_priority1'] = 'Normal';
 $txt['delegator_priority2'] = 'High';
+$txt['task_name'] = 'Task name';
+$txt['task_desc'] = 'Task description';
 $txt['delegator_add'] = 'Add';
+$txt['delegator_add_proj'] = 'Add Project';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';

@@ -41,6 +41,7 @@ function Delegator()
     $subActions = array(
         'delegator' => 'delegator_main', //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
         'personal_view' => 'personal_view', //zadolzitve uporabnika
+        'proj' => 'proj', // omfg, kje si g1smo?
         'add_proj' => 'add_proj',
         'add' => 'add',
         'add_task' => 'add_task',

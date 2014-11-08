@@ -6,10 +6,10 @@ function template_main()
 
 	//if (allowedTo('add_new_todo'))
     echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
-    //template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
-    template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=add_task' . ';sa=add_t', 'active'=> true)), 'right');
+    template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right'); // ';sa=add' - tukaj more biti add
+    //template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=add_task' . ';sa=add', 'active'=> true)), 'right');
 
-    template_button_strip(array(array('text' => 'add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=add_proj' . ';sa=add_p', 'active'=> true)), 'right');
+    template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
     template_show_list('list_tasks');
                 //template_show_list('list_delegator');
@@ -24,20 +24,20 @@ function template_add()
 		<h3 class="catbg"><span class="left"></span>
 			', $context['page_title'], '
 		</h3>
-		<form action="', $scripturl, '?action=delegator;sa=add_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
+		<form action="', $scripturl, '?action=delegator;sa=add" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
 					<dl class="delegator_add">
 						<dt>
 						<!--	<label for="name">', $txt['task_name'], '</label> --> <!-- pusti prazno, ker nimamo definiranega texta tas_name -->
-                                   <label for="name"> Zadolžitev </label> 
+                                   <label for="name"> Zadolzitev </label> 
 						</dt>
 						<dd>
 							<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
 						</dd>
                                                 <dt>
-              <!-- <label for="description>"', $txt['task_description'],' </label> -->
+              <!-- <label for="description>"', $txt['task_desc'],' </label> -->
                     <label for="description>" opis:  </label>
  </dt>
                                <dd>
