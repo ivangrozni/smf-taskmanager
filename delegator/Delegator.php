@@ -24,34 +24,39 @@
 * Delegator is continued work from To Do list created by grafitus - slava mu      *                
 **********************************************************************************/
 
-// First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. 
+// First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. Sledeci vrstici sta dodani, da kdo ne sheka (SMF uporablja v vseh fajlih, mod ni uporabljal).
 if (!defined('SMF'))
     die('Hack Attempt...');
 
+//Tu se zacne originalni To-Do list mod
 function Delegator()
 {
     global $context, $txt, $scripturl; // potrebne variable
+                                       // $context - ne vem, se za kaj se uporablja
+                                       // $txt - notri so vsa prikazana besedila (zaradi prevodov)
+                                       // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
     
-    //isAllowedTo('view_todo'); // kaj bomo s tem?
+    //isAllowedTo('view_todo');        // za zdaj smo izkljucili permissione
     
-    loadTemplate('Delegator');
-    //Fourth, Come up with a page title for the main page
-    $context['page_title'] = $txt['delegator'];
+    loadTemplate('Delegator');         // nalozi template
+
+    $context['page_title'] = $txt['delegator'];   //poberes page title iz $txt['delegator']
     
-    $subActions = array(
-        'delegator' => 'delegator_main', //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-        'personal_view' => 'personal_view', //zadolzitve uporabnika
-        'proj' => 'proj', // omfg, kje si g1smo?
-        'add_proj' => 'add_proj',
-        'add' => 'add',
-        'add_task' => 'add_task',
-        'acc_task' => 'acc_task',
-        'end_task' => 'end_task',
-        'edit_task' => 'edit_task',
-        'edit_proj' => 'edit_proj',
-        'view_task' => 'view_task',
-        'view_proj' => 'view_proj',
+    $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
+        'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
+        'personal_view' => 'personal_view',   //zadolzitve uporabnika
+        'proj' => 'proj',                     //[!]omfg, kje si g1smo?
+        'add_proj' => 'add_proj',             //dodajanje projekta
+        'add' => 'add',                       //[!]razlika med add in add task?
+        'add_task' => 'add_task',             //[!]razlika med add in add_task?
+        'acc_task' => 'acc_task',             //sprejemanje zadolzitve (proste zadolzitve)
+        'end_task' => 'end_task',             //zakljucek zadolzitve
+        'edit_task' => 'edit_task',           //editanje taska
+        'edit_proj' => 'edit_proj',           //editanje projekta
+        'view_task' => 'view_task',           //podrobnosti taska
+        'view_proj' => 'view_proj',           //podrobnosti projekta
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
+            // Spodnji komentarji so stara To-Do list mod koda
             //'ToDo' => 'ToDoMain',
             //'add' => 'add',
             //'add2' => 'add2',
@@ -59,10 +64,10 @@ function Delegator()
             //'did' => 'didChange',
     );
     
-    if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))
-        $sub_action = 'delegator';
-    else
-        $sub_action = $_REQUEST['sa'];
+    if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))     //tega
+        $sub_action = 'delegator';                                           //tko res
+    else                                                                     //ne
+        $sub_action = $_REQUEST['sa'];                                       //stekam
     
     //Fifth, define the navigational link tree to be shown at the top of the page.
     $context['linktree'][] = array(
@@ -71,6 +76,7 @@ function Delegator()
     );
 
     $subActions[$sub_action]();
+
 //Sixth, begin doing all the stuff that we want this action to display 
 // Store the results of this stuff in the $context array. 
 // This action's template(s) will display the contents of $context.
@@ -78,18 +84,18 @@ function Delegator()
 }
 
 
-function delegator_main()
+function delegator_main()                                      //glavna funkcija
 {
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
-    global $context, $scripturl, $sourcedir, $smcFunc, $txt;
+    global $context, $scripturl, $sourcedir, $smcFunc, $txt;   //globalne spremenljivke lahko kliceju funkcije iz zunaj kajne?
     
-    //isAllowedTo('view_todo'); // kaj bomo s tem?
+    //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
     
     $list_options = array(
-        //'id' => 'list_todos',
+        //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks',
         'items_per_page' => 30,
-        'base_href' => $scripturl . '?action=delegator',
+        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
         'default_sort_col' => 'deadline',
         'get_items' => array(
             // FUNKCIJE !!! uredi querry
