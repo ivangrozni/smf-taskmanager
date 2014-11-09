@@ -178,7 +178,7 @@ WHERE T1.state = 0 OR T1.state = 1
 /*
              'project' => array(      //PROJEKT - dodal Jaka - delo v teku
                 'header' => array(
-                    'value' => $txt['delegator_project'],      //dodano v modification.xml
+                    'value' => $txt['project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(                               //tu je treba ugotoviti, kako dobiti ime projekta - kako dobiti ime iz tabele projektov preko povezave z ID-ji
                     'function' => create_function('$row', '
