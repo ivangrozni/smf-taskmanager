@@ -39,7 +39,7 @@ $tables = array(
 			array(
 				'name' => 'description', // Description of task
 				'type' => 'varchar',
-				'size' => '50',
+				'size' => '250',
 			),
 			array(
 				'name' => 'creation_date', // Date of creation
@@ -103,7 +103,7 @@ $tables = array(
 			array(
 				'name' => 'description', // Description of the project
 				'type' => 'varchar',
-				'size' => '50',
+				'size' => '250',
 			),
 			array(
 				'name' => 'start', // Project start

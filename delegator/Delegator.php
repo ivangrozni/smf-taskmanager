@@ -301,6 +301,7 @@ function add_task()
     );
     
     redirectexit('action=delegator'); //ali moram tole spremeniti???
+    // Pomoje ne...
 }
 
 
@@ -310,7 +311,7 @@ function proj()
 
     //isAllowedTo('add_new_todo');
     
-    $context['sub_template'] = 'add_proj';
+    $context['sub_template'] = 'proj';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=add_proj',
         'name' => $txt['delegator_add_proj']
@@ -361,6 +362,7 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     $id_coord = $context['user']['id'];
     
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
+    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $start = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
     $end = $smcFunc['htmlspecialchars']($_POST['dend3'] . '-' . $_POST['dend1'] . '-' . $_POST['dend2']);
 
@@ -369,10 +371,10 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
 // description manjka
     $smcFunc['db_insert']('', '{db_prefix}projects',
     array(
-        'id_coord' => 'int', 'name' => 'string', 'start' => 'date', 'end' => 'date', 
+        'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date', 
     ),
     array(
-        $id_author, $subject, $due_date, $_POST['priority'], 0,
+        $id_coord, $name, $description, $start, $end, 
     ),
     array('id')
     );

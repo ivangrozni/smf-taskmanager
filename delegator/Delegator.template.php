@@ -9,6 +9,7 @@ function template_main()
     template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right'); // ';sa=add' - tukaj more biti add
     //template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=add_task' . ';sa=add', 'active'=> true)), 'right');
 
+    // template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
     template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
     template_show_list('list_tasks');
@@ -24,7 +25,8 @@ function template_add()
 		<h3 class="catbg"><span class="left"></span>
 			', $context['page_title'], '
 		</h3>
-		<form action="', $scripturl, '?action=delegator;sa=add" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
+                                           <!-- tukaj bom probal dat sa=add_task -->
+		<form action="', $scripturl, '?action=delegator;sa=add_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
@@ -76,7 +78,8 @@ function template_add()
 }
 
 //funkcija za dodajanje projektov
-function template_add_proj()
+//imena morajo ustrezat subactionnom...
+function template_proj()
 {
 	global $scripturl, $context, $txt;
 
@@ -89,14 +92,44 @@ function template_add_proj()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_add">
+					<dl class="delegator_add_proj">
 						<dt>
-							<label for="subject">', $txt['delegator_project'], '</label>
+							<label for="name">', $txt['project_name'], '</label>
 						</dt>
 						<dd>
-							<input type="text" name="project" value="" size="50" maxlength="255" class="input_text" />
+							<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
 						</dd>
-						
+
+						<dt>
+							<label for="description">', $txt['project_desc'], '</label>
+						</dt>
+						<dd>
+						<textarea name="description" rows="3" cols="30"> </textarea>
+						</dd>
+
+
+
+<dt>
+							<label for="start">', $txt['delegator_deadline'], '</label><br />
+							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
+						</dt>
+						<dd>
+							<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
+							<input type="text" name="duet1" size="2" maxlength="2" value="" class="input_text" /> -
+							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" />
+						</dd>
+
+<dt>
+							<label for="end">', $txt['delegator_deadline'], '</label><br />
+							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
+						</dt>
+						<dd>
+							<input type="text" name="dend3" size="4" maxlength="4" value="" class="input_text" /> -
+							<input type="text" name="dend1" size="2" maxlength="2" value="" class="input_text" /> -
+							<input type="text" name="dend2" size="2" maxlength="2" value="" class="input_text" />
+						</dd>						
+
+
 
 					</dl>
 					<div id="confirm_buttons">
