@@ -37,7 +37,7 @@ function Delegator()
                                        // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
     
     //isAllowedTo('view_todo');        // za zdaj smo izkljucili permissione
-    
+
     loadTemplate('Delegator');         // nalozi template
 
     $context['page_title'] = $txt['delegator'];   //poberes page title iz $txt['delegator']
@@ -63,7 +63,7 @@ function Delegator()
             //'delete' => 'delete',
             //'did' => 'didChange',
     );
-    
+
     if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))     //tega
         $sub_action = 'delegator';                                           //tko res
     else                                                                     //ne
@@ -82,7 +82,6 @@ function Delegator()
 // This action's template(s) will display the contents of $context.
 
 }
-
 
 function delegator_main()                                      //glavna funkcija
 {
@@ -149,6 +148,24 @@ function delegator_main()                                      //glavna funkcija
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
             // avtor, worker(s), projekt, stanje - se manjkajo
+
+            // doda id stolpec v tabelo, ki se pojavi na strani od delegatorja
+            'id' => array( 
+                'header' => array(
+                    'value' => 'id',
+                ),
+                'data' => array(
+                    'function' => create_function('$row', 'return $row[\'id\'];'
+                    ),
+                 'sort' => array(
+                     'default' => 'id',
+                     'reverse' => 'id DESC',
+                    ),
+                ),
+
+            ), // oklepaji
+            // vsaka stvar v tabeli ima header, data, sort
+
             'name' => array(
                 'header' => array(
                     'value' => $txt['name'],
@@ -170,19 +187,19 @@ function delegator_main()                                      //glavna funkcija
                 'header' => array(
                     'value' => $txt['task_due_time'],
                 ),
-				'data' => array(
-                                    'function' => create_function('$row', '
+                'data' => array(
+                    'function' => create_function('$row', '
 						$row[\'deadline\'] = strtotime($row[\'deadline\']);
 						return timeformat($row[\'deadline\'], \'%d %B %Y, %A\');
 					'),
-                                    'style' => 'width: 20%; text-align: center;',
-				),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
                 'sort' =>  array(
-					'default' => 'deadline',
+                    'default' => 'deadline',
 ######################################
-# Subs-List.php 64. satýr is wrong!!!
+# Subs-List.php 64. satyr is wrong!!!
 ######################################
-					'reverse' => 'deadline DESC',
+                    'reverse' => 'deadline DESC',
                 ),
             ),
             'priority' => array(
@@ -234,7 +251,7 @@ function add()
     
     $context['sub_template'] = 'add';
     $context['linktree'][] = array(
-        'url' => $scripturl . '?action=delegator;sa=add',
+        'url' => $scripturl . '?action=delegator;sa=add', //spet add
         'name' => $txt['delegator_add']
     );
     $context['html_headers'] .= '
@@ -304,7 +321,7 @@ function add_task()
     // Pomoje ne...
 }
 
-
+// analogija funkciji add()
 function proj()
 {
     global $smcFunc, $scripturl, $context, $txt;
@@ -313,29 +330,29 @@ function proj()
     
     $context['sub_template'] = 'proj';
     $context['linktree'][] = array(
-        'url' => $scripturl . '?action=delegator;sa=add_proj',
-        'name' => $txt['delegator_add_proj']
+        'url' => $scripturl . '?action=delegator;sa=proj',
+        'name' => $txt['delegator_proj']
     );
     $context['html_headers'] .= '
 	<style type="text/css">
-		dl.delegator_add_proj
+		dl.delegator_proj
 		{
 			margin: 0;
 			clear: right;
 			overflow: auto;
 		}
-		dl.delegator_add_proj dt
+		dl.delegator_proj dt
 		{
 			float: left;
 			clear: both;
 			width: 30%;
 			margin: 0.5em 0 0 0;
 		}
-		dl.delegator_add_proj label
+		dl.delegator_proj label
 		{
 			font-weight: bold;
 		}
-		dl.delegator_add_proj dd
+		dl.delegator_proj dd
 		{
 			float: left;
 			width: 69%;
@@ -354,12 +371,13 @@ function proj()
 function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
 {
     global $smcFunc, $context;
-    
+
     //isAllowedTo('add_new_todo');
     
     checkSession();
     
     $id_coord = $context['user']['id'];
+  
     
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));

@@ -67,7 +67,7 @@ function template_add()
 						</dd>
 					</dl>
 					<div id="confirm_buttons">
-						<input type="submit" name="submit" value="', $txt['delegator_add'], '" class="button_submit" />
+						<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
 					</div>
 			</div>
 			<span class="botslice"><span></span></span>
@@ -88,7 +88,7 @@ function template_proj()
 		<h3 class="catbg"><span class="left"></span>
 			', $context['page_title'], '
 		</h3>
-		<form action="', $scripturl, '?action=add_proj;sa=add_proj" method="post" accept-charset="', $context['character_set'], '" name="delegator_add_proj">
+		<form action="', $scripturl, '?action=add_proj;sa=add_proj" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
@@ -111,7 +111,7 @@ function template_proj()
 
 <dt>
 							<label for="start">', $txt['delegator_deadline'], '</label><br />
-							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
+							<span class="smalltext">', $txt['xdelegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
