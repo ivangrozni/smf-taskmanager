@@ -83,7 +83,7 @@ function Delegator()
 
 }
 
-function delegator_main()                                      //glavna funkcija
+function delegator_main()                                      //glavna funkcija - prikaze taske
 {
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
     global $context, $scripturl, $sourcedir, $smcFunc, $txt;   //globalne spremenljivke lahko kliceju funkcije iz zunaj kajne?
@@ -93,11 +93,20 @@ function delegator_main()                                      //glavna funkcija
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks',
-        'items_per_page' => 30,
+        'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
-        'default_sort_col' => 'deadline',
+        'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
-            // FUNKCIJE !!! uredi querry
+            // FUNKCIJE !!! uredi querry !!!
+
+/*predlog za querry (prvi del):
+SELECT *
+FROM {db_prefix}tasks T1 LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+WHERE T1.state = 0 OR T1.state = 1
+
+[!]Vprasanje: pod kaksnimi imeni bodo vrnjeni stolpci v $row? T1.name? name? tasks_name?
+*/
+
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
 
@@ -113,16 +122,16 @@ function delegator_main()                                      //glavna funkcija
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
 					)
-				);
+				);                            
 				$tasks = array();
 				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
 					$tasks[] = $row;
 				$smcFunc[\'db_free_result\']($request);
 
-				return $tasks;
+				return $tasks;                                    //funkcija vrne taske
                                 '), 
             'params' => array(
-                'id_member' => $context['user']['id'],
+                'id_member' => $context['user']['id'],         //[!]zopet - kateri member? vcasih je
                  ), 
         ),
 
@@ -147,7 +156,7 @@ function delegator_main()                                      //glavna funkcija
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
-            // avtor, worker(s), projekt, stanje - se manjkajo
+            // avtor, worker(s), projekt, stanje - se manjkajo - ugotoviti, kako jih zajeti
 
             // doda id stolpec v tabelo, ki se pojavi na strani od delegatorja
             'id' => array( 
@@ -166,9 +175,9 @@ function delegator_main()                                      //glavna funkcija
             ), // oklepaji
             // vsaka stvar v tabeli ima header, data, sort
 
-            'name' => array(
+            'name' => array( // ime taska
                 'header' => array(
-                    'value' => $txt['name'],
+                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -183,9 +192,25 @@ function delegator_main()                                      //glavna funkcija
                     'reverse' => 'name DESC',
                 ),
             ),
-            'deadline' => array(
+/*
+             'project' => array(      //PROJEKT - dodal Jaka - delo v teku
                 'header' => array(
-                    'value' => $txt['task_due_time'],
+                    'value' => $txt['project_name'],      //dodano v modification.xml
+                ),
+                'data' => array(                               //tu je treba ugotoviti, kako dobiti ime projekta - kako dobiti ime iz tabele projektov preko povezave z ID-ji
+                    'function' => create_function('$row', '
+						return parse_bbc($row[\'name\']);
+					'),
+                ),
+                'sort' =>  array(
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
+                ),
+            ),
+*/
+            'deadline' => array(      //ROK
+                'header' => array(
+                    'value' => $txt['task_due_time'],    //pojma nimam iz kje dobi to - morda je zgolj nek znak
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -196,13 +221,11 @@ function delegator_main()                                      //glavna funkcija
                 ),
                 'sort' =>  array(
                     'default' => 'deadline',
-######################################
-# Subs-List.php 64. satyr is wrong!!!
-######################################
                     'reverse' => 'deadline DESC',
                 ),
             ),
-            'priority' => array(
+
+            'priority' => array(      //POMEMBNOST
                 'header' => array(
                     'value' => $txt['priority'],
                 ),
@@ -222,7 +245,7 @@ function delegator_main()                                      //glavna funkcija
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
-            'actions' => array(
+            'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
                 'header' => array(
                     'value' => $txt['task_actions'],
                 ),
@@ -243,11 +266,11 @@ function delegator_main()                                      //glavna funkcija
     createList($list_options);
 }
 
-function add()
+function add()   //ni se prava funkcija za dodajanje - samo za gumb?
 {
     global $smcFunc, $scripturl, $context, $txt;
 
-    //isAllowedTo('add_new_todo');
+    //isAllowedTo('add_new_todo');      //spet izkljuceni permissioni
     
     $context['sub_template'] = 'add';
     $context['linktree'][] = array(
@@ -287,6 +310,7 @@ function add()
 	</style>';
 }
 
+//Prava funkcija za dodajanje taska:
 // Kaj se vpise v bazo, ko se ustvari task?
 //id, id_proj, id_author, name, description, creation_date, deadline, priority, state
 // MANJKA: description
