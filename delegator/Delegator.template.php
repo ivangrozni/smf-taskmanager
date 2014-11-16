@@ -24,7 +24,7 @@ function template_add()
         // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
         global $smcFunc;
         $request = $smcFunc['db_query']('', ' 
-                 SELECT name 
+                 SELECT id, name 
                  FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
         // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
 	echo '
