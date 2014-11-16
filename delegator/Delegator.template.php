@@ -6,7 +6,7 @@ function template_main()
 
 	//if (allowedTo('add_new_todo'))
     echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
-    template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right'); // ';sa=add' - tukaj more biti add
+    template_button_strip(array(array('text' => 'delegator_add_task', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right'); // ';sa=add' - tukaj more biti add
     //template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=add_task' . ';sa=add', 'active'=> true)), 'right');
 
     // template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
@@ -25,8 +25,8 @@ function template_add()
         global $smcFunc;
         $request = $smcFunc['db_query']('', ' 
                  SELECT name 
-                 FROM  {db_prefix}projects  ', array()  ); // tukaj je manjkala vejice in je sel cel forum v k
-
+                 FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
+        // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
 	echo '
 	<div id="container">
 		<h3 class="catbg"><span class="left"></span>
@@ -83,6 +83,7 @@ function template_add()
         while ($row = $smcFunc['db_fetch_assoc']($request)) {
             echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
             }
+        $smcFunc['db_free_result']($request);
 
             echo ' </select> 
 
@@ -91,7 +92,7 @@ function template_add()
 
 
 					<div id="confirm_buttons">
-						<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
+						<input type="submit" name="submit" value="', $txt['delegator_add_proj'], '" class="button_submit" />
 					</div>
 			</div>
 			<span class="botslice"><span></span></span>
@@ -166,4 +167,18 @@ function template_proj()
 		</form>
 	</div><br />';
 }
+
+function template_view_task() // id bi bil kar dober argument
+{
+    /*
+      Imena zadolzitev je treba spremeniti v linke, id se lahko posreduje z metodo GET
+      Iz baze moram potegniti podatke o tasku
+      Prikazati: Ime, rok, pomembnost
+                 Opis, opis, opis, opis, opis
+                 Izvajalce...
+      2 gumba: Back in Submit (nazaj in sprejmi zadolzitev)
+     */
+}
+
+
 ?>

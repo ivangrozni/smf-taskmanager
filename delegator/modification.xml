@@ -113,7 +113,7 @@ $txt['task_name'] = 'Task name';
 $txt['task_desc'] = 'Task description';
 $txt['delegator_add_task'] = 'Add Task';
 //Add Project
-$txt['delegator_add'] = 'Add';
+$txt['delegator_add'] = 'Add Task'; // Tole bo treba se postimat...
 $txt['delegator_add_proj'] = 'Add Project';
 $txt['project_name'] = 'Project';
 $txt['project_desc'] = 'Description';
