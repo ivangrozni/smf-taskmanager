@@ -319,7 +319,7 @@ function add_task()
     global $smcFunc, $context;
     
     //isAllowedTo('add_new_todo');
-    
+
     checkSession();
     
     $id_author = $context['user']['id'];
@@ -327,16 +327,17 @@ function add_task()
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
+    $state = 0;
 
     if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
         fatal_lang_error('to_do_empty_fields', false);
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
     array(
-        'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
+        'id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
     ),
     array(
-        $id_author, $name, $description, $deadline, $_POST['priority'], 0,
+        $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state,
     ),
     array('id')
     );

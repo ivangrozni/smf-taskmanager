@@ -108,8 +108,10 @@ $txt['delegator_priority'] = 'Priority';
 $txt['delegator_priority0'] = 'Low';
 $txt['delegator_priority1'] = 'Normal';
 $txt['delegator_priority2'] = 'High';
+//Add Task
 $txt['task_name'] = 'Task name';
 $txt['task_desc'] = 'Task description';
+$txt['delegator_add_task'] = 'Add Task';
 //Add Project
 $txt['delegator_add'] = 'Add';
 $txt['delegator_add_proj'] = 'Add Project';

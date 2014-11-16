@@ -20,6 +20,13 @@ function template_add()
 {
 	global $scripturl, $context, $txt;
         // id_author, name, description, creation_date, deadline, priority, state
+
+        // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
+        global $smcFunc;
+        $request = $smcFunc['db_query']('', ' 
+                 SELECT name 
+                 FROM  {db_prefix}projects  ', array()  ); // tukaj je manjkala vejice in je sel cel forum v k
+
 	echo '
 	<div id="container">
 		<h3 class="catbg"><span class="left"></span>
@@ -66,6 +73,23 @@ function template_add()
 							</ul>
 						</dd>
 					</dl>
+
+                                         <dt>
+							<label>', $txt['project_name'], '</label>
+					 </dt>
+						<dd>
+						
+                       <select name="id_proj">'; // nadomestil navadno vejico
+        while ($row = $smcFunc['db_fetch_assoc']($request)) {
+            echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
+            }
+
+            echo ' </select> 
+
+						</dd>
+					</dl>
+
+
 					<div id="confirm_buttons">
 						<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
 					</div>
@@ -88,7 +112,7 @@ function template_proj()
 		<h3 class="catbg"><span class="left"></span>
 			', $context['page_title'], '
 		</h3>
-		<form action="', $scripturl, '?action=add_proj;sa=add_proj" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
+		<form action="', $scripturl, '?action=delegator;sa=add_proj" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
@@ -133,7 +157,7 @@ function template_proj()
 
 					</dl>
 					<div id="confirm_buttons">
-						<input type="submit" name="submit" value="', $txt['delegator_add'], '" class="button_submit" />
+						<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
 					</div>
 			</div>
 			<span class="botslice"><span></span></span>
