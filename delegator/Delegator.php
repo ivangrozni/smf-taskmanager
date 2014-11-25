@@ -45,6 +45,7 @@ function Delegator()
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
         'personal_view' => 'personal_view',   //zadolzitve uporabnika
+	'add' => 'add',
         'proj' => 'proj',                     //[!]omfg, kje si g1smo?
         'add_proj' => 'add_proj',             //dodajanje novega projekta
         'add_task' => 'add_task',             //dodajanje novega taska
@@ -98,16 +99,11 @@ function delegator_main()                                      //glavna funkcija
         'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
-            // FUNKCIJE !!! uredi querry !!!
-
-/*predlog za querry (prvi del):
-SELECT *
-FROM {db_prefix}tasks T1 LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-WHERE T1.state = 0 OR T1.state = 1
-
-[!]Vprasanje: pod kaksnimi imeni bodo vrnjeni stolpci v $row? T1.name? name? tasks_name?
+            // FUNKCIJE
+/*
+query posodobljen - zdaj sta združeni tabela taskov in projektov
+nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 */
-
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
 
@@ -134,11 +130,11 @@ WHERE T1.state = 0 OR T1.state = 1
 				return $tasks;                                    //funkcija vrne taske
                                 '), 
             'params' => array(
-                'id_member' => $context['user']['id'],         //[!]zopet - kateri member? vcasih je
+                'id_member' => $context['user']['id'],
                  ), 
         ),
 
-        'get_count' => array(
+        'get_count' => array(							//tudi tu je posodobljen query
             'function' => create_function('', '
 				global $smcFunc;
 
@@ -161,7 +157,8 @@ WHERE T1.state = 0 OR T1.state = 1
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
-            // avtor, worker(s), projekt, stanje - se manjkajo - ugotoviti, kako jih zajeti
+            // avtor, worker(s), stanje - se manjkajo - ugotoviti, kako jih zajeti
+	    // projekt zdaj dela
 
             // doda id stolpec v tabelo, ki se pojavi na strani od delegatorja
             'id' => array( 
@@ -177,10 +174,10 @@ WHERE T1.state = 0 OR T1.state = 1
                     ),
                 ),
 
-            ), // oklepaji
+            ),
             // vsaka stvar v tabeli ima header, data, sort
 
-            'name' => array( // ime taska
+            'name' => array(		// TASK
                 'header' => array(
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
@@ -198,11 +195,11 @@ WHERE T1.state = 0 OR T1.state = 1
                 ),
             ),
 
-             'project' => array(      //PROJEKT - dodal Jaka - delo v teku
+             'project' => array(      //PROJEKT - dela!
                 'header' => array(
                     'value' => $txt['project_name'],      //dodano v modification.xml
                 ),
-                'data' => array(                               //tu je treba ugotoviti, kako dobiti ime projekta - kako dobiti ime iz tabele projektov preko povezave z ID-ji
+                'data' => array(
                     'function' => create_function('$row', '
 						return parse_bbc($row[\'project_name\']);
 					'),
@@ -215,7 +212,7 @@ WHERE T1.state = 0 OR T1.state = 1
 
             'deadline' => array(      //ROK
                 'header' => array(
-                    'value' => $txt['delegator_deadline'],    //pojma nimam iz kje dobi to - morda je zgolj nek znak
+                    'value' => $txt['delegator_deadline'],
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
