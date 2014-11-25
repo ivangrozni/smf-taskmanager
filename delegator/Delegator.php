@@ -244,7 +244,9 @@ WHERE T1.state = 0 OR T1.state = 1
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" alt="Priority: ' . $txt["delegator_priority" . $row["priority"]] . '" /> \' . $txt[\'to_do_priority\'] . $row[\'priority\']];
+                        $label = \'Priority: \' . $txt[\'delegator_priority\' . $row[\'priority\']]\';
+
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" alt="$label" /> \' . $txt[\'to_do_priority\'] . $row[\'priority\']];
                         '),
                     'style' => 'width: 10%; text-align: center;',
                 ),
