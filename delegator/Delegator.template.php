@@ -63,6 +63,13 @@ function template_add()
 							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" />
 						</dd>
 						<dt>
+							<label for="user">Delegirani uporabniki</label>
+						</dt>
+						<dd>
+							<input type="text" name="user">
+							<div id="user-list"></div>
+						</dd>
+						<dt>
 							<label>', $txt['delegator_priority'], '</label>
 						</dt>
 						<dd>
@@ -99,6 +106,22 @@ function template_add()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</div>
 		</form>
+		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \'', $context['session_id'], '\',
+				sSessionVar: \'', $context['session_var'], '\',
+				sSuggestId: \'user\',
+				sControlId: \'toAdd\',
+				sSearchType: \'member\',
+				sPostName: \'member_add\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+				bItemList: true,
+				sItemListContainerId: \'user-list\'
+			});
+		// ]]></script>
 	</div><br />';
 }
 

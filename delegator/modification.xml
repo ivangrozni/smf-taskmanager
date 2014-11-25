@@ -14,7 +14,7 @@
 	<file name="$sourcedir/ManagePermissions.php">
 		<operation>
 			<search position="replace"><![CDATA[			'karma_edit' => array(false, 'general', 'moderate_general'),]]></search>
-			<add><![CDATA[			
+			<add><![CDATA[
             'karma_edit' => array(false, 'general', 'moderate_general'),
 			'view_todo' => array(false, 'general', 'view_todolist'),
 			'add_new_todo' => array(false, 'general', 'add_new_todolist'),]]></add>
@@ -31,9 +31,9 @@
 		-->
 		<operation>
 			<search position="replace"><![CDATA['mlist' => array(]]></search>
-<!-- 
+<!--
 Drop down menu: @Jaka - kaj rabimo?
--->               
+-->
 
 			<add><![CDATA['delegator' => array(
 				'title' => function_exists('get_today_todos') ? get_today_todos() :  'DELEGATOR TODAY PLACEHOLDER',
@@ -85,7 +85,7 @@ Drop down menu: @Jaka - kaj rabimo?
 	$smcFunc['db_free_result']($request);
 
 	return $txt['delegator'] . ' [<strong>' . $todays_todos . '</strong>]';*/
-	
+
 	return 'Delegator: <strong>Spread communism</strong>';
 }
 ?>]]></add>
@@ -99,7 +99,7 @@ $txt['delegator_actions'] = 'Actions';
 $txt['delegator_empty'] = !$context['user']['is_admin'] ? 'To-Do List is empty!' : 'To-Do List is empty! Are you free man? :)';
 $txt['delegator_del'] = 'Delete';
 $txt['delegator_subject'] = 'Subject';
-$txt['delegator_due_time'] = 'Due date'; 
+$txt['delegator_due_time'] = 'Due date';
 $txt['delegator_deadline'] = 'Deadline';
 $txt['delegator_due_year'] = 'Year (YYYY)';
 $txt['delegator_due_month'] = 'Month (MM)';
@@ -108,6 +108,7 @@ $txt['delegator_priority'] = 'Priority';
 $txt['delegator_priority0'] = 'Low';
 $txt['delegator_priority1'] = 'Normal';
 $txt['delegator_priority2'] = 'High';
+$txt['tasks_empty'] = 'No tasks';
 //Add Task
 $txt['task_name'] = 'Task name';
 $txt['task_desc'] = 'Task description';
@@ -115,6 +116,7 @@ $txt['delegator_add_task'] = 'Add Task';
 //Add Project
 $txt['delegator_add'] = 'Add Task'; // Tole bo treba se postimat...
 $txt['delegator_add_proj'] = 'Add Project';
+$txt['delegator_add_task'] = 'Add Task';
 $txt['project_name'] = 'Project';
 $txt['project_desc'] = 'Description';
 // Permissions

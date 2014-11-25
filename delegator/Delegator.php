@@ -21,7 +21,7 @@
 * See the "license.txt" file for details of the Simple Machines license.          *
 * The latest version can always be found at http://www.simplemachines.org.        *
 ***********************************************************************************
-* Delegator is continued work from To Do list created by grafitus - slava mu      *                
+* Delegator is continued work from To Do list created by grafitus - slava mu      *
 **********************************************************************************/
 
 // First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. Sledeci vrstici sta dodani, da kdo ne sheka (SMF uporablja v vseh fajlih, mod ni uporabljal).
@@ -32,29 +32,30 @@ if (!defined('SMF'))
 function Delegator()
 {
     global $context, $txt, $scripturl; // potrebne variable
-                                       // $context - ne vem, se za kaj se uporablja
+                                       // $context - kontekst smf-ja kot takega. globalna spremenljivka, ki nudi Delegatorju
+                                       //       kot modulu interakcijo s smf forumom
                                        // $txt - notri so vsa prikazana besedila (zaradi prevodov)
-                                       // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
-    
+                                       // $scripturl - obstojec url, vpisan v brskalnik (simple nacin za generirat linke)
+
     //isAllowedTo('view_todo');        // za zdaj smo izkljucili permissione
 
     loadTemplate('Delegator');         // nalozi template
 
     $context['page_title'] = $txt['delegator'];   //poberes page title iz $txt['delegator']
-    
+
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-        'personal_view' => 'personal_view',   //zadolzitve uporabnika
+        'personal_view' => 'personal_view',   //zadolzitve trenutno logiranega uporabnika
         'proj' => 'proj',                     //[!]omfg, kje si g1smo?
-        'add_proj' => 'add_proj',             //dodajanje projekta
-        'add' => 'add',                       //[!]razlika med add in add task?
-        'add_task' => 'add_task',             //[!]razlika med add in add_task?
-        'acc_task' => 'acc_task',             //sprejemanje zadolzitve (proste zadolzitve)
-        'end_task' => 'end_task',             //zakljucek zadolzitve
-        'edit_task' => 'edit_task',           //editanje taska
-        'edit_proj' => 'edit_proj',           //editanje projekta
-        'view_task' => 'view_task',           //podrobnosti taska
-        'view_proj' => 'view_proj',           //podrobnosti projekta
+                                                        //tukaj!
+
+                                                        // ta pejdz bo vseboval seznam vseh projektov
+        'add_proj' => 'add_proj',             // dodajanje novega projekta
+        'add_task' => 'add_task',             // dodajanje novega taska
+        'edit_task' => 'edit_task',           // urejanje taska
+        'edit_proj' => 'edit_proj',           // editanje projekta
+        'view_task' => 'view_task',           // pregled/podrobnosti taska
+        'view_proj' => 'view_proj',           // pregled/podrobnosti projekta
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
             //'ToDo' => 'ToDoMain',
@@ -64,12 +65,14 @@ function Delegator()
             //'did' => 'didChange',
     );
 
+    // Delegator v celoti je kot en modul. Razni viewi so "subactioni". Defaulten subaction je delegator. Ce
+    // je izbran action ($_REQUEST['sa']) neveljaven ali ni specificiran, se zloada defaulten subaction, to je "delegator"
     if (!isset($_REQUEST['sa']) || !isset($subActions[$_REQUEST['sa']]))     //tega
         $sub_action = 'delegator';                                           //tko res
     else                                                                     //ne
         $sub_action = $_REQUEST['sa'];                                       //stekam
-    
-    //Fifth, define the navigational link tree to be shown at the top of the page.
+
+    // Dodaj delegator na navigacijo v zgornjem delu strani
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator',
         'name' => $txt['delegator']
@@ -77,8 +80,8 @@ function Delegator()
 
     $subActions[$sub_action]();
 
-//Sixth, begin doing all the stuff that we want this action to display 
-// Store the results of this stuff in the $context array. 
+//Sixth, begin doing all the stuff that we want this action to display
+// Store the results of this stuff in the $context array.
 // This action's template(s) will display the contents of $context.
 
 }
@@ -87,9 +90,9 @@ function delegator_main()                                      //glavna funkcija
 {
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
     global $context, $scripturl, $sourcedir, $smcFunc, $txt;   //globalne spremenljivke lahko kliceju funkcije iz zunaj kajne?
-    
+
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
-    
+
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks',
@@ -122,17 +125,17 @@ WHERE T1.state = 0 OR T1.state = 1
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
 					)
-				);                            
+				);
 				$tasks = array();
 				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
 					$tasks[] = $row;
 				$smcFunc[\'db_free_result\']($request);
 
 				return $tasks;                                    //funkcija vrne taske
-                                '), 
+                                '),
             'params' => array(
                 'id_member' => $context['user']['id'],         //[!]zopet - kateri member? vcasih je
-                 ), 
+                 ),
         ),
 
         'get_count' => array(
@@ -159,7 +162,7 @@ WHERE T1.state = 0 OR T1.state = 1
             // avtor, worker(s), projekt, stanje - se manjkajo - ugotoviti, kako jih zajeti
 
             // doda id stolpec v tabelo, ki se pojavi na strani od delegatorja
-            'id' => array( 
+            'id' => array(
                 'header' => array(
                     'value' => 'id',
                 ),
@@ -192,14 +195,15 @@ WHERE T1.state = 0 OR T1.state = 1
                     'reverse' => 'name DESC',
                 ),
             ),
-/*
-             'project' => array(      //PROJEKT - dodal Jaka - delo v teku
+
+            'project' => array(      //PROJEKT - dodal Jaka - delo v teku
                 'header' => array(
                     'value' => $txt['project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(                               //tu je treba ugotoviti, kako dobiti ime projekta - kako dobiti ime iz tabele projektov preko povezave z ID-ji
-                    'function' => create_function('$row', '
-						return parse_bbc($row[\'name\']);
+                    'function' => create_function('$row,$scripturl', '
+                        $label = "<a href=\"$scripturl?sa=view_task&taskid=$row[\'id\']\">$row[\'name\']</a>";
+						return parse_bbc($row[$label]);
 					'),
                 ),
                 'sort' =>  array(
@@ -207,10 +211,10 @@ WHERE T1.state = 0 OR T1.state = 1
                     'reverse' => 'name DESC',
                 ),
             ),
-*/
+
             'deadline' => array(      //ROK
                 'header' => array(
-                    'value' => $txt['task_due_time'],    //pojma nimam iz kje dobi to - morda je zgolj nek znak
+                    'value' => $txt['delegator_deadline'],    //pojma nimam iz kje dobi to - morda je zgolj nek znak
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -227,12 +231,12 @@ WHERE T1.state = 0 OR T1.state = 1
 
             'priority' => array(      //POMEMBNOST
                 'header' => array(
-                    'value' => $txt['priority'],
+                    'value' => $txt['delegator_priority'],
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
 						global $settings, $txt;
-						
+
 						if ($row[\'priority\'] == 0)
 							$image = \'warning_watch\';
 						elseif ($row[\'priority\'] == 1)
@@ -240,14 +244,14 @@ WHERE T1.state = 0 OR T1.state = 1
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" alt="" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
-					'),
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" alt="Priority: ' . $txt["delegator_priority" . $row["priority"]] . '" /> \' . $txt[\'to_do_priority\'] . $row[\'priority\']];
+                        '),
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
             'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
                 'header' => array(
-                    'value' => $txt['task_actions'],
+                    'value' => $txt['delegator_actions'],
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -260,9 +264,9 @@ WHERE T1.state = 0 OR T1.state = 1
             ),
         ),
     );
-    
+
     require_once($sourcedir . '/Subs-List.php');
-    
+
     createList($list_options);
 }
 
@@ -271,7 +275,7 @@ function add()   //ni se prava funkcija za dodajanje - samo za gumb?
     global $smcFunc, $scripturl, $context, $txt;
 
     //isAllowedTo('add_new_todo');      //spet izkljuceni permissioni
-    
+
     $context['sub_template'] = 'add';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=add', //spet add
@@ -317,13 +321,13 @@ function add()   //ni se prava funkcija za dodajanje - samo za gumb?
 function add_task()
 {
     global $smcFunc, $context;
-    
+
     //isAllowedTo('add_new_todo');
 
     checkSession();
-    
+
     $id_author = $context['user']['id'];
-    
+
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
@@ -341,7 +345,7 @@ function add_task()
     ),
     array('id')
     );
-    
+
     redirectexit('action=delegator'); //ali moram tole spremeniti???
     // Pomoje ne...
 }
@@ -352,7 +356,7 @@ function proj()
     global $smcFunc, $scripturl, $context, $txt;
 
     //isAllowedTo('add_new_todo');
-    
+
     $context['sub_template'] = 'proj';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=proj',
@@ -398,12 +402,11 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     global $smcFunc, $context;
 
     //isAllowedTo('add_new_todo');
-    
+
     checkSession();
-    
+
     $id_coord = $context['user']['id'];
-  
-    
+
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $start = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
@@ -414,14 +417,14 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
 // description manjka
     $smcFunc['db_insert']('', '{db_prefix}projects',
     array(
-        'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date', 
+        'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date',
     ),
     array(
-        $id_coord, $name, $description, $start, $end, 
+        $id_coord, $name, $description, $start, $end,
     ),
     array('id')
     );
-    
+
     redirectexit('action=delegator'); // redirect exit - logicno
 }
 
@@ -446,7 +449,7 @@ function didChange()
     );
     list ($id_todo, $is_did) = $smcFunc['db_fetch_row']($request);
     $smcFunc['db_free_result']($request);
-    
+
     if (!empty($id_todo))
 	{
             $smcFunc['db_query']('', '
@@ -459,7 +462,7 @@ function didChange()
             )
             );
 	}
-    
+
     redirectexit('action=delegator');
 }
 
@@ -471,7 +474,7 @@ function delete()
 
     $todo_id = (int) $_GET['id'];
     $id_member = $context['user']['id'];
-    
+
     $smcFunc['db_query']('', '
 		DELETE FROM {db_prefix}to_dos
 		WHERE id_todo = {int:todo_id}
@@ -481,7 +484,7 @@ function delete()
         'id_member' => $id_member,
     )
     );
-    
+
     redirectexit('action=delegator');
 }
 
