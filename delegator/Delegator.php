@@ -108,9 +108,10 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state
+					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
 					WHERE T1.state =0
 					OR T1.state =1
 					ORDER BY {raw:sort}
@@ -142,6 +143,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 					SELECT COUNT(*)
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
 					WHERE T1.state =0
 					OR T1.state =1\',
 					array(
@@ -190,14 +192,14 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 					'),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'task_name',
+                    'reverse' => 'task_name DESC',
                 ),
             ),
 
-             'project' => array(      //PROJEKT - dela!
+            'project' => array(      //PROJEKT - dela!
                 'header' => array(
-                    'value' => $txt['project_name'],      //dodano v modification.xml
+                    'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -210,14 +212,29 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                 ),
             ),
 
-            'deadline' => array(      //ROK
+	    'author' => array(      //AVTOR - dela!
+                'header' => array(
+                    'value' => $txt['delegator_author'],      //dodano v modification.xml
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						return parse_bbc($row[\'author\']);
+					'),
+                ),
+                'sort' =>  array(
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
+                ),
+            ),
+
+            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne številke dneva v letu - EVO TUKI GIZMO!
                 'header' => array(
                     'value' => $txt['delegator_deadline'],
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
 						$row[\'deadline\'] = strtotime($row[\'deadline\']);
-						return timeformat($row[\'deadline\'], \'%d %B %Y, %A\');
+						return timeformat($row[\'deadline\'], \'%j\') - date("z") - 1 . " " . "dni se";
 					'),
                     'style' => 'width: 20%; text-align: center;',
                 ),

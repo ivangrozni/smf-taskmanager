@@ -96,6 +96,7 @@ Drop down menu: @Jaka - kaj rabimo?
 			<search position="end" />
 			<add><![CDATA[$txt['delegator'] = 'Delegator';
 $txt['delegator_actions'] = 'Actions';
+$txt['delegator_author'] = 'Author';
 $txt['delegator_empty'] = !$context['user']['is_admin'] ? 'To-Do List is empty!' : 'To-Do List is empty! Are you free man? :)';
 $txt['delegator_del'] = 'Delete';
 $txt['delegator_subject'] = 'Subject';
@@ -108,6 +109,7 @@ $txt['delegator_priority'] = 'Priority';
 $txt['delegator_priority0'] = 'Low';
 $txt['delegator_priority1'] = 'Normal';
 $txt['delegator_priority2'] = 'High';
+$txt['delegator_project_name'] = 'Project';
 $txt['tasks_empty'] = 'No tasks';
 //Add Task
 $txt['task_name'] = 'Task name';
