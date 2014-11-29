@@ -14,6 +14,11 @@ function template_main()
 
     template_show_list('list_tasks');
                 //template_show_list('list_delegator');
+
+    // include js
+    echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>';
 }
 
 function template_add()
@@ -23,8 +28,8 @@ function template_add()
 
         // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
         global $smcFunc;
-        $request = $smcFunc['db_query']('', ' 
-                 SELECT id, name 
+        $request = $smcFunc['db_query']('', '
+                 SELECT id, name
                  FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
         // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
 	echo '
@@ -40,7 +45,7 @@ function template_add()
 					<dl class="delegator_add">
 						<dt>
 						<!--	<label for="name">', $txt['task_name'], '</label> --> <!-- pusti prazno, ker nimamo definiranega texta tas_name -->
-                                   <label for="name"> Zadolzitev </label> 
+                                   <label for="name"> Zadolzitev </label>
 						</dt>
 						<dd>
 							<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
@@ -85,14 +90,14 @@ function template_add()
 							<label>', $txt['project_name'], '</label>
 					 </dt>
 						<dd>
-						
+
                        <select name="id_proj">'; // nadomestil navadno vejico
         while ($row = $smcFunc['db_fetch_assoc']($request)) {
             echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
             }
         $smcFunc['db_free_result']($request);
 
-            echo ' </select> 
+            echo ' </select>
 
 						</dd>
 					</dl>
@@ -175,7 +180,7 @@ function template_proj()
 							<input type="text" name="dend3" size="4" maxlength="4" value="" class="input_text" /> -
 							<input type="text" name="dend1" size="2" maxlength="2" value="" class="input_text" /> -
 							<input type="text" name="dend2" size="2" maxlength="2" value="" class="input_text" />
-						</dd>						
+						</dd>
 
 
 

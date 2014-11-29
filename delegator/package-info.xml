@@ -11,6 +11,8 @@
 		<modification>modification.xml</modification>
 		<require-file name="Delegator.php" destination="$sourcedir" />
 		<require-file name="Delegator.template.php" destination="$themedir" />
+		<require-file name="delegator.js" destination="$themedir/scripts" />
+		<require-file name="moment.min.js" destination="$themedir/scripts" />
 		<database>database.php</database>
 		<redirect url="$scripturl?action=delegator" timeout="3000">redirect.txt</redirect>
 	</install>
@@ -20,5 +22,7 @@
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="$sourcedir/Delegator.php" />
 		<remove-file name="$themedir/Delegator.template.php" />
+		<remove-file name="$themedir/scripts/delegator.js" />
+		<remove-file name="$themedir/scripts/moment.min.js" />
 	</uninstall>
 </package-info>
