@@ -111,6 +111,9 @@ $txt['delegator_priority1'] = 'Normal';
 $txt['delegator_priority2'] = 'High';
 $txt['delegator_project_name'] = 'Project';
 $txt['tasks_empty'] = 'No tasks';
+$txt['priority_0'] = 'Please to do it';
+$txt['priority_1'] = 'Do it';
+$txt['priority_2'] = 'Do it or gulag';
 //Add Task
 $txt['task_name'] = 'Task name';
 $txt['task_desc'] = 'Task description';

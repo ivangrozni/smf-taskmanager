@@ -242,7 +242,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" alt="" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
