@@ -52,15 +52,14 @@ function Delegator()
         'acc_task' => 'acc_task',             //sprejemanje zadolzitve (proste zadolzitve)
         'end_task' => 'end_task',             //zakljucek zadolzitve
         'edit_task' => 'edit_task',           //editanje taska
+        'del_task' => 'del_task',
         'edit_proj' => 'edit_proj',           //editanje projekta
         'view_task' => 'view_task',           //podrobnosti taska
         'view_proj' => 'view_proj',           //podrobnosti projekta
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
             //'ToDo' => 'ToDoMain',
-            //'add' => 'add',
             //'add2' => 'add2',
-            //'delete' => 'delete',
             //'did' => 'didChange',
     );
 
@@ -161,22 +160,6 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
             // name, deadline, priority - so ze narejeni
             // avtor, worker(s), stanje - se manjkajo - ugotoviti, kako jih zajeti
 	    // projekt zdaj dela
-
-            // doda id stolpec v tabelo, ki se pojavi na strani od delegatorja
-            'id' => array(
-                'header' => array(
-                    'value' => 'id',
-                ),
-                'data' => array(
-                    'function' => create_function('$row', 'return $row[\'id\'];'
-                    ),
-                 'sort' => array(
-                     'default' => 'id',
-                     'reverse' => 'id DESC',
-                    ),
-                ),
-
-            ),
             // vsaka stvar v tabeli ima header, data, sort
 
             'name' => array(		// TASK
@@ -272,7 +255,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'state\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
@@ -482,23 +465,21 @@ function didChange()
     redirectexit('action=delegator');
 }
 
-function delete()
+function del_task()
 {
     global $smcFunc, $context;
 
     checkSession('get');
 
-    $todo_id = (int) $_GET['id'];
-    $id_member = $context['user']['id'];
+    $task_id = (int) $_GET['task_id'];
+    //$id_member = $context['user']['id'];
 
     $smcFunc['db_query']('', '
-		DELETE FROM {db_prefix}to_dos
-		WHERE id_todo = {int:todo_id}
-			AND id_member = {int:id_member}',
-    array(
-        'todo_id' => $todo_id,
-        'id_member' => $id_member,
-    )
+        DELETE FROM {db_prefix}tasks
+        WHERE id = {int:task_id}',
+        array(
+            'task_id' => $task_id
+        )
     );
 
     redirectexit('action=delegator');
