@@ -56,6 +56,7 @@ function Delegator()
         'edit_proj' => 'edit_proj',           //editanje projekta
         'view_task' => 'view_task',           //podrobnosti taska
         'view_proj' => 'view_proj',           //podrobnosti projekta
+        'vt' => 'vt'
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
             //'ToDo' => 'ToDoMain',
@@ -166,13 +167,9 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                 'header' => array(
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
-                'data' => array(
-                    'function' => create_function('$row', '
-						if (strtolower($row[\'task_name\']) == \'i love grafitus\')
-							return parse_bbc($row[\'task_name\']) . \' <br /><em>grafitus said: "Me too you... :)))"</em>\';
-
-						return parse_bbc($row[\'task_name\']);
-					'),
+                'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
+                    'function' => create_function('$row', 'return <a href=\"$scripturl?sa=vt;task_id=$row[\'id\']\">$row[\'name\']<a>);'
+					),
                 ),
                 'sort' =>  array(
                     'default' => 'task_name',
@@ -257,6 +254,10 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 
 						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 					'),
+/*=======
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'state\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
+					'), // kaj je ta dolg string???
+                                        >>>>>>> 44a1722... view task upam, da ne bo spet brickal */
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -427,7 +428,81 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     redirectexit('action=delegator'); // redirect exit - logicno
 }
 
+##################################################################
+########################## view_task #############################
+##################################################################
 
+// analogija funkciji add()
+function vt()
+{
+    global $smcFunc, $scripturl, $context, $txt;
+
+    $context['sub_template'] = 'vt';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=vt',
+        'name' => $txt['delegator_view_task']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_vt
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_vt dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_vt label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_vt dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+}
+
+
+function view_task() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
+// tale funkcija ni nujno potrebna - view bo nalozila zgornja funkcija vt
+{
+    global $smcFunc, $context;
+//isAllowedTo('add_new_todo');
+    checkSession();
+    $id_coord = $context['user']['id'];
+/* Tale funkcija bo vkljucevala gumb za prevzemanje naloge
+ */
+// description manjka
+/*$smcFunc['db_insert']('', '{db_prefix}projects',
+array(
+'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date',
+),
+array(
+$id_coord, $name, $description, $start, $end,
+),
+array('id')
+); // Tukaj se bo vpisevalo v relacijsko tabelo
+*/
+    redirectexit('action=delegator'); // redirect exit - logicno
+}
+
+
+##################################################################
+##################################################################
+##################################################################
 
 
 // To bomo smotrno preuredili!!!

@@ -124,6 +124,9 @@ $txt['delegator_add_proj'] = 'Add Project';
 $txt['delegator_add_task'] = 'Add Task';
 $txt['project_name'] = 'Project';
 $txt['project_desc'] = 'Description';
+//View Task
+$txt['delegator_view_task'] = 'View Task';
+
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';
