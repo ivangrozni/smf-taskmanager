@@ -168,7 +168,8 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row', 'return <a href=\"$scripturl?sa=vt;task_id=$row[\'id\']\">$row[\'name\']<a>);'
+                    'function' => create_function('$row', 
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
@@ -223,7 +224,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'reverse' => 'deadline DESC',
                 ),
             ),
-
+            // spet undefined index priority je v errolog-u
             'priority' => array(      //POMEMBNOST
                 'header' => array(
                     'value' => $txt['delegator_priority'],
@@ -244,6 +245,9 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
+            // undefined index: task_actions
+            // g1zmo - tole je ze delalo - ali sva pobrkala z verzijami???
+            // mislim da ne dela, ker v tabeli tasks ni stolpca actions... al kaj
             'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
                 'header' => array(
                     'value' => $txt['delegator_actions'],

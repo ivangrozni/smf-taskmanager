@@ -211,12 +211,12 @@ function template_vt() // id bi bil kar dober argument
     // id_author, name, description, creation_date, deadline, priority, state
     
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
-    $task_id = $_GET['id'];
+    $task_id = $_GET['task_id'];
 
     $request = $smcFunc['db_query']('', '
           SELECT *
           FROM {db_prefix}tasks 
-          WHERE id = $task_id ', array() ); // pred array je manjkala vejica in je sel cel forum v k
+          WHERE id = \'.$task_id .\'', array() ); // pred array je manjkala vejica in je sel cel forum v k
 // id od zeljenega taska potrebujemo podatke
     $row = $smcFunc['db_fetch_assoc']($request);
 // v tale echo bo padla tudi kaka forma / claim task / edit task
