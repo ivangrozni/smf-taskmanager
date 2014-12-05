@@ -216,25 +216,69 @@ function template_vt() // id bi bil kar dober argument
     $request = $smcFunc['db_query']('', '
           SELECT *
           FROM {db_prefix}tasks 
-          WHERE id = \'.$task_id .\'', array() ); // pred array je manjkala vejica in je sel cel forum v k
+          WHERE id = '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v k
 // id od zeljenega taska potrebujemo podatke
     $row = $smcFunc['db_fetch_assoc']($request);
 // v tale echo bo padla tudi kaka forma / claim task / edit task
-    echo '
-          <div id="container">
-          <h3 class="catbg"><span class="left"></span>
-          ', $context['page_title'], '
-          </h3>
-          <div class="content">
-          <p><h3>', $txt['delegator_deadline'],':</h3> ', $row['deadline'] ,'</p>
-          <p>', $txt['delegator_state'],': ', $row['state'] ,'</p>
-          <!-- <p>', $txt['delegator_proj_name'],': ', $row['id_proj'] ,'</p> <!-- Tukaj bi rabil ime projekta in link do view_proj oz vp --> -->
-          <!-- <p>', $txt['delegator_avtor'],': ', $row['id_author'] ,'</p> <!-- Tukaj bi rabil ime memberja in link do osebnega pogleda memberja --> -->
-          <!-- <p>', $txt['delegator_proj_name'],': ', $row['id_proj'] ,'</p> <!-- Tukaj bi rabil ime projekta in link do view_proj oz vp, kar je celo v drugi tabeli - bo treba delat joine --> -->
-          <!-- <p>', $txt['delegator_workers'],': ', $row['id_workers'] ,'</p> <!-- Tukaj bi rabil ime projekta in link do view_proj oz vp --> -->
-          <p>',$row['description'],'</p>
-          </div> </div>
-           '; 
+
+echo '
+    <div id="container">
+	<h3 class="catbg"><span class="left"></span>
+		', $context['page_title'], '
+	</h3>
+	<div class="windowbg">
+		<span class="topslice"><span></span></span>
+		<div class="content">
+			<dl class="delegator_vt">
+				<dt>
+					<label for="name">', $txt['task_name'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['name'] ,'
+					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
+				</dd>
+                                <dt>
+					<label for="deadline">', $txt['delegator_deadline'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['deadline'] ,'
+				</dd>
+                                <dt>
+					<label for="description">', $txt['task_desc'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['description'] ,'
+				</dd>
+                                <dt>
+					<label for="priority">', $txt['delegator_priority'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['priority'] ,'
+				</dd>
+                                <dt>
+					<label for="state">', $txt['delegator_state'], '</label>
+				</dt>
+				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
+                                       ', $row['state'] ,'
+				</dd>
+
+
+			 </dl>
+					<div id="buttons"> <!-- skupaj bodo tukaj gumbi za sprejetje naloge, urejanje in brisanje -->
+						
+					</div>
+			</div>
+			<span class="botslice"><span></span></span>
+		</div>
+	</div><br />
+        <div class="windowbg">
+           <div id="buttons">
+		<input type="submit" name="submit" value="',$txt['delegator_claim_task'] ,'" class="button_submit" /> &nbsp
+                <input type="submit" name="submit" value="',$txt['delegator_edit_task'] ,'" class="button_submit" /> &nbsp
+                <input type="submit" name="submit" value="',$txt['delegator_del_task'] ,'" class="button_submit" />
+           </div>
+        </div>
+';
 }
 
 
