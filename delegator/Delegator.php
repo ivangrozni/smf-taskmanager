@@ -108,7 +108,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author
+					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
@@ -183,9 +183,11 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						return parse_bbc($row[\'project_name\']);
-					'),
+                    'function' => create_function('$row', 
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
+//'return parse_bbc($row[\'project_name\']);
+
+					),
                 ),
                 'sort' =>  array(
                     'default' => 'name',
@@ -488,6 +490,7 @@ function view_task() // mrbit bi moral imeti se eno funkcijo, v stilu add pri ta
     checkSession();
     $id_coord = $context['user']['id'];
 /* Tale funkcija bo vkljucevala gumb za prevzemanje naloge
+   added: ALI PA TUDI NE... imamo druge funkcije za to...
  */
 // description manjka
 /*$smcFunc['db_insert']('', '{db_prefix}projects',
@@ -502,6 +505,58 @@ array('id')
 */
     redirectexit('action=delegator'); // redirect exit - logicno
 }
+
+
+##################################################################
+##################################################################
+##################################################################
+
+##################################################################
+################### view project #################################
+##################################################################
+
+function view_proj()
+{
+    global $smcFunc, $scripturl, $context, $txt;
+
+    $context['sub_template'] = 'view_proj';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=view_proj',
+        'name' => $txt['delegator_view_proj']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_view_proj
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_view_proj dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_view_proj label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_view_proj dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+}
+
 
 
 ##################################################################

@@ -213,10 +213,20 @@ function template_vt() // id bi bil kar dober argument
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
     $task_id = $_GET['task_id'];
 
+
+
+
     $request = $smcFunc['db_query']('', '
-          SELECT *
+SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description
+					FROM {db_prefix}tasks T1
+					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+					LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
+					WHERE '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+
+
+/*          SELECT *
           FROM {db_prefix}tasks 
-          WHERE id = '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v k
+          WHERE id = '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v k*/
 // id od zeljenega taska potrebujemo podatke
     $row = $smcFunc['db_fetch_assoc']($request);
 // v tale echo bo padla tudi kaka forma / claim task / edit task
@@ -234,9 +244,33 @@ echo '
 					<label for="name">', $txt['task_name'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['name'] ,'
+                                      <h3> ', $row['task_name'] ,' </h3>
 					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
 				</dd>
+
+                                <dt>
+					<label for="author">', $txt['delegator_task_author'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['author'] ,'
+				</dd>
+
+                                <dt>
+					<label for="project_name">', $txt['project_name'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['project_name'] ,'
+				</dd>
+
+                                <dt>
+					<label for="creation_date">', $txt['delegator_creation_date'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['creation_date'] ,'
+				</dd>
+
+
+
                                 <dt>
 					<label for="deadline">', $txt['delegator_deadline'], '</label>
 				</dt>
@@ -279,7 +313,98 @@ echo '
            </div>
         </div>
 ';
+$smcFunc['db_free_result']($request);
+
 }
+
+//##############################//##############################
+//##############################//##############################
+//##############################//##############################
+
+
+function template_view_proj() 
+{
+
+    global $scripturl, $context, $txt;
+    global $smcFunc;
+
+    $id_proj = $_GET['id_proj'];
+
+    $request = $smcFunc['db_query']('', '
+SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
+					FROM {db_prefix}projects T1
+					LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
+					WHERE '.$id_proj .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+
+echo '
+    <div id="container">
+	<h3 class="catbg"><span class="left"></span>
+		', $context['page_title'], '
+	</h3>
+	<div class="windowbg">
+		<span class="topslice"><span></span></span>
+		<div class="content">
+			<dl class="delegator_view_proj">
+				<dt>
+					<label for="name">', $txt['project_name'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['proj_name'] ,'
+					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
+				</dd>
+
+                                <dt>
+					<label for="coordinator">', $txt['delegator_proj_coord'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['coord_name'] ,'
+          <!-- Tukaj bo link do view_personal !!! -->
+				</dd>
+
+                                <dt>
+					<label for="start">', $txt['project_start'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['start'] ,'
+				</dd>
+
+                                <dt>
+					<label for="end">', $txt['project_end'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['end'] ,'
+				</dd>
+
+
+                                <dt>
+					<label for="description">', $txt['project_desc'], '</label>
+				</dt>
+				<dd>
+                                       ', $row['description'] ,'
+				</dd>
+
+			 </dl>
+					<div id="buttons"> <!-- skupaj bodo tukaj gumbi za sprejetje naloge, urejanje in brisanje -->
+						
+					</div>
+			</div>
+			<span class="botslice"><span></span></span>
+		</div>
+	</div><br />
+        <div class="windowbg">
+           Tukaj bo prisla tabela taskov tega projekta...<br>
+           Seveda mora biti spet polinkana s prikazom taskov...
+           </div>
+        </div>
+';
+
+$smcFunc['db_free_result']($request);
+
+}
+
+
 
 
 ?>
