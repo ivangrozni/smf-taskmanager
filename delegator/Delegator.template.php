@@ -93,7 +93,7 @@ function template_add()
 
                        <select name="id_proj">'; // nadomestil navadno vejico
         while ($row = $smcFunc['db_fetch_assoc']($request)) {
-            echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
+            echo '<option value="'.$row['id'].'">'.$row['name'].' id:'.$row['id'] . '</option> ';
             }
         $smcFunc['db_free_result']($request);
 
@@ -217,12 +217,12 @@ function template_vt() // id bi bil kar dober argument
 
 
     $request = $smcFunc['db_query']('', '
-SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description
+SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-					WHERE '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
-
+					WHERE T1.id = '. $task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+// id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
 
 /*          SELECT *
           FROM {db_prefix}tasks 
@@ -252,14 +252,15 @@ echo '
 					<label for="author">', $txt['delegator_task_author'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['author'] ,'
+                                       ', $row['author'] ,' <!-- tukaj bo link do personal_view od avtorja -->
 				</dd>
 
                                 <dt>
 					<label for="project_name">', $txt['project_name'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['project_name'] ,'
+                                       <!-- ', $row['project_name'] ,' -->
+                                       <a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>  
 				</dd>
 
                                 <dt>
@@ -334,7 +335,7 @@ function template_view_proj()
 SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
 					FROM {db_prefix}projects T1
 					LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
-					WHERE '.$id_proj .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+					WHERE T1.id = '.$id_proj .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 
     $row = $smcFunc['db_fetch_assoc']($request);
 
@@ -401,6 +402,8 @@ echo '
 ';
 
 $smcFunc['db_free_result']($request);
+
+// template_show_list('list_tasks'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
 }
 

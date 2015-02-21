@@ -6,4 +6,5 @@
 Odkrita huda napaka na forum_kopija, na katerem naj bi testirali delegator.
 Zato so bila testiranja neuspesna. Krivec je Jaka Perovsek. Pozabil je pobrisat Cache file.
 
-
+2015 02 21
+Torej, dobil sem novo idejo. Vsaj projektu bi lahko dali zraven še topic_id, v katerem bi potekala debata o tem projektu... Kjer bi bil pregled nad zadolžitvami projekta...
