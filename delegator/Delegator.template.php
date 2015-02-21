@@ -18,7 +18,7 @@ function template_main()
     // include js
     echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
     echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
 }
 
 function template_add()
@@ -403,10 +403,12 @@ echo '
 
 $smcFunc['db_free_result']($request);
 
-// template_show_list('list_tasks'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+template_show_list('list_tasks_of_proj'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
 
 }
-
 
 
 

@@ -515,9 +515,9 @@ array('id')
 ################### view project #################################
 ##################################################################
 
-function view_proj()  
+function view_proj()   
 {
-    global $smcFunc, $scripturl, $context, $txt;
+    global $smcFunc, $scripturl, $context, $txt, $sourcedir;
 
     $context['sub_template'] = 'view_proj';
     $context['linktree'][] = array(
@@ -560,13 +560,13 @@ function view_proj()
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-/*
+    $id_proj = $_GET['id_proj'];
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
-        'id' => 'list_tasks',
+        'id' => 'list_tasks_of_proj',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
@@ -737,8 +737,9 @@ function view_proj()
 
     //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
 
+    require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
-*/
+
 }
 
 
