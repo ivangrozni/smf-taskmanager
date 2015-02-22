@@ -272,7 +272,7 @@ SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline A
 		)
 	);
 
-    $members = [];
+    $members = array();
     while ($m = $smcFunc['db_fetch_assoc']($request)) {
     	$members[] = $m["real_name"];
     }
@@ -469,7 +469,7 @@ function template_view_worker()
 
     $request = $smcFunc['db_query']('', '
     SELECT T1.real_name AS name FROM {db_prefix}members T1
-    WHERE T1.id_member={int:id_member}', array('id_member' => $id_member);
+    WHERE T1.id_member={int:id_member}', array('id_member' => $id_member));
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
