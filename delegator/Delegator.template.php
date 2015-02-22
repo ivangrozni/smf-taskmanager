@@ -465,6 +465,48 @@ function template_view_worker()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
+    $id_member = (int) $_GET['id_member'];
+
+    $request = $smcFunc['db_query']('', '
+    SELECT T1.real_name AS name FROM {db_prefix}members T1
+    WHERE T1.id_member={int:id_member}', array('id_member' => $id_member);
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+
+echo '
+    <div id="container">
+    <div class="cat_bar">
+		<h3 class="catbg"><span class="left"></span>
+			', $context['page_title'], '
+		</h3>
+	</div>
+	<div class="windowbg">
+		<span class="topslice"><span></span></span>
+		<div class="content">
+			<dl class="delegator_view_worker">
+				<dt>
+					<label for="name"><h2>WORKER</h2></label>
+				</dt>
+				<dd>
+                                       '.$row['name'].'
+				</dd>
+
+                                <dt>
+
+				</dt>
+				<dd>
+
+				</dd>
+
+			 </dl>
+
+		</div>
+	</div>
+	<span class="botslice"></span>
+    </div>
+    </div><br />';
+
 
 template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
