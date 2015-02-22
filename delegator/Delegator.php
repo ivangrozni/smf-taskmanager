@@ -45,7 +45,7 @@ function Delegator()
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
         'personal_view' => 'personal_view',   //zadolzitve uporabnika
-	'add' => 'add',
+	'add' => 'add',                       // nalozi view za add task... al kaj
         'proj' => 'proj',                     //[!]omfg, kje si g1smo?
         'add_proj' => 'add_proj',             //dodajanje novega projekta
         'add_task' => 'add_task',             //dodajanje novega taska
@@ -362,8 +362,8 @@ function add_task()
     array('id')
     );
 
-    redirectexit('action=delegator'); //ali moram tole spremeniti???
-    // Pomoje ne...
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');     
+
 }
 
 // analogija funkciji add()
@@ -442,7 +442,17 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     array('id')
     );
 
-    redirectexit('action=delegator'); // redirect exit - logicno
+    // Redirect vrze na isti projekt...
+    // Fora je, da moram pogledat, kateri id je dobil...
+    $request = $smcFunc['db_query']('', '
+    SELECT T1.id AS id_proj FROM {db_prefix}projects T1
+    ORDER BY T1.id DESC
+    LIMIT 1', array() );
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+
+    redirectexit('action=delegator;sa=view_proj;id_proj='.$row['id']); // redirect exit - logicno
 }
 
 ##################################################################

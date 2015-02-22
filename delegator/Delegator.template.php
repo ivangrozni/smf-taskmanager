@@ -434,9 +434,11 @@ echo '
 			<span class="botslice"><span></span></span>
 		</div>
 	</div><br />
+                
+                 <a href="index.php?action=delegator;sa=add" class="button_submit">', $txt['delegator_add_task'] ,'</a>&nbsp;
 
                 <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+                <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a>
 
        <!-- <div class="windowbg">
            Tukaj bo prisla tabela taskov tega projekta...<br>
@@ -472,7 +474,7 @@ function template_view_worker()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-echo '<h2 style="font-size:1.5em" '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
 
 template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
