@@ -80,7 +80,7 @@ function Delegator()
 
     $subActions[$sub_action]();
 
-//Sixth, begin doing all the stuff that we want this action to display
+// Sixth, begin doing all the stuff that we want this action to display
 // Store the results of this stuff in the $context array.
 // This action's template(s) will display the contents of $context.
 
@@ -169,7 +169,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 					),
                 ),
@@ -184,7 +184,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
 //'return parse_bbc($row[\'project_name\']);
 
@@ -259,7 +259,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 					'),
 /*=======
 						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'state\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
@@ -344,10 +344,10 @@ function add_task()
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
     array(
-        'id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
+        'id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string'
     ),
     array(
-        $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state,
+        $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state, date("Y-m-d")
     ),
     array('id')
     );
@@ -558,7 +558,7 @@ function view_proj()
 	</style>';
 
 /////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
+//////////////////// prikaz taskov v projektu  //////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
     $id_proj = $_GET['id_proj'];
@@ -637,7 +637,7 @@ function view_proj()
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 					),
                 ),
@@ -652,7 +652,7 @@ function view_proj()
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
 //'return parse_bbc($row[\'project_name\']);
 
@@ -968,7 +968,7 @@ function view_worker()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 					'),
 
                     'style' => 'width: 10%; text-align: center;',
@@ -976,6 +976,7 @@ function view_worker()
             ),
         ),
     );
+
 
     //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
 
