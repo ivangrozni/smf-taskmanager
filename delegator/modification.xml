@@ -58,6 +58,12 @@ Drop down menu: @Jaka - kaj rabimo?
                                             'show' => allowedTo('add_new_todo'),
                                             'is_last' => true,
                                         ),
+                                        'view_projects' => array(
+                                            'title' => $txt['delegator_projects'],
+                                            'href' => $scripturl . '?action=delegator;sa=view_projects',
+                                            'show' => allowedTo('add_new_todo'),
+                                            'is_last' => true,
+                                        ),
 
 				),
 			),
