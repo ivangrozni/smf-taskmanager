@@ -61,6 +61,7 @@ function Delegator()
         'view_proj' => 'view_proj',           //podrobnosti projekta
         'vt' => 'vt',
         'view_worker' => 'view_worker',
+        'my_tasks' => 'my_tasks',
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -592,14 +593,12 @@ function view_proj()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT COUNT(*)
-					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state =0
-					OR T1.state =1\',
-					array(
-					)
+			SELECT COUNT(*)
+			FROM {db_prefix}tasks T1
+			LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+			LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
+			WHERE T1.state =0
+			OR T1.state =1\', array()
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
 				$smcFunc[\'db_free_result\']($request);
@@ -733,7 +732,7 @@ function view_proj()
 #################### view member #################################
 ##################################################################
 
-function view_worker()
+function view_worker() 
 {
 // More pokazat zadolzitve, pri katerih si worker...
 
@@ -802,7 +801,7 @@ function view_worker()
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
                                         LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
-                                        WHERE T1.id_member='.$id_member.'
+                                        WHERE T1.id_member={int:id_member}
                                         ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
@@ -834,7 +833,7 @@ function view_worker()
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state =0
+					WHERE T1.state = 0
 					OR T1.state =1\',
 					array(
 					)
@@ -967,6 +966,235 @@ function view_worker()
 }
 
 
+function my_tasks() 
+{
+
+
+    global $smcFunc, $scripturl, $context, $txt, $sourcedir;
+
+    $context['sub_template'] = 'my_tasks';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=my_tasks',
+        'name' => $txt['delegator_my_tasks']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_my_tasks
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_my_tasks dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_my_tasks label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_my_tasks dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+
+    $id_member = $context['user']['id'];
+
+// tole lahko uporabimo za prikaz taskov, ampak si ne upam...
+// matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
+    $list_options = array(
+        //'id' => 'list_todos',                                //stara To-Do List koda
+        'id' => 'list_tasks_of_worker',
+        'items_per_page' => 30,                                //stevilo taskov na stran
+        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'default_sort_col' => 'deadline',                      //razvrsis taske po roku
+        'get_items' => array(
+            // FUNKCIJE
+
+            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+				global $smcFunc;
+
+				$request = $smcFunc[\'db_query\'](\'\', \'
+                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj
+                                        FROM {db_prefix}workers T1
+                                        LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
+                                        LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
+                                        LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
+                                        WHERE T1.id_member={int:id_member}
+                                        ORDER BY {raw:sort}
+					LIMIT {int:start}, {int:per_page}\',
+					array(
+						\'id_member\' => $id_member,
+						\'sort\' => $sort,
+						\'start\' => $start,
+						\'per_page\' => $items_per_page,
+					)
+				);
+
+				$tasks = array();
+				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+					$tasks[] = $row;
+				$smcFunc[\'db_free_result\']($request);
+
+				return $tasks;                                    //funkcija vrne taske
+                                '),
+            'params' => array(
+                'id_member' => $context['user']['id'],
+                 ),
+        ),
+
+        'get_count' => array(							//tudi tu je posodobljen query
+            'function' => create_function('', '
+				global $smcFunc;
+
+				$request = $smcFunc[\'db_query\'](\'\', \'
+					SELECT COUNT(*)
+					FROM {db_prefix}tasks T1
+					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
+					WHERE T1.state = 0
+					OR T1.state = 1\',
+					array(
+					)
+				);
+				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
+				$smcFunc[\'db_free_result\']($request);
+
+				return $total_tasks;
+			'),
+        ),
+        'no_items_label' => $txt['tasks_empty'],
+        'columns' => array(
+            // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
+            // name, deadline, priority - so ze narejeni
+            // avtor, worker(s), stanje - se manjkajo - ugotoviti, kako jih zajeti
+	    // projekt zdaj dela
+            // vsaka stvar v tabeli ima header, data, sort
+
+            'name' => array(		// TASK
+                'header' => array(
+                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                ),
+                'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
+                    'function' => create_function('$row', 
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
+					),
+                ),
+                'sort' =>  array(
+                    'default' => 'task_name',
+                    'reverse' => 'task_name DESC',
+                ),
+            ),
+
+            'project' => array(      //PROJEKT - dela!
+                'header' => array(
+                    'value' => $txt['delegator_project_name'],      //dodano v modification.xml
+                ),
+                'data' => array(
+                    'function' => create_function('$row',
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
+//'return parse_bbc($row[\'project_name\']);
+
+					),
+                ),
+                'sort' =>  array(
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
+                ),
+            ),
+
+	    'author' => array(      //AVTOR - dela!
+                'header' => array(
+                    'value' => $txt['delegator_author'],      //dodano v modification.xml
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '
+//return parse_bbc($row[\'author\']);
+					),
+                ),
+                'sort' =>  array(
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
+                ),
+            ),
+
+            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne številke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_deadline'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						$deadline = $row[\'deadline\'];
+                        return "<span class=\"relative-time\">$deadline</span>";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'deadline',
+                    'reverse' => 'deadline DESC',
+                ),
+            ),
+            // spet undefined index priority je v errolog-u
+            'priority' => array(      //POMEMBNOST
+                'header' => array(
+                    'value' => $txt['delegator_priority'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						global $settings, $txt;
+
+						if ($row[\'priority\'] == 0)
+							$image = \'warning_watch\';
+						elseif ($row[\'priority\'] == 1)
+							$image = \'warn\';
+						elseif ($row[\'priority\'] == 2)
+							$image = \'warning_mute\';
+
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
+					'),
+                    'style' => 'width: 10%; text-align: center;',
+                ),
+            ),
+            // undefined index: task_actions
+            // g1zmo - tole je ze delalo - ali sva pobrkala z verzijami???
+            // mislim da ne dela, ker v tabeli tasks ni stolpca actions... al kaj
+            'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
+                'header' => array(
+                    'value' => $txt['delegator_actions'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						global $context, $settings, $scripturl;
+
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+					'),
+
+                    'style' => 'width: 10%; text-align: center;',
+                ),
+            ),
+        ),
+    );
+
+
+    //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
+
+    require_once($sourcedir . '/Subs-List.php');
+    createList($list_options);
+
+}
+
 
 
 
@@ -1040,30 +1268,14 @@ function edit_task()
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     //$deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
     $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
-    $state = 0; // !!!!!!!!! POPRAVI V TEMPLATE-u
-
-    /*if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
-      fatal_lang_error('to_do_empty_fields', false); */
+    //$state = 0; // !!!!!!!!! POPRAVI V TEMPLATE-u
 
     $smcFunc['db_query']('','
                   UPDATE {db_prefix}tasks T1
-                  SET T1.name={string:name}, T1.description={string:description}, T1.deadline={string:deadline}, T1.state={int:state}, T1.id_proj={int:id_proj}
-                  WHERE T1.id = {int:id_task}', array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'state' => $state, 'id_proj' => $id_proj, 'id_task' => $id_task) );
+                  SET T1.name={string:name}, T1.description={string:description}, T1.deadline={string:deadline},  T1.id_proj={int:id_proj}
+                  WHERE T1.id = {int:id_task}', array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task) );
 
-    // replace !!!
-    /*
-    $smcFunc['db_insert']('replace', '{db_prefix}tasks',
-    array(
-        'id' => 'int','id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
-    ),
-    array(
-        $id_task ,$_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state,
-    ),
-    array('id')
-    );
-    */
-    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');
-
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');     
 }
 
 // To bomo smotrno preuredili!!!

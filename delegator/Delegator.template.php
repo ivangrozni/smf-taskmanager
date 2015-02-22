@@ -19,13 +19,14 @@ function template_add()
 {
 	global $scripturl, $context, $txt;
         // id_author, name, description, creation_date, deadline, priority, state
-
+        
         // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
         global $smcFunc;
         $request = $smcFunc['db_query']('', '
                  SELECT id, name
                  FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
         // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
+        
 	echo '
 	<div id="container">
 		<div class="cat_bar">
@@ -123,7 +124,7 @@ function template_add()
 function template_proj()
 {
 	global $scripturl, $context, $txt;
-
+        
 	echo '
 	<div id="container">
 		<div class="cat_bar">
@@ -201,9 +202,9 @@ function template_vt() // id bi bil kar dober argument
     // id_author, name, description, creation_date, deadline, priority, state
 
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
-    $task_id = $_GET['task_id'];
+    $task_id = (int) $_GET['task_id']; 
 
-
+    
 
 
     $request = $smcFunc['db_query']('', '
@@ -211,7 +212,7 @@ SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline A
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-		WHERE T1.id = '. $task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+		WHERE T1.id = {int:task_id} ', array('task_id' => $task_id) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 // id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
 
 /*          SELECT *
@@ -345,7 +346,7 @@ echo '
 			 </dl>
 			 <br />
 				', $claimButton, '&nbsp;
-                <a href="index.php?action=delegator;sa=edit_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=et;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
                 <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
 			</div>
 			<span class="botslice"><span></span></span>
@@ -367,13 +368,13 @@ function template_view_proj()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
-    $id_proj = $_GET['id_proj'];
+    $id_proj = (int) $_GET['id_proj'];
 
     $request = $smcFunc['db_query']('', '
 SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
 					FROM {db_prefix}projects T1
 					LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
-					WHERE T1.id = '.$id_proj .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+					WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 
     $row = $smcFunc['db_fetch_assoc']($request);
 
@@ -433,6 +434,10 @@ echo '
 			<span class="botslice"><span></span></span>
 		</div>
 	</div><br />
+
+                <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+
        <!-- <div class="windowbg">
            Tukaj bo prisla tabela taskov tega projekta...<br>
            Seveda mora biti spet polinkana s prikazom taskov...
@@ -467,43 +472,33 @@ function template_view_worker()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-echo '
-    <div id="container">
-    <div class="cat_bar">
-		<h3 class="catbg"><span class="left"></span>
-			', $context['page_title'], '
-		</h3>
-	</div>
-	<div class="windowbg">
-		<span class="topslice"><span></span></span>
-		<div class="content">
-			<dl class="delegator_view_worker">
-				<dt>
-					<label for="name"><h2>WORKER</h2></label>
-				</dt>
-				<dd>
-                                       '.$row['name'].'
-				</dd>
-
-                                <dt>
-
-				</dt>
-				<dd>
-
-				</dd>
-
-			 </dl>
-
-		</div>
-	</div>
-	<span class="botslice"></span>
-    </div>
-    </div><br />';
-
+echo '<h2 style="font-size:1.5em" '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
 
 template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
 }
+
+function template_my_tasks()
+{
+
+    global $scripturl, $context, $txt;
+    global $smcFunc;
+
+    $id_member = $context['user']['id'];
+
+    $request = $smcFunc['db_query']('', '
+    SELECT T1.real_name AS name FROM {db_prefix}members T1
+    WHERE T1.id_member={int:id_member}', array('id_member' => $id_member) );
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+
+echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+
+template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+
+}
+
 
 //##############################//##############################
 //##############################//##############################
@@ -637,9 +632,6 @@ deadline date before: '.$row['deadline'].'</br>
 			});
 		// ]]></script>
 	</div><br />';
-
-
-
 }
 
 

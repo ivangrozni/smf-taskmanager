@@ -149,6 +149,7 @@ $txt['delegator_del_proj'] = 'Delete Project';
 //View Task
 $txt['delegator_view_task'] = 'View Task';
 $txt['delegator_view_worker'] = 'View Tasks of Worker';
+$txt['delegator_my_tasks'] = 'My Tasks';
 $txt['delegator_worker'] = 'Worker';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
