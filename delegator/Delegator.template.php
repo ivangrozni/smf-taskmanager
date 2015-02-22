@@ -108,13 +108,13 @@ function template_add()
 				sSuggestId: \'to-add\',
 				sControlId: \'to-add\',
 				sSearchType: \'member\',
-				sPostName: \'member_add\',
-				//sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 				bItemList: true,
-				sItemListContainerId: \'user-list\'
+				sPostName: \'member_add\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+				sItemListContainerId: \'user-list\',
+				aListItems: []
 			});
-			console.log(oAddMemberSuggest);
 		// ]]></script>
 	</div><br />';
 }
@@ -536,29 +536,25 @@ function template_et()
 				', $context['page_title'], '
 			</h3>
 		</div>
-                                           <!-- tukaj bom probal dat sa=add_task -->
 		<form action="', $scripturl, '?action=delegator;sa=edit_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
 					<dl class="delegator_et">
 						<dt>
-						<!--	<label for="name">', $txt['task_name'], '</label> --> <!-- pusti prazno, ker nimamo definiranega texta tas_name -->
-                                   <label for="name"> Zadolzitev </label>
+                            <label for="name"> Zadolzitev </label>
 						</dt>
 						<dd>
 							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
-                                                        <input type="hidden" name="id_task" value ="'.$id_task.'" />
+                            <input type="hidden" name="id_task" value ="'.$id_task.'" />
 						</dd>
-                                                <dt>
-                    <label for="description>" opis:  </label>
- </dt>
-                               <dd>
-
-                <textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
-                                </dd>
+                        <dt>
+                		    <label for="description"> opis:  </label>
+ 						</dt>
+                        <dd>
+                			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
+                        </dd>
 						<dt>
-
 							<label for="duet3">', $txt['delegator_deadline'], '</label><br />
 							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
 deadline date before: '.$row['deadline'].'</br>
@@ -573,7 +569,7 @@ deadline date before: '.$row['deadline'].'</br>
 							<label for="user">Delegirani uporabniki</label>
 						</dt>
 						<dd>
-							<input type="text" name="user">
+							<input id="to-add" type="text" name="user">
 							<div id="user-list"></div>
 						</dd>
 						<dt>
@@ -587,54 +583,50 @@ deadline date before: '.$row['deadline'].'</br>
 							</ul>
 						</dd>
 					</dl>
+                    <dt>
+						<label><b>', $txt['project_name'], '</b></label>
+					</dt>
+					<dd>
+                    	<select name="id_proj">'; // nadomestil navadno vejico
+					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
+					            if ($row_p['id'] == $row['id_proj']){
+					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].' id:'.$row_p['id'] . '--</option> ';
+					            }
+					            else {
+					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].' id:'.$row_p['id'] . '</option> ';
+					            }
+					        }
+        					$smcFunc['db_free_result']($request_p);
 
-                                         <dt>
-							<label><b>', $txt['project_name'], '</b></label>
-					 </dt>
-						<dd>
-
-                       <select name="id_proj">'; // nadomestil navadno vejico
-        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-            if ($row_p['id'] == $row['id_proj']){
-                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].' id:'.$row_p['id'] . '--</option> ';
-            }
-            else {
-                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].' id:'.$row_p['id'] . '</option> ';
-            }
-        }
-        $smcFunc['db_free_result']($request_p);
-
-            echo ' </select>
-						</dd>
-					</dl>
-
-
-					<div id="confirm_buttons">
-						<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
-					</div>
+            			echo '
+            			</select>
+					</dd>
+				</dl>
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<br />
+				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
 			</div>
-			<span class="botslice"><span></span></span>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<span class="botslice"></span>
 		</div>
 		</form>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: \'', $context['session_id'], '\',
 				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'user\',
-				sControlId: \'toAdd\',
+				sSuggestId: \'to-add\',
+				sControlId: \'to-add\',
 				sSearchType: \'member\',
+				bItemList: true,
 				sPostName: \'member_add\',
 				sURLMask: \'action=profile;u=%item_id%\',
 				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				bItemList: true,
-				sItemListContainerId: \'user-list\'
+				sItemListContainerId: \'user-list\',
+				aListItems: []
 			});
 		// ]]></script>
 	</div><br />';
 }
-
 
 ?>
