@@ -41,11 +41,12 @@ Drop down menu: @Jaka - kaj rabimo?
 				'show' => $context['allow_memberlist'], // @TODO: proper permission
 				'sub_buttons' => array(
 					'add' => array(
-						'title' => $txt['delegator_add'],
+						'title' => $txt['delegator_task_add'],
 						'href' => $scripturl . '?action=delegator;sa=add',
 						'show' => allowedTo('add_new_todo'),	// @TODO: proper permission
 						'is_last' => true,
 					),
+
                                         'add_proj' => array(
                                             'title' => $txt['delegator_add_proj'],
                                             'href' => $scripturl . '?action=delegator;sa=proj',
@@ -68,8 +69,6 @@ Drop down menu: @Jaka - kaj rabimo?
 				),
 			),
 'mlist' => array(]]></add>
-
-
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[?>]]></search>
@@ -115,51 +114,41 @@ $txt['delegator_del'] = 'Delete';
 $txt['delegator_subject'] = 'Subject';
 $txt['delegator_due_time'] = 'Due date';
 $txt['delegator_deadline'] = 'Deadline';
-$txt['delegator_due_year'] = 'Year (YYYY)';
-$txt['delegator_due_month'] = 'Month (MM)';
-$txt['delegator_due_day'] = 'Day (DD)';
 $txt['delegator_priority'] = 'Priority';
-$txt['delegator_priority0'] = 'Low';
-$txt['delegator_priority1'] = 'Normal';
-$txt['delegator_priority2'] = 'High';
-$txt['delegator_project_name'] = 'Project';
-$txt['tasks_empty'] = 'No tasks';
-$txt['priority_0'] = 'Please to do it';
-$txt['priority_1'] = 'Do it';
-$txt['priority_2'] = 'Do it or gulag';
-//Add Task
-$txt['task_name'] = 'Task name';
-$txt['task_desc'] = 'Task description';
-$txt['delegator_add_task'] = 'Add Task';
+$txt['delegator_priority_0'] = 'Please to do it';
+$txt['delegator_priority_1'] = 'Do it';
+$txt['delegator_priority_2'] = 'Do it or gulag';
+// Tasks
+$txt['delegator_tasks_empty'] = 'No tasks';
+$txt['delegator_task_name'] = 'Task name';
+$txt['delegator_task_desc'] = 'Task description';
+$txt['delegator_task_delegates'] = 'Delegates';
+$txt['delegator_task_add'] = 'Add Task';
 $txt['delegator_state'] = 'Task\'s state';
 $txt['delegator_claim_task'] = 'Claim Task';
 $txt['delegator_unclaim_task'] = 'Unclaim Task';
-$txt['delegator_delegates'] = 'Delegates';
 $txt['delegator_edit_task'] = 'Edit Task';
 $txt['delegator_del_task'] = 'Delete Task';
 $txt['delegator_task_author'] = 'Task\'s Author';
 $txt['delegator_creation_date'] = 'Task\'s Creation Date';
 $txt['delegator_edit_task'] = 'Edit Task';
-//Add Project
-$txt['delegator_add'] = 'Add Task'; // Tole bo treba se postimat...
-$txt['delegator_add_proj'] = 'Add Project';
-$txt['delegator_add_task'] = 'Add Task';
-$txt['project_name'] = 'Project';
-$txt['project_desc'] = 'Description';
-$txt['project_start'] = 'Project Start Date';
-$txt['project_end'] = 'Project End Date';
-$txt['project_view_proj'] = 'View Project';
-$txt['delegator_view_projects'] = 'View All Projects';
-$txt['delegator_proj_coord'] = 'Project Coordinator';
-$txt['delegator_edit_proj'] = 'Edit Project';
-$txt['delegator_del_proj'] = 'Delete Project';
-$txt['projects_empty'] = 'No Projects';
-$txt['delegator_coordinator_name'] = 'Name of Coordinator';
-//View Task
 $txt['delegator_view_task'] = 'View Task';
 $txt['delegator_view_worker'] = 'View Tasks of Worker';
 $txt['delegator_my_tasks'] = 'My Tasks';
 $txt['delegator_worker'] = 'Worker';
+// Projects
+$txt['delegator_project_add'] = 'Add Project';
+$txt['delegator_project_name'] = 'Project';
+$txt['delegator_project_desc'] = 'Description';
+$txt['delegator_project_start'] = 'Project Start Date';
+$txt['delegator_project_end'] = 'Project End Date';
+$txt['delegator_view_proj'] = 'View Project';
+$txt['delegator_project_coord'] = 'Project Coordinator';
+$txt['delegator_edit_proj'] = 'Edit Project';
+$txt['delegator_del_proj'] = 'Delete Project';
+$txt['delegator_coordinator_name'] = 'Name of Coordinator';
+$txt['delegator_view_projects'] = 'View All Projects';
+$txt['projects_empty'] = 'No Projects';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';

@@ -6,11 +6,8 @@ function template_main()
 
 	//if (allowedTo('add_new_todo'))
     echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
-    template_button_strip(array(array('text' => 'delegator_add_task', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right'); // ';sa=add' - tukaj more biti add
-    //template_button_strip(array(array('text' => 'delegator_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=add_task' . ';sa=add', 'active'=> true)), 'right');
-
-    // template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
-    template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
+    template_button_strip(array(array('text' => 'delegator_task_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
+    template_button_strip(array(array('text' => 'delegator_project_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
     template_show_list('list_tasks');
 }
@@ -19,14 +16,14 @@ function template_add()
 {
 	global $scripturl, $context, $txt;
         // id_author, name, description, creation_date, deadline, priority, state
-        
+
         // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
         global $smcFunc;
         $request = $smcFunc['db_query']('', '
                  SELECT id, name
                  FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
         // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
-        
+
 	echo '
 	<div id="container">
 		<div class="cat_bar">
@@ -46,12 +43,10 @@ function template_add()
 						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
 					</dd>
                     <dt>
-		            	<!-- <label for="description>"', $txt['task_desc'],' </label> -->
-                    	<label for="description>" opis:  </label>
+		            	<label for="description">', $txt['task_desc'], '</label>
  					</dt>
                     <dd>
-           				<!-- <input type="text" name="description" value="" ROW=3 COL=30 maxlength="250" class="input_text" /> -->
-                		<textarea name="description" rows="3" cols="30"> </textarea>
+                		<textarea name="description" rows="3" cols="30"></textarea>
                     </dd>
 					<dt>
 						<label for="duet3">', $txt['delegator_deadline'], '</label><br />
@@ -73,13 +68,13 @@ function template_add()
 					</dt>
 					<dd>
 						<ul class="reset">
-							<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority0'], '</li>
-							<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority1'], '</li>
-							<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority2'], '</li>
+							<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_0'], '</li>
+							<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority_1'], '</li>
+							<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_2'], '</li>
 						</ul>
 					</dd>
                     <dt>
-						<label for="id_proj">', $txt['project_name'], '</label>
+						<label for="id_proj">', $txt['delegator_project_name'], '</label>
 					</dt>
 					<dd>
                        <select name="id_proj">'; // nadomestil navadno vejico
@@ -93,10 +88,9 @@ function template_add()
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
-				<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
-
-				<span class="botslice">&nbsp;</span>
+				<input type="submit" name="submit" value="', $txt['delegator_task_add'], '" class="button_submit" />
 			</div>
+            <span class="botslice">&nbsp;</span>
 		</div>
 		</form>
 		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
@@ -115,6 +109,7 @@ function template_add()
 				sItemListContainerId: \'user-list\',
 				aListItems: []
 			});
+            console.log(oAddMemberSuggest);
 		// ]]></script>
 	</div><br />';
 }
@@ -124,7 +119,7 @@ function template_add()
 function template_proj()
 {
 	global $scripturl, $context, $txt;
-        
+
 	echo '
 	<div id="container">
 		<div class="cat_bar">
@@ -136,49 +131,35 @@ function template_proj()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_add_proj">
-						<dt>
-							<label for="name">', $txt['project_name'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
-						</dd>
+				<dl class="delegator_add_proj">
+					<dt>
+						<label for="name">', $txt['delegator_project_name'], '</label>
+					</dt>
+					<dd>
+						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
+					</dd>
 
-						<dt>
-							<label for="description">', $txt['project_desc'], '</label>
-						</dt>
-						<dd>
-						<textarea name="description" rows="3" cols="30"> </textarea>
-						</dd>
-
-
-
+					<dt>
+						<label for="description">', $txt['delegator_project_desc'], '</label>
+					</dt>
+					<dd>
+					   <textarea name="description" rows="3" cols="30"> </textarea>
+					</dd>
+                    <dt>
+						<label for="start">', $txt['delegator_project_start'], '</label><br />
+					</dt>
+					<dd>
+						<input type="text" name="start" class="input_text kalender" />
+					</dd>
 <dt>
-							<label for="start">', $txt['delegator_deadline'], '</label><br />
-							<span class="smalltext">', $txt['xdelegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-						</dt>
-						<dd>
-							<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
-							<input type="text" name="duet1" size="2" maxlength="2" value="" class="input_text" /> -
-							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" />
-						</dd>
-
-<dt>
-							<label for="end">', $txt['delegator_deadline'], '</label><br />
-							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-						</dt>
-						<dd>
-							<input type="text" name="dend3" size="4" maxlength="4" value="" class="input_text" /> -
-							<input type="text" name="dend1" size="2" maxlength="2" value="" class="input_text" /> -
-							<input type="text" name="dend2" size="2" maxlength="2" value="" class="input_text" />
-						</dd>
-
-
-
-					</dl>
-					<div id="confirm_buttons">
-						<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
-					</div>
+						<label for="end">', $txt['delegator_project_end'], '</label>
+					</dt>
+					<dd>
+						<input type="text" name="end" class="input_text kalender" />
+					</dd>
+				</dl>
+                <br />
+				<input type="submit" name="submit" value="', $txt['delegator_task_add'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -202,9 +183,9 @@ function template_vt() // id bi bil kar dober argument
     // id_author, name, description, creation_date, deadline, priority, state
 
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
-    $task_id = (int) $_GET['task_id']; 
+    $task_id = (int) $_GET['task_id'];
 
-    
+
 
 
     $request = $smcFunc['db_query']('', '
@@ -288,7 +269,7 @@ echo '
 		<div class="content">
 			<dl class="delegator_vt">
 				<dt>
-					<label for="name">', $txt['task_name'], '</label>
+					<label for="name">', $txt['delegator_task_name'], '</label>
 				</dt>
 				<dd>
                     <h3> ', $row['task_name'] ,' </h3>
@@ -301,10 +282,9 @@ echo '
                     <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'] ,'"> ',$row['author'],'</a>
 				</dd>
                 <dt>
-					<label for="project_name">', $txt['project_name'], '</label>
+					<label for="project_name">', $txt['delegator_project_name'], '</label>
 				</dt>
 				<dd>
-                    <!-- ', $row['project_name'] ,' -->
                     <a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
 				</dd>
                 <dt>
@@ -320,13 +300,13 @@ echo '
 					<span class="relative-time">', $row['deadline'], '</span> (<span class="format-time">' , $row['deadline'], '</span>)
 				</dd>
 				<dt>
-					<label for="delegates">', $txt['delegator_delegates'], '</label>
+					<label for="delegates">', $txt['delegator_task_delegates'], '</label>
 				</dt>
 				<dd>
 					', $delegates , '
 				</dd>
                 <dt>
-					<label for="description">', $txt['task_desc'], '</label>
+					<label for="description">', $txt['delegator_task_desc'], '</label>
 				</dt>
 				<dd>
                     ', $row['description'] ,'
@@ -335,7 +315,7 @@ echo '
 					<label for="priority">', $txt['delegator_priority'], '</label>
 				</dt>
 				<dd>
-                    <img src="', $settings['images_url'], '/', $pimage, '.gif" /> ', $txt['priority_' . $row['priority']] ,'
+                    <img src="', $settings['images_url'], '/', $pimage, '.gif" /> ', $txt['delegator_priority_' . $row['priority']] ,'
 				</dd>
                 <dt>
 					<label for="state">', $txt['delegator_state'], '</label>
@@ -371,10 +351,10 @@ function template_view_proj()
     $id_proj = (int) $_GET['id_proj'];
 
     $request = $smcFunc['db_query']('', '
-SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
-					FROM {db_prefix}projects T1
-					LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
-					WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+        SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
+		FROM {db_prefix}projects T1
+		LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
+		WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 
     $row = $smcFunc['db_fetch_assoc']($request);
 
@@ -390,67 +370,52 @@ echo '
 		<div class="content">
 			<dl class="delegator_view_proj">
 				<dt>
-					<label for="name">', $txt['project_name'], '</label>
+					<label for="name">', $txt['delegator_project_name'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['proj_name'] ,'
-					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
+                    ', $row['proj_name'] ,'
 				</dd>
-
-                                <dt>
-					<label for="coordinator">', $txt['delegator_proj_coord'], '</label>
+                <dt>
+					<label for="coordinator">', $txt['delegator_project_coord'], '</label>
 				</dt>
 				<dd>
-                                       <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_coord'] ,'"> ',$row['coord_name'],'</a>
+                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_coord'] ,'"> ',$row['coord_name'],'</a>
 				</dd>
-
-                                <dt>
-					<label for="start">', $txt['project_start'], '</label>
+                <dt>
+					<label for="start">', $txt['delegator_project_start'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['start'] ,'
+                    <span class="format-date">', $row['start'] ,'</span>
 				</dd>
-
-                                <dt>
-					<label for="end">', $txt['project_end'], '</label>
+                <dt>
+					<label for="end">', $txt['delegator_project_end'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['end'] ,'
+                    <span class="format-date">', $row['end'] ,'</span>
 				</dd>
-
-
-                                <dt>
-					<label for="description">', $txt['project_desc'], '</label>
+                <dt>
+					<label for="description">', $txt['delegator_project_desc'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['description'] ,'
+                    ', $row['description'] ,'
 				</dd>
 
-			 </dl>
-					<div id="buttons"> <!-- skupaj bodo tukaj gumbi za sprejetje naloge, urejanje in brisanje -->
+			</dl>
+            <br />
+			<a href="index.php?action=delegator;sa=add" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
 
-					</div>
+            <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
+            <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a>
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
 	</div><br />
-                
-                 <a href="index.php?action=delegator;sa=add" class="button_submit">', $txt['delegator_add_task'] ,'</a>&nbsp;
-
-                <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a>
-
-       <!-- <div class="windowbg">
-           Tukaj bo prisla tabela taskov tega projekta...<br>
-           Seveda mora biti spet polinkana s prikazom taskov...
-           </div> -->
-        </div>
+</div>
 ';
 
 $smcFunc['db_free_result']($request);
 
-template_show_list('list_tasks_of_proj'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
-
+template_show_list('list_tasks_of_proj');
 }
 
 
@@ -528,20 +493,44 @@ function template_et()
     $id_task = (int) $_GET['task_id'];
 
     $request = $smcFunc['db_query']('', '
-                SELECT T1.id AS id, T1.name AS task_name,  T1.deadline AS deadline, T1.description AS description, T1.priority AS priority, T1.state AS t_state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date AS creation_date, T1.start_date AS start_date, T1.end_date AS end_date, T1.end_comment AS end_comment
+        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority, T1.id_proj
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-                WHERE T1.id = {int:id_task} ' , array( 'id_task' => $id_task) );
+        WHERE T1.id = {int:id_task}',
+        array( 'id_task' => $id_task)
+    );
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
-    // var_dump($row); var_dump($id_task); //die;
+
+    // Delegirani uporabniki
+    $request_d = $smcFunc['db_query']('', '
+        SELECT T1.id_member, T2.real_name
+        FROM {db_prefix}workers T1
+        LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
+        WHERE T1.id_task = {int:id_task}',
+        array('id_task' => $id_task)
+    );
+
+    $delegates = "";
+    while ($member = $smcFunc['db_fetch_assoc']($request_d)) {
+        $id = $member["id_member"];
+        $name = $member["real_name"];
+        $delegates .=
+            '<div id="suggest_to-add_' . $id . '">
+                <input name="member_add[]" value="' . $id . '" type="hidden">
+                <a href="index.php?action=profile;u=' . $id . '" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">' . $name . '</a>
+                <img src="Themes/default/images/pm_recipient_delete.gif" alt="Delete Item" title="Delete Item" onclick="return oAddMemberSuggest.deleteAddedItem(' . $id . ');">
+            </div>';
+    }
+    $smcFunc['db_free_result']($request_d);
 
     $request_p = $smcFunc['db_query']('', '
-                 SELECT id, name
-                 FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
-        // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
+        SELECT id, name
+        FROM  {db_prefix}projects'
+    );
+
 	echo '
 	<div id="container">
 		<div class="cat_bar">
@@ -555,58 +544,55 @@ function template_et()
 			<div class="content">
 					<dl class="delegator_et">
 						<dt>
-                            <label for="name"> Zadolzitev </label>
+                            <label for="name">', $txt['delegator_task_name'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
                             <input type="hidden" name="id_task" value ="'.$id_task.'" />
 						</dd>
                         <dt>
-                		    <label for="description"> opis:  </label>
+                		    <label for="description">', $txt['delegator_task_desc'], '</label>
  						</dt>
                         <dd>
                 			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
                         </dd>
 						<dt>
-							<label for="duet3">', $txt['delegator_deadline'], '</label><br />
-							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-deadline date before: '.$row['deadline'].'</br>
+							<label for="deadline">', $txt['delegator_deadline'], '</label>
 						</dt>
 						<dd>
-							<input class="kalender" type="text" name="deadline" />
-						<!--	<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
-							<input type="text" name="duet1" size="2" maxlength="2" value="" class="input_text" /> -
-							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" /> -->
-						</dd>
+							<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
+                        </dd>
 						<dt>
-							<label for="user">Delegirani uporabniki</label>
+							<label for="user">', $txt['delegator_task_delegates'], '</label>
 						</dt>
 						<dd>
 							<input id="to-add" type="text" name="user">
-							<div id="user-list"></div>
+							<div id="user-list">
+                                ' . $delegates . '
+                            </div>
 						</dd>
 						<dt>
 							<label>', $txt['delegator_priority'], '</label>
 						</dt>
 						<dd>
 							<ul class="reset">
-								<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority0'], '</li>
-								<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority1'], '</li>
-								<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority2'], '</li>
+								<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_0'], '</li>
+								<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority_1'], '</li>
+								<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_2'], '</li>
 							</ul>
 						</dd>
 					</dl>
                     <dt>
-						<label><b>', $txt['project_name'], '</b></label>
+						<label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
 					</dt>
 					<dd>
                     	<select name="id_proj">'; // nadomestil navadno vejico
 					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
 					            if ($row_p['id'] == $row['id_proj']){
-					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].' id:'.$row_p['id'] . '--</option> ';
+					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
 					            }
 					            else {
-					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].' id:'.$row_p['id'] . '</option> ';
+					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
 					            }
 					        }
         					$smcFunc['db_free_result']($request_p);
@@ -619,7 +605,7 @@ deadline date before: '.$row['deadline'].'</br>
 				<br />
 				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
 			</div>
-			<span class="botslice"></span>
+			<span class="botslice"><span></span></span>
 		</div>
 		</form>
 		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
