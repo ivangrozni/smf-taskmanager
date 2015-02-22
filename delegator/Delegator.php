@@ -44,7 +44,6 @@ function Delegator()
 
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-        'personal_view' => 'personal_view',   //zadolzitve uporabnika
 	'add' => 'add',
         'proj' => 'proj',                     //[!]omfg, kje si g1smo?
         'add_proj' => 'add_proj',             //dodajanje novega projekta
@@ -57,7 +56,7 @@ function Delegator()
         'view_task' => 'view_task',           //podrobnosti taska
         'view_proj' => 'view_proj',           //podrobnosti projekta
         'vt' => 'vt',
-        'view_worker' => 'view_worker',
+        'view_worker' => 'view_worker',       // personal view !!!
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -992,6 +991,44 @@ function view_worker()
 ##################################################################
 ##################################################################
 ##################################################################
+
+function edit_task()
+{
+    // prebere podatke o tem tasku
+    // odpre template z vpisanimi podatki
+    // naredis UPDATE v bazi z novimi podatki
+
+    global $smcFunc, $context;
+
+    //isAllowedTo('add_new_todo');
+
+    checkSession();
+
+    $id_author = $context['user']['id'];
+
+    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
+    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
+    $deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
+    $state = 0;
+
+    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+        fatal_lang_error('to_do_empty_fields', false);
+
+    $smcFunc['db_insert']('', '{db_prefix}tasks',
+    array(
+        'id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
+    ),
+    array(
+        $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state,
+    ),
+    array('id')
+    );
+
+    redirectexit('action=delegator'); //ali moram tole spremeniti???
+    // Pomoje ne...    
+    
+
+}
 
 
 // To bomo smotrno preuredili!!!
