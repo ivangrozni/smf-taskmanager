@@ -143,9 +143,12 @@ $txt['project_desc'] = 'Description';
 $txt['project_start'] = 'Project Start Date';
 $txt['project_end'] = 'Project End Date';
 $txt['project_view_proj'] = 'View Project';
+$txt['delegator_view_projects'] = 'View All Projects';
 $txt['delegator_proj_coord'] = 'Project Coordinator';
 $txt['delegator_edit_proj'] = 'Edit Project';
 $txt['delegator_del_proj'] = 'Delete Project';
+$txt['projects_empty'] = 'No Projects';
+$txt['delegator_coordinator_name'] = 'Name of Coordinator';
 //View Task
 $txt['delegator_view_task'] = 'View Task';
 $txt['delegator_view_worker'] = 'View Tasks of Worker';

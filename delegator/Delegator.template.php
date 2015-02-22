@@ -501,6 +501,19 @@ template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del 
 
 }
 
+function template_view_projects()
+{
+
+    global $scripturl, $context, $txt;
+    global $smcFunc;
+
+echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
+
+template_show_list('list_of_projects'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+
+}
+
+
 
 //##############################//##############################
 //##############################//##############################

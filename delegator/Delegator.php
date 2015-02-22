@@ -44,30 +44,26 @@ function Delegator()
 
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-        'personal_view' => 'personal_view',   //zadolzitve uporabnika
 	'add' => 'add',                       // nalozi view za add task... al kaj
-        'proj' => 'proj',                     //[!]omfg, kje si g1smo?
-        'add_proj' => 'add_proj',             //dodajanje novega projekta
-        'add_task' => 'add_task',             //dodajanje novega taska
-        'acc_task' => 'acc_task',             //sprejemanje zadolzitve (proste zadolzitve)
-        'end_task' => 'end_task',             //zakljucek zadolzitve
-        'et' => 'et',                         // nalaganje edita
+        'proj' => 'proj',                     // template za vnos projekta
+        'add_proj' => 'add_proj',             // funkcija ki vnese projekt
+        'add_task' => 'add_task',             // funkcija, ki vnese task
+
+        'end_task' => 'end_task',             // MANJKA zakljucek zadolzitve
+        'et' => 'et',                         // nalaganje edita - view
         'edit_task' => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
         'del_task' => 'del_task',
         'claim_task' => 'claim_task',         //vzemi odgovornost v svoje roke!
         'unclaim_task' => 'unclaim_task',     //ali pa si premisli
-        'edit_proj' => 'edit_proj',           //editanje projekta
-        'view_task' => 'view_task',           //podrobnosti taska
-        'view_proj' => 'view_proj',           //podrobnosti projekta
-        'vt' => 'vt',
-        'view_worker' => 'view_worker',
-        'my_tasks' => 'my_tasks',
+        'edit_proj' => 'edit_proj',           //MANJKA in BO SE MANJKALO editanje projekta
+        'view_proj' => 'view_proj',           // podrobnosti projekta
+        'vt' => 'vt',                         // nalozi view za ogled zadolzitve
+        'view_worker' => 'view_worker',       // prikaze naloge enega workerja
+        'my_tasks' => 'my_tasks',             // moje naloge
+        'view_projects' => 'view_projects',   // seznam vseh projektov
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
-            //'ToDo' => 'ToDoMain',
-            //'add2' => 'add2',
-            //'did' => 'didChange',
     );
 
 	// Delegator v celoti je kot en modul. Razni viewi so "subactioni". Defaulten subaction je delegator. Ce
@@ -346,23 +342,27 @@ function add_task()
 
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
-    $deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
+    $deadline = $smcFunc['htmlspecialchars']($_POST['duedate']);
     $state = 0;
 
-    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+    if ($smcFunc['htmltrim']($_POST['name']) === '')
         fatal_lang_error('to_do_empty_fields', false);
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
-    array(
-        'id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string'
-    ),
-    array(
-        $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state, date("Y-m-d")
-    ),
-    array('id')
-    );
+        array('id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string'),
+        array( $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state, date("Y-m-d")),
+        array('id')
+    ); 
 
-    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');     
+    $request = $smcFunc['db_query']('', '
+    SELECT T1.id AS id_task FROM {db_prefix}tasks T1
+    ORDER BY T1.id DESC
+    LIMIT 1', array() );
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+
+    redirectexit('action=delegator;sa=vt&task_id='.$row['id_task'].'');     
 
 }
 
@@ -452,7 +452,7 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    redirectexit('action=delegator;sa=view_proj;id_proj='.$row['id']); // redirect exit - logicno
+    redirectexit('action=delegator;sa=view_proj;id_proj='.$row['id_proj']); // redirect exit - logicno
 }
 
 ##################################################################
@@ -738,9 +738,197 @@ function view_proj()
 ##################################################################
 ##################################################################
 
+# prikaze vse projekte in to v lepo urejeni tabeli...
+
+function view_projects()
+{
+    global $smcFunc, $scripturl, $context, $txt, $sourcedir;
+
+    $context['sub_template'] = 'view_projects';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=view_projects',
+        'name' => $txt['delegator_view_projects']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_view_projects
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_view_projects dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_view_projects label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_view_projects dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+
+    $list_options = array(
+        'id' => 'list_of_projects',
+        'items_per_page' => 30,                                //stevilo taskov na stran
+        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'default_sort_col' => 'end',                      //razvrsis taske po roku
+        'get_items' => array(
+            // FUNKCIJE
+
+            'function' => create_function('$start, $items_per_page, $sort', '
+				global $smcFunc;
+
+				$request = $smcFunc[\'db_query\'](\'\', \'
+					SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord  T2.real_name AS coordinator
+					FROM {db_prefix}projects T1
+					LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id
+
+					ORDER BY {raw:sort}
+					LIMIT {int:start}, {int:per_page}\',
+					array(
+						\'sort\' => $sort,
+						\'start\' => $start,
+						\'per_page\' => $items_per_page,
+					)
+				);
+				$projects = array();
+				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+					$projects[] = $row;
+				$smcFunc[\'db_free_result\']($request);
+
+				return $projects;
+                                '),
+            'params' => array(
+                'id_member' => $context['user']['id'], // tega ne rabim, ane...
+                 ),
+        ),
+
+        'get_count' => array(							//tudi tu je posodobljen query
+            'function' => create_function('', '
+				global $smcFunc;
+
+				$request = $smcFunc[\'db_query\'](\'\', \'
+			SELECT COUNT(*)
+			FROM {db_prefix}projects T1\', array()
+				);
+				list($total_projects) = $smcFunc[\'db_fetch_row\']($request);
+				$smcFunc[\'db_free_result\']($request);
+
+				return $total_projects;
+			'),
+        ),
+        'no_items_label' => $txt['projects_empty'],
+        'columns' => array(
+            // vsaka stvar v tabeli ima header, data, sort
+
+            'name' => array(		// PROJECT
+                'header' => array(
+                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                ),
+                'data' => array(
+                    'function' => create_function('$row',
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
+					),
+                ),
+                'sort' =>  array(
+                    'default' => 'project_name',
+                    'reverse' => 'project_name DESC',
+                ),
+            ),
+
+            'coordinator' => array(      //KOORDINATOR
+                'header' => array(
+                    'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
+                ),
+                'data' => array(
+                    'function' => create_function('$row',
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_coord\'] .\'">\'.$row[\'coordinator\'].\'</a>\'; '
+
+					),
+                ),
+                'sort' =>  array(
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
+                ),
+            ),
+
+	    'start' => array(      
+                'header' => array(
+                    'value' => $txt['project_start'],      //dodano v modification.xml
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+                                                return $row[\'start\'] ;'
+					),
+                ),
+                'sort' =>  array(
+                    'default' => 'start',
+                    'reverse' => 'start DESC',
+                ),
+            ),
+
+            'end' => array( 
+                'header' => array(
+                    'value' => $txt['project_end'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', ' return $row[\'end\'] '),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'end',
+                    'reverse' => 'end DESC',
+                ),
+            ),
+
+            /*'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
+                'header' => array(
+                    'value' => $txt['delegator_actions'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						global $context, $settings, $scripturl;
+
+						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+					'),
+
+                    'style' => 'width: 10%; text-align: center;',
+                ),
+             ),*/
+        ),
+    );
+
+    require_once($sourcedir . '/Subs-List.php');
+    createList($list_of_projects);
+
+}
+
+
+
+
+##################################################################
+##################################################################
+##################################################################
+
 ##################################################################
 #################### view member #################################
 ##################################################################
+
+// oglej si delavca - lahko bi se prikazalo se kaj njegove statistike
 
 function view_worker() 
 {
