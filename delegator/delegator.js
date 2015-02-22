@@ -11,4 +11,14 @@ $(function () {
 		var newTime = moment(time, "YYYY-MM-DD").format("D. M. YYYY");
 		this.innerHTML = newTime;
 	});
+	$('input.kalender').pikaday({
+		format: "YYYY-MM-DD",
+		i18n: {
+		    previousMonth : 'Levo',
+		    nextMonth     : 'Naslednji mesec',
+		    months        : ['Januar','Februar','Marec','April','Maj','Junij','Julij','Avgust','September','Oktober','November','December'],
+		    weekdays      : ['Nedelja','Ponedeljek','Torek','Sreda','Četrtek','Petek','Sobota'],
+		    weekdaysShort : ['Ned','Pon','Tor','Sre','Čet','Pet','Sob']
+		}
+	});
 });

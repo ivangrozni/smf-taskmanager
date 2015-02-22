@@ -33,77 +33,69 @@ function template_add()
 				', $context['page_title'], '
 			</h3>
 		</div>
-                                           <!-- tukaj bom probal dat sa=add_task -->
 		<form action="', $scripturl, '?action=delegator;sa=add_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_add">
-						<dt>
-						<!--	<label for="name">', $txt['task_name'], '</label> --> <!-- pusti prazno, ker nimamo definiranega texta tas_name -->
-                                   <label for="name"> Zadolzitev </label>
-						</dt>
-						<dd>
-							<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
-						</dd>
-                                                <dt>
-              <!-- <label for="description>"', $txt['task_desc'],' </label> -->
-                    <label for="description>" opis:  </label>
- </dt>
-                               <dd>
-           <!-- <input type="text" name="description" value="" ROW=3 COL=30 maxlength="250" class="input_text" /> -->
-                <textarea name="description" rows="3" cols="30"> </textarea>
-                                </dd>
-						<dt>
-							<label for="duet3">', $txt['delegator_deadline'], '</label><br />
-							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-						</dt>
-						<dd>
-							<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
-							<div id="kalender"></div>
-						</dd>
-						<dt>
-							<label for="user">Delegirani uporabniki</label>
-						</dt>
-						<dd>
-							<input type="text" name="user" id="toAdd">
-							<div id="user-list"></div>
-						</dd>
-						<dt>
-							<label>', $txt['delegator_priority'], '</label>
-						</dt>
-						<dd>
-							<ul class="reset">
-								<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority0'], '</li>
-								<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority1'], '</li>
-								<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority2'], '</li>
-							</ul>
-						</dd>
-					</dl>
-
-                                         <dt>
-							<label>', $txt['project_name'], '</label>
-					 </dt>
-						<dd>
-
+				<dl class="delegator_add">
+					<dt>
+                       <label for="name"> Zadolzitev </label>
+					</dt>
+					<dd>
+						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
+					</dd>
+                    <dt>
+		            	<!-- <label for="description>"', $txt['task_desc'],' </label> -->
+                    	<label for="description>" opis:  </label>
+ 					</dt>
+                    <dd>
+           				<!-- <input type="text" name="description" value="" ROW=3 COL=30 maxlength="250" class="input_text" /> -->
+                		<textarea name="description" rows="3" cols="30"> </textarea>
+                    </dd>
+					<dt>
+						<label for="duet3">', $txt['delegator_deadline'], '</label><br />
+						<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
+					</dt>
+					<dd>
+						<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
+						<div id="kalender"></div>
+					</dd>
+					<dt>
+						<label for="user">Delegirani uporabniki</label>
+					</dt>
+					<dd>
+						<input type="text" name="user" id="to-add">
+						<span id="user-list"></span>
+					</dd>
+					<dt>
+						<label for="priority">', $txt['delegator_priority'], '</label>
+					</dt>
+					<dd>
+						<ul class="reset">
+							<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority0'], '</li>
+							<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority1'], '</li>
+							<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority2'], '</li>
+						</ul>
+					</dd>
+                    <dt>
+						<label for="id_proj">', $txt['project_name'], '</label>
+					</dt>
+					<dd>
                        <select name="id_proj">'; // nadomestil navadno vejico
-        while ($row = $smcFunc['db_fetch_assoc']($request)) {
-            echo '<option value="'.$row['id'].'">'.$row['name'].' id:'.$row['id'] . '</option> ';
-            }
-        $smcFunc['db_free_result']($request);
+					    while ($row = $smcFunc['db_fetch_assoc']($request)) {
+					        echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
+					        }
+					    $smcFunc['db_free_result']($request);
+        				echo '
+        				</select>
+					</dd>
+				</dl>
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<br />
+				<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
 
-            echo ' </select>
-
-						</dd>
-					</dl>
-
-
-					<div id="confirm_buttons">
-						<input type="submit" name="submit" value="', $txt['delegator_add_task'], '" class="button_submit" />
-					</div>
+				<span class="botslice">&nbsp;</span>
 			</div>
-			<span class="botslice"><span></span></span>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</div>
 		</form>
 		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
@@ -112,8 +104,8 @@ function template_add()
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: \'', $context['session_id'], '\',
 				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to_suggest\',
-				sControlId: \'toAdd\',
+				sSuggestId: \'to-add\',
+				sControlId: \'to-add\',
 				sSearchType: \'member\',
 				sPostName: \'member_add\',
 				//sURLMask: \'action=profile;u=%item_id%\',
@@ -121,6 +113,7 @@ function template_add()
 				bItemList: true,
 				sItemListContainerId: \'user-list\'
 			});
+			console.log(oAddMemberSuggest);
 		// ]]></script>
 	</div><br />';
 }
@@ -531,7 +524,7 @@ function template_et()
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
                 WHERE T1.id = {int:id_task} ' , array( 'id_task' => $id_task) );
 
-    $row = $smcFunc['db_fetch_assoc']($request);    
+    $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
     // var_dump($row); var_dump($id_task); //die;
 
@@ -574,7 +567,7 @@ function template_et()
 deadline date before: '.$row['deadline'].'</br>
 						</dt>
 						<dd>
-<input class="kalendar" type="text" name="deadline" />
+							<input class="kalender" type="text" name="deadline" />
 						<!--	<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
 							<input type="text" name="duet1" size="2" maxlength="2" value="" class="input_text" /> -
 							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" /> -->

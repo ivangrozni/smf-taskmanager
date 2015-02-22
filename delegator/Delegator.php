@@ -272,12 +272,8 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+						return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 					'),
-/*=======
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/\'. ($row[\'state\'] ? \'package_old\' : \'package_installed\'). \'.gif" alt="" /></a><a href="\'. $scripturl. \'?action=delegator;sa=delete;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="" /></a>\';
-					'), // kaj je ta dolg string???
-                                        >>>>>>> 44a1722... view task upam, da ne bo spet brickal */
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -862,7 +858,7 @@ function view_worker()
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 					),
                 ),
@@ -1066,7 +1062,7 @@ function edit_task()
     array('id')
     );
     */
-    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');     
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');
 
 }
 
