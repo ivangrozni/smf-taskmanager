@@ -8,3 +8,9 @@ Zato so bila testiranja neuspesna. Krivec je Jaka Perovsek. Pozabil je pobrisat 
 
 2015 02 21
 Torej, dobil sem novo idejo. Vsaj projektu bi lahko dali zraven še topic_id, v katerem bi potekala debata o tem projektu... Kjer bi bil pregled nad zadolžitvami projekta...
+
+TO DO:
+ 1) view_tasks by id_member
+ 2) claim_task
+ 3) edit_task
+ 4) delete_task

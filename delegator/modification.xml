@@ -136,6 +136,7 @@ $txt['project_view_proj'] = 'View Project';
 $txt['delegator_proj_coord'] = 'Project Coordinator';
 //View Task
 $txt['delegator_view_task'] = 'View Task';
+$txt['delegator_view_worker'] = 'View Tasks of Worker';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';

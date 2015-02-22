@@ -252,7 +252,8 @@ echo '
 					<label for="author">', $txt['delegator_task_author'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['author'] ,' <!-- tukaj bo link do personal_view od avtorja -->
+                                       <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'] ,'"> ',$row['author'],'</a>
+	                               
 				</dd>
 
                                 <dt>
@@ -360,8 +361,7 @@ echo '
 					<label for="coordinator">', $txt['delegator_proj_coord'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['coord_name'] ,'
-          <!-- Tukaj bo link do view_personal !!! -->
+                                       <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_coord'] ,'"> ',$row['coord_name'],'</a>
 				</dd>
 
                                 <dt>
@@ -394,16 +394,36 @@ echo '
 			<span class="botslice"><span></span></span>
 		</div>
 	</div><br />
-        <div class="windowbg">
+       <!-- <div class="windowbg">
            Tukaj bo prisla tabela taskov tega projekta...<br>
            Seveda mora biti spet polinkana s prikazom taskov...
-           </div>
+           </div> -->
         </div>
 ';
 
 $smcFunc['db_free_result']($request);
 
 template_show_list('list_tasks_of_proj'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
+    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
+
+}
+
+
+//##############################//##############################
+//##############################//##############################
+//##############################//##############################
+
+
+function template_view_worker() 
+{
+
+    global $scripturl, $context, $txt;
+    global $smcFunc;
+
+
+template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
     echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
     echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
     echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
