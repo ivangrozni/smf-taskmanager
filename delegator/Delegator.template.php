@@ -13,12 +13,6 @@ function template_main()
     template_button_strip(array(array('text' => 'delegator_add_proj', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
     template_show_list('list_tasks');
-                //template_show_list('list_delegator');
-
-    // include js
-    echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
 }
 
 function template_add()
@@ -65,15 +59,14 @@ function template_add()
 							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
-							<input type="text" name="duet1" size="2" maxlength="2" value="" class="input_text" /> -
-							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" />
+							<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
+							<div id="kalender"></div>
 						</dd>
 						<dt>
 							<label for="user">Delegirani uporabniki</label>
 						</dt>
 						<dd>
-							<input type="text" name="user">
+							<input type="text" name="user" id="toAdd">
 							<div id="user-list"></div>
 						</dd>
 						<dt>
@@ -113,17 +106,17 @@ function template_add()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</div>
 		</form>
-		<script type="text/javascript" src="', $settings['default_theme_url'], '/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			var oAddMemberSuggest = new smc_AutoSuggest({
 				sSelf: \'oAddMemberSuggest\',
 				sSessionId: \'', $context['session_id'], '\',
 				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'user\',
+				sSuggestId: \'to_suggest\',
 				sControlId: \'toAdd\',
 				sSearchType: \'member\',
 				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
+				//sURLMask: \'action=profile;u=%item_id%\',
 				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 				bItemList: true,
 				sItemListContainerId: \'user-list\'
@@ -222,10 +215,10 @@ function template_vt() // id bi bil kar dober argument
 
     $request = $smcFunc['db_query']('', '
 SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
-					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-					WHERE T1.id = '. $task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+		FROM {db_prefix}tasks T1
+		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
+		WHERE T1.id = '. $task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 // id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
 
 /*          SELECT *
@@ -244,6 +237,50 @@ SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline A
 
 	$session_var = $context['session_var'];
 	$session_id = $context['session_id'];
+
+	// Imam task claiman?
+	$member_id = (int) $context['user']['id'];
+
+	$request = $smcFunc['db_query']('',
+		'SELECT id
+		FROM {db_prefix}workers
+		WHERE id_task = {int:task_id} AND id_member = {int:member_id}',
+		array(
+			'task_id' => $task_id,
+			'member_id' => $member_id
+		)
+	);
+
+    $amClaimed = $smcFunc['db_fetch_assoc']($request);
+
+    if ($amClaimed !== false) {
+		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;task_id=' . $task_id . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
+    } else {
+    	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;task_id=' . $task_id . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
+    }
+
+    // Seznam delegatov
+
+    $request = $smcFunc['db_query']('',
+		'SELECT T2.real_name
+		FROM {db_prefix}workers T1
+			LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
+
+		WHERE id_task = {int:task_id}',
+		array(
+			'task_id' => $task_id
+		)
+	);
+
+    $members = [];
+    while ($m = $smcFunc['db_fetch_assoc']($request)) {
+    	$members[] = $m["real_name"];
+    }
+
+	$delegates = "&nbsp;&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
+	if (count($members)) {
+		$delegates = implode(", ", $members);
+	}
 
 echo '
     <div id="container">
@@ -288,6 +325,12 @@ echo '
 				<dd>
 					<span class="relative-time">', $row['deadline'], '</span> (<span class="format-time">' , $row['deadline'], '</span>)
 				</dd>
+				<dt>
+					<label for="delegates">', $txt['delegator_delegates'], '</label>
+				</dt>
+				<dd>
+					', $delegates , '
+				</dd>
                 <dt>
 					<label for="description">', $txt['task_desc'], '</label>
 				</dt>
@@ -308,20 +351,14 @@ echo '
 				</dd>
 			 </dl>
 			 <br />
-
-				<a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_claim_task'] ,'</a>&nbsp;
-                
-<a href="index.php?action=delegator;sa=et;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
-                
-<a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+				', $claimButton, '&nbsp;
+                <a href="index.php?action=delegator;sa=edit_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
 	</div><br />
 ';
-echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
-echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
-echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>';
 $smcFunc['db_free_result']($request);
 
 }
@@ -413,9 +450,6 @@ echo '
 $smcFunc['db_free_result']($request);
 
 template_show_list('list_tasks_of_proj'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
-    echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
 
 }
 
@@ -425,7 +459,7 @@ template_show_list('list_tasks_of_proj'); // ko bomo odkomentirali veliki del v 
 //##############################//##############################
 
 
-function template_view_worker() 
+function template_view_worker()
 {
 
     global $scripturl, $context, $txt;
@@ -433,9 +467,6 @@ function template_view_worker()
 
 
 template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
-    echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
-    echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>'; 
 
 }
 

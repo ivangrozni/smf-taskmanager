@@ -13,6 +13,9 @@
 		<require-file name="Delegator.template.php" destination="$themedir" />
 		<require-file name="delegator.js" destination="$themedir/scripts" />
 		<require-file name="moment.min.js" destination="$themedir/scripts" />
+		<require-file name="pikaday.js" destination="$themedir/scripts" />
+		<require-file name="pikaday.jquery.js" destination="$themedir/scripts" />
+		<require-file name="pikaday.css" destination="$themedir/css" />
 		<database>database.php</database>
 		<redirect url="$scripturl?action=delegator" timeout="3000">redirect.txt</redirect>
 	</install>
@@ -24,5 +27,8 @@
 		<remove-file name="$themedir/Delegator.template.php" />
 		<remove-file name="$themedir/scripts/delegator.js" />
 		<remove-file name="$themedir/scripts/moment.min.js" />
+		<remove-file name="$themedir/scripts/pikaday.js" />
+		<remove-file name="$themedir/scripts/pikaday.jquery.js" />
+		<remove-file name="$themedir/scripts/pikaday.css" />
 	</uninstall>
 </package-info>

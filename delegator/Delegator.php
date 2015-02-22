@@ -31,7 +31,7 @@ if (!defined('SMF'))
 //Tu se zacne originalni To-Do list mod
 function Delegator()
 {
-    global $context, $txt, $scripturl; // potrebne variable
+    global $context, $txt, $scripturl, $settings; // potrebne variable
                                        // $context - ne vem, se za kaj se uporablja
                                        // $txt - notri so vsa prikazana besedila (zaradi prevodov)
                                        // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
@@ -44,6 +44,7 @@ function Delegator()
 
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
+        'personal_view' => 'personal_view',   //zadolzitve uporabnika
 	'add' => 'add',
         'proj' => 'proj',                     //[!]omfg, kje si g1smo?
         'add_proj' => 'add_proj',             //dodajanje novega projekta
@@ -53,11 +54,13 @@ function Delegator()
         'et' => 'et',                         // nalaganje edita
         'edit_task' => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
         'del_task' => 'del_task',
+        'claim_task' => 'claim_task',         //vzemi odgovornost v svoje roke!
+        'unclaim_task' => 'unclaim_task',     //ali pa si premisli
         'edit_proj' => 'edit_proj',           //editanje projekta
         'view_task' => 'view_task',           //podrobnosti taska
         'view_proj' => 'view_proj',           //podrobnosti projekta
         'vt' => 'vt',
-        'view_worker' => 'view_worker',       // personal view !!!
+        'view_worker' => 'view_worker',
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -79,6 +82,15 @@ function Delegator()
         'name' => $txt['delegator']
     );
 
+    // CSS, javascript!
+    $context['html_headers'] .= '
+        <link rel="stylesheet" type="text/css" href="Themes/default/css/pikaday.css" />
+        <script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>
+        <script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>
+        <script src="Themes/default/scripts/pikaday.js" type="text/javascript"></script>
+        <script src="Themes/default/scripts/pikaday.jquery.js" type="text/javascript"></script>
+        <script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>
+    ';
     $subActions[$sub_action]();
 
 // Sixth, begin doing all the stuff that we want this action to display
@@ -203,7 +215,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
-                                                return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '					
+                                                return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
@@ -483,32 +495,6 @@ function vt()
 	</style>';
 }
 
-
-function view_task() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
-// tale funkcija ni nujno potrebna - view bo nalozila zgornja funkcija vt
-{
-    global $smcFunc, $context;
-//isAllowedTo('add_new_todo');
-    checkSession();
-    $id_coord = $context['user']['id'];
-/* Tale funkcija bo vkljucevala gumb za prevzemanje naloge
-   added: ALI PA TUDI NE... imamo druge funkcije za to...
- */
-// description manjka
-/*$smcFunc['db_insert']('', '{db_prefix}projects',
-array(
-'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date',
-),
-array(
-$id_coord, $name, $description, $start, $end,
-),
-array('id')
-); // Tukaj se bo vpisevalo v relacijsko tabelo
-*/
-    redirectexit('action=delegator'); // redirect exit - logicno
-}
-
-
 ##################################################################
 ##################################################################
 ##################################################################
@@ -517,7 +503,7 @@ array('id')
 ################### view project #################################
 ##################################################################
 
-function view_proj()   
+function view_proj()
 {
     global $smcFunc, $scripturl, $context, $txt, $sourcedir;
 
@@ -738,8 +724,6 @@ function view_proj()
         ),
     );
 
-    //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
-
     require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
 
@@ -880,7 +864,6 @@ function view_worker()
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row', 
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
-
 					),
                 ),
                 'sort' =>  array(
@@ -894,7 +877,7 @@ function view_worker()
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
 //'return parse_bbc($row[\'project_name\']);
 
@@ -1087,7 +1070,6 @@ function edit_task()
 
 }
 
-
 // To bomo smotrno preuredili!!!
 function didChange()
 {
@@ -1141,6 +1123,55 @@ function del_task()
     );
 
     redirectexit('action=delegator');
+}
+
+function claim_task()
+{
+    global $smcFunc, $context, $scripturl;
+
+    checkSession('get');
+
+    $task_id = (int) $_GET['task_id'];
+    $member_id = (int) $context['user']['id'];
+
+    $smcFunc['db_insert']('', '{db_prefix}workers',
+        array(
+            'id_member' => 'int', 'id_task' => 'int'
+        ),
+        array(
+            $member_id, $task_id
+        ),
+        array('id')
+    );
+
+    $smcFunc['db_free_result']($request);
+
+    //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
+    redirectexit('action=delegator;sa=vt;task_id=' . $task_id);
+}
+
+function unclaim_task()
+{
+    global $smcFunc, $context, $scripturl;
+
+    checkSession('get');
+
+    $task_id = (int) $_GET['task_id'];
+    $member_id = (int) $context['user']['id'];
+
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}workers
+        WHERE id_task = {int:task_id} AND id_member = {int:member_id}',
+        array(
+            'task_id' => $task_id,
+            'member_id' => $member_id
+        )
+    );
+
+    $smcFunc['db_free_result']($request);
+
+    //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
+    redirectexit('action=delegator;sa=vt&task_id=' . $task_id);
 }
 
 is_not_guest();
