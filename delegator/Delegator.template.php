@@ -34,9 +34,11 @@ function template_add()
         // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
 	echo '
 	<div id="container">
-		<h3 class="catbg"><span class="left"></span>
-			', $context['page_title'], '
-		</h3>
+		<div class="cat_bar">
+			<h3 class="catbg"><span class="left"></span>
+				', $context['page_title'], '
+			</h3>
+		</div>
                                            <!-- tukaj bom probal dat sa=add_task -->
 		<form action="', $scripturl, '?action=delegator;sa=add_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
 		<div class="windowbg">
@@ -138,9 +140,11 @@ function template_proj()
 
 	echo '
 	<div id="container">
-		<h3 class="catbg"><span class="left"></span>
-			', $context['page_title'], '
-		</h3>
+		<div class="cat_bar">
+			<h3 class="catbg"><span class="left"></span>
+				', $context['page_title'], '
+			</h3>
+		</div>
 		<form action="', $scripturl, '?action=delegator;sa=add_proj" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
@@ -206,10 +210,10 @@ function template_vt() // id bi bil kar dober argument
                  Izvajalce...
       2 gumba: Back in Submit (nazaj in sprejmi zadolzitev)
      */
-    global $scripturl, $context, $txt;
+    global $scripturl, $context, $txt, $settings;
     global $smcFunc;
     // id_author, name, description, creation_date, deadline, priority, state
-    
+
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
     $task_id = $_GET['task_id'];
 
@@ -225,17 +229,29 @@ SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline A
 // id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
 
 /*          SELECT *
-          FROM {db_prefix}tasks 
+          FROM {db_prefix}tasks
           WHERE id = '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v k*/
 // id od zeljenega taska potrebujemo podatke
     $row = $smcFunc['db_fetch_assoc']($request);
 // v tale echo bo padla tudi kaka forma / claim task / edit task
 
+    if ($row['priority'] == 0)
+		$pimage = 'warning_watch';
+	elseif ($row['priority'] == 1)
+		$pimage = 'warn';
+	elseif ($row['priority'] == 2)
+		$pimage = 'warning_mute';
+
+	$session_var = $context['session_var'];
+	$session_id = $context['session_id'];
+
 echo '
     <div id="container">
-	<h3 class="catbg"><span class="left"></span>
-		', $context['page_title'], '
-	</h3>
+    <div class="cat_bar">
+		<h3 class="catbg"><span class="left"></span>
+			', $context['page_title'], '
+		</h3>
+	</div>
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
@@ -244,77 +260,65 @@ echo '
 					<label for="name">', $txt['task_name'], '</label>
 				</dt>
 				<dd>
-                                      <h3> ', $row['task_name'] ,' </h3>
+                    <h3> ', $row['task_name'] ,' </h3>
 					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
 				</dd>
-
-                                <dt>
+                <dt>
 					<label for="author">', $txt['delegator_task_author'], '</label>
 				</dt>
 				<dd>
-                                       <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'] ,'"> ',$row['author'],'</a>
-	                               
+                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'] ,'"> ',$row['author'],'</a>
 				</dd>
-
-                                <dt>
+                <dt>
 					<label for="project_name">', $txt['project_name'], '</label>
 				</dt>
 				<dd>
-                                       <!-- ', $row['project_name'] ,' -->
-                                       <a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>  
+                    <!-- ', $row['project_name'] ,' -->
+                    <a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
 				</dd>
-
-                                <dt>
+                <dt>
 					<label for="creation_date">', $txt['delegator_creation_date'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['creation_date'] ,'
+                    <span class="format-time">', $row['creation_date'] ,'</span>
 				</dd>
-
-
-
-                                <dt>
+                <dt>
 					<label for="deadline">', $txt['delegator_deadline'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['deadline'] ,'
+					<span class="relative-time">', $row['deadline'], '</span> (<span class="format-time">' , $row['deadline'], '</span>)
 				</dd>
-                                <dt>
+                <dt>
 					<label for="description">', $txt['task_desc'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['description'] ,'
+                    ', $row['description'] ,'
 				</dd>
-                                <dt>
+                <dt>
 					<label for="priority">', $txt['delegator_priority'], '</label>
 				</dt>
 				<dd>
-                                       ', $row['priority'] ,'
+                    <img src="', $settings['images_url'], '/', $pimage, '.gif" /> ', $txt['priority_' . $row['priority']] ,'
 				</dd>
-                                <dt>
+                <dt>
 					<label for="state">', $txt['delegator_state'], '</label>
 				</dt>
 				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
                                        ', $row['state'] ,'
 				</dd>
-
-
 			 </dl>
-					<div id="buttons"> <!-- skupaj bodo tukaj gumbi za sprejetje naloge, urejanje in brisanje -->
-						
-					</div>
+			 <br />
+				<a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_claim_task'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
 	</div><br />
-        <div class="windowbg">
-           <div id="buttons">
-		<input type="submit" name="submit" value="',$txt['delegator_claim_task'] ,'" class="button_submit" /> &nbsp
-                <input type="submit" name="submit" value="',$txt['delegator_edit_task'] ,'" class="button_submit" /> &nbsp
-                <input type="submit" name="submit" value="',$txt['delegator_del_task'] ,'" class="button_submit" />
-           </div>
-        </div>
 ';
+echo '<script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>';
+echo '<script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>';
+echo '<script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>';
 $smcFunc['db_free_result']($request);
 
 }
@@ -324,7 +328,7 @@ $smcFunc['db_free_result']($request);
 //##############################//##############################
 
 
-function template_view_proj() 
+function template_view_proj()
 {
 
     global $scripturl, $context, $txt;
@@ -342,9 +346,11 @@ SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.descriptio
 
 echo '
     <div id="container">
-	<h3 class="catbg"><span class="left"></span>
-		', $context['page_title'], '
-	</h3>
+    <div class="cat_bar">
+		<h3 class="catbg"><span class="left"></span>
+			', $context['page_title'], '
+		</h3>
+	</div>
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
@@ -388,7 +394,7 @@ echo '
 
 			 </dl>
 					<div id="buttons"> <!-- skupaj bodo tukaj gumbi za sprejetje naloge, urejanje in brisanje -->
-						
+
 					</div>
 			</div>
 			<span class="botslice"><span></span></span>
