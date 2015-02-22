@@ -166,7 +166,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 				return $total_tasks;
 			'),
         ),
-        'no_items_label' => $txt['tasks_empty'],
+        'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
@@ -253,7 +253,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
@@ -291,7 +291,7 @@ function add()   //ni se prava funkcija za dodajanje - samo za gumb?
     $context['sub_template'] = 'add';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=add', //spet add
-        'name' => $txt['delegator_add']
+        'name' => $txt['delegator_task_add']
     );
     $context['html_headers'] .= '
 	<style type="text/css">
@@ -362,8 +362,7 @@ function add_task()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    redirectexit('action=delegator;sa=vt&task_id='.$row['id_task'].'');     
-
+    redirectexit('action=delegator;sa=vt&task_id='.$row['id_task']);     
 }
 
 // analogija funkciji add()
@@ -426,8 +425,8 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
 
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
-    $start = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
-    $end = $smcFunc['htmlspecialchars']($_POST['dend3'] . '-' . $_POST['dend1'] . '-' . $_POST['dend2']);
+    $start = $smcFunc['htmlspecialchars']($_POST['start']);
+    $end = $smcFunc['htmlspecialchars']($_POST['end']);
 
     if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
         fatal_lang_error('delegator_empty_fields', false);
@@ -616,7 +615,7 @@ function view_proj()
 				return $total_tasks;
 			'),
         ),
-        'no_items_label' => $txt['tasks_empty'],
+        'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
@@ -704,7 +703,7 @@ function view_proj()
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
@@ -1042,7 +1041,7 @@ function view_worker()
 				return $total_tasks;
 			'),
         ),
-        'no_items_label' => $txt['tasks_empty'],
+        'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
@@ -1130,7 +1129,7 @@ function view_worker()
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
@@ -1164,7 +1163,7 @@ function view_worker()
 }
 
 
-function my_tasks() 
+function my_tasks()
 {
 
 
@@ -1272,7 +1271,7 @@ function my_tasks()
 				return $total_tasks;
 			'),
         ),
-        'no_items_label' => $txt['tasks_empty'],
+        'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
             // name, deadline, priority - so ze narejeni
@@ -1285,7 +1284,7 @@ function my_tasks()
                     'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row', 
+                    'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 					),
                 ),
@@ -1360,7 +1359,7 @@ function my_tasks()
 						elseif ($row[\'priority\'] == 2)
 							$image = \'warning_mute\';
 
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'to_do_priority\' . $row[\'priority\']];
+						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
 					'),
                     'style' => 'width: 10%; text-align: center;',
                 ),
@@ -1469,11 +1468,24 @@ function edit_task()
     //$state = 0; // !!!!!!!!! POPRAVI V TEMPLATE-u
 
     $smcFunc['db_query']('','
-                  UPDATE {db_prefix}tasks T1
-                  SET T1.name={string:name}, T1.description={string:description}, T1.deadline={string:deadline},  T1.id_proj={int:id_proj}
-                  WHERE T1.id = {int:id_task}', array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task) );
+        UPDATE {db_prefix}tasks T1
+        SET T1.name={string:name}, T1.description={string:description}, T1.deadline={string:deadline},  T1.id_proj={int:id_proj}
+        WHERE T1.id = {int:id_task}', array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task) );
 
-    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');     
+    // Dodaj delegirane memberje
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}workers
+            WHERE id_task={int:id_task}',
+        array('id_task' => $id_task)
+    );
+    foreach ($_POST["member_add"] as $member) {
+        $smcFunc['db_insert']('', '{db_prefix}workers',
+            array('id_member' => 'int', 'id_task' => 'int'),
+            array((int) $member, $id_task)
+        );
+    }
+
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task);
 }
 
 // To bomo smotrno preuredili!!!
