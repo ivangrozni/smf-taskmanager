@@ -50,7 +50,8 @@ function Delegator()
         'add_task' => 'add_task',             //dodajanje novega taska
         'acc_task' => 'acc_task',             //sprejemanje zadolzitve (proste zadolzitve)
         'end_task' => 'end_task',             //zakljucek zadolzitve
-        'edit_task' => 'edit_task',           //editanje taska
+        'et' => 'et',                         // nalaganje edita
+        'edit_task' => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
         'del_task' => 'del_task',
         'edit_proj' => 'edit_proj',           //editanje projekta
         'view_task' => 'view_task',           //podrobnosti taska
@@ -752,7 +753,7 @@ function view_proj()
 #################### view member #################################
 ##################################################################
 
-function view_worker()   
+function view_worker()
 {
 // More pokazat zadolzitve, pri katerih si worker...
 
@@ -816,7 +817,7 @@ function view_worker()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-                                        SELECT T1.id_task AS id_task, T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj
+                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
@@ -878,7 +879,8 @@ function view_worker()
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row', 
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
+
 					),
                 ),
                 'sort' =>  array(
@@ -993,12 +995,57 @@ function view_worker()
 ##################################################################
 ##################################################################
 
-function edit_task()
+function et()
 {
     // prebere podatke o tem tasku
     // odpre template z vpisanimi podatki
-    // naredis UPDATE v bazi z novimi podatki
+    // naredis UPDATE v bazi z novimi podatki -> funkcija edit_task
 
+    global $smcFunc, $scripturl, $context, $txt;
+
+    $context['sub_template'] = 'et';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=et',
+        'name' => $txt['delegator_edit_task']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_et
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_et dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_et label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_et dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+
+
+
+}
+
+function edit_task()
+{
     global $smcFunc, $context;
 
     //isAllowedTo('add_new_todo');
@@ -1006,28 +1053,37 @@ function edit_task()
     checkSession();
 
     $id_author = $context['user']['id'];
+    //var_dump($_GET); var_dump($_POST); die;
+    $id_task = (int) $_POST['id_task'];
+    $id_proj = $_POST['id_proj'];
 
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
-    $deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
-    $state = 0;
+    //$deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
+    $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
+    $state = 0; // !!!!!!!!! POPRAVI V TEMPLATE-u
 
-    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
-        fatal_lang_error('to_do_empty_fields', false);
+    /*if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+      fatal_lang_error('to_do_empty_fields', false); */
 
-    $smcFunc['db_insert']('', '{db_prefix}tasks',
+    $smcFunc['db_query']('','
+                  UPDATE {db_prefix}tasks T1
+                  SET T1.name={string:name}, T1.description={string:description}, T1.deadline={string:deadline}, T1.state={int:state}, T1.id_proj={int:id_proj}
+                  WHERE T1.id = {int:id_task}', array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'state' => $state, 'id_proj' => $id_proj, 'id_task' => $id_task) );
+
+    // replace !!!
+    /*
+    $smcFunc['db_insert']('replace', '{db_prefix}tasks',
     array(
-        'id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
+        'id' => 'int','id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int',
     ),
     array(
-        $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state,
+        $id_task ,$_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state,
     ),
     array('id')
     );
-
-    redirectexit('action=delegator'); //ali moram tole spremeniti???
-    // Pomoje ne...    
-    
+    */
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task.'');     
 
 }
 
@@ -1054,7 +1110,7 @@ function didChange()
     if (!empty($id_todo))
 	{
             $smcFunc['db_query']('', '
-			UPDATE {db_prefix}to_dos
+			UPDATE {db_prefix}ta
 			SET is_did = {int:is_did}
 			WHERE id_todo = {int:id_todo}',
             array(

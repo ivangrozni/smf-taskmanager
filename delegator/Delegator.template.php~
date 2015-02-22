@@ -449,18 +449,20 @@ function template_et()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
-    $id_task = (int) $_GET['task_id'];
+    $id_task = $_GET['id_task'];
 
     $request = $smcFunc['db_query']('', '
-                SELECT T1.id AS id, T1.name AS task_name,  T1.deadline AS deadline, T1.description AS description, T1.priority AS priority, T1.state AS t_state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date AS creation_date, T1.start_date AS start_date, T1.end_date AS end_date, T1.end_comment AS end_comment
+                SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS author, T1.creation_date AS creation_date, T1.start_date AS start_date, T1.end_date AS end_date, T1.end_comment AS end_comment
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-                WHERE T1.id = {int:id_task} ' , array( 'id_task' => $id_task) );
+		LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
+                WHERE T1.id_task = '.$id_task.'
+		,
+');
 
     $row = $smcFunc['db_fetch_assoc']($request);    
-    $smcFunc['db_free_result']($request);
-    // var_dump($row); var_dump($id_task); //die;
+
+
 
     $request_p = $smcFunc['db_query']('', '
                  SELECT id, name
@@ -484,27 +486,24 @@ function template_et()
                                    <label for="name"> Zadolzitev </label>
 						</dt>
 						<dd>
-							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
-                                                        <input type="hidden" name="id_task" value ="'.$id_task.'" />
+							<input type="text" name="name" value="'.$row['name'].'" size="50" maxlength="255" class="input_text" />
 						</dd>
                                                 <dt>
                     <label for="description>" opis:  </label>
  </dt>
                                <dd>
 
-                <textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
+                <textarea name="description" rows="3" cols="30" value="'.$row['description'].'"> </textarea>
                                 </dd>
 						<dt>
-
+deadline date before: '.$row['deadline'].'
 							<label for="duet3">', $txt['delegator_deadline'], '</label><br />
 							<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-deadline date before: '.$row['deadline'].'</br>
 						</dt>
 						<dd>
-<input class="kalendar" type="text" name="deadline" />
-						<!--	<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
+							<input type="text" name="duet3" size="4" maxlength="4" value="" class="input_text" /> -
 							<input type="text" name="duet1" size="2" maxlength="2" value="" class="input_text" /> -
-							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" /> -->
+							<input type="text" name="duet2" size="2" maxlength="2" value="" class="input_text" />
 						</dd>
 						<dt>
 							<label for="user">Delegirani uporabniki</label>
@@ -526,22 +525,18 @@ deadline date before: '.$row['deadline'].'</br>
 					</dl>
 
                                          <dt>
-							<label><b>', $txt['project_name'], '</b></label>
+							<label>', $txt['project_name'], '</label>
 					 </dt>
 						<dd>
-
+proj before: '.$row['project_name'].'</br>
                        <select name="id_proj">'; // nadomestil navadno vejico
         while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-            if ($row_p['id'] == $row['id_proj']){
-                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].' id:'.$row_p['id'] . '--</option> ';
+            echo '<option value="'.$row_p['id'].'">'.$row_p['name'].' id:'.$row_p['id'] . '</option> ';
             }
-            else {
-                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].' id:'.$row_p['id'] . '</option> ';
-            }
-        }
         $smcFunc['db_free_result']($request_p);
 
             echo ' </select>
+
 						</dd>
 					</dl>
 
@@ -572,7 +567,7 @@ deadline date before: '.$row['deadline'].'</br>
 		// ]]></script>
 	</div><br />';
 
-
+        $smcFunc['db_free_result']($request);
 
 }
 
