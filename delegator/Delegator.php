@@ -794,8 +794,7 @@ function view_projects()
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord  T2.real_name AS coordinator
 					FROM {db_prefix}projects T1
-					LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id
-
+					LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member
 					ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
@@ -840,7 +839,7 @@ function view_projects()
                 ),
                 'data' => array(
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'delegator_project_name\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
@@ -867,7 +866,7 @@ function view_projects()
 
 	    'start' => array(      
                 'header' => array(
-                    'value' => $txt['project_start'],      //dodano v modification.xml
+                    'value' => $txt['delegator_project_start'],      //dodano v modification.xml
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
@@ -882,7 +881,7 @@ function view_projects()
 
             'end' => array( 
                 'header' => array(
-                    'value' => $txt['project_end'],
+                    'value' => $txt['delegator_project_end'],
                 ),
                 'data' => array(
                     'function' => create_function('$row', ' return $row[\'end\'] '),
@@ -912,7 +911,7 @@ function view_projects()
     );
 
     require_once($sourcedir . '/Subs-List.php');
-    createList($list_of_projects);
+    createList($list_options);
 
 }
 

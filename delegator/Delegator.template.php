@@ -159,7 +159,7 @@ function template_proj()
 					</dd>
 				</dl>
                 <br />
-				<input type="submit" name="submit" value="', $txt['delegator_task_add'], '" class="button_submit" />
+				<input type="submit" name="submit" value="', $txt['delegator_project_add'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
