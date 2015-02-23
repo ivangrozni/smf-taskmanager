@@ -1,5 +1,30 @@
 <?php
 
+/*******************
+ * Helper funkcije *
+ ******************/
+
+// Sestavi seznam prioritet (izbor)
+function getPriorities($row, $txt)
+{
+    $priorities = "";
+    for ($i = 0; $i < 3; $i++) {
+        $checked = ($i == $row["priority"]) ? "checked" : "";
+        $priorities .= '
+            <li>
+                <input type="radio" name="priority" id="priority_' . $i . '" value="' . $i . '" class="input_radio" class="input_radio"' . $checked . '/>
+                ' . $txt['delegator_priority_' . $i] . '
+            </li>
+        ';
+    }
+    return $priorities;
+}
+
+
+/******************
+ *    Templati    *
+ ******************/
+
 function template_main()
 {
     global $scripturl;
@@ -68,9 +93,7 @@ function template_add()
 					</dt>
 					<dd>
 						<ul class="reset">
-							<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_0'], '</li>
-							<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority_1'], '</li>
-							<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_2'], '</li>
+							' . getPriorities($row, $txt) . '
 						</ul>
 					</dd>
                     <dt>
@@ -576,9 +599,7 @@ function template_et()
 						</dt>
 						<dd>
 							<ul class="reset">
-								<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_0'], '</li>
-								<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority_1'], '</li>
-								<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_2'], '</li>
+								' . getPriorities($row, $txt) . '
 							</ul>
 						</dd>
 					</dl>

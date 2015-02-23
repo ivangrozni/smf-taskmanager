@@ -28,13 +28,30 @@
 if (!defined('SMF'))
     die('Hack Attempt...');
 
+/*******************
+ * Helper funkcije *
+ ******************/
+
+function getPriorityIcon($row) {
+    global $settings, $txt;
+
+    if ($row['priority'] == 0)
+        $image = 'warning_watch';
+    elseif ($row['priority'] == 1)
+        $image = 'warn';
+    elseif ($row['priority'] == 2)
+        $image = 'warning_mute';
+
+    return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
+};
+
 //Tu se zacne originalni To-Do list mod
 function Delegator()
 {
     global $context, $txt, $scripturl, $settings; // potrebne variable
-                                       // $context - ne vem, se za kaj se uporablja
-                                       // $txt - notri so vsa prikazana besedila (zaradi prevodov)
-                                       // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
+    // $context - ne vem, se za kaj se uporablja
+    // $txt - notri so vsa prikazana besedila (zaradi prevodov)
+    // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
 
     //isAllowedTo('view_todo');        // za zdaj smo izkljucili permissione
 
@@ -87,14 +104,42 @@ function Delegator()
         <script src="Themes/default/scripts/pikaday.js" type="text/javascript"></script>
         <script src="Themes/default/scripts/pikaday.jquery.js" type="text/javascript"></script>
         <script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>
-    ';
+        <style type="text/css">
+            dl.delegator_et
+            {
+                margin: 0;
+                clear: right;
+                overflow: auto;
+            }
+            dl.delegator_et dt
+            {
+                float: left;
+                clear: both;
+                width: 30%;
+                margin: 0.5em 0 0 0;
+            }
+            dl.delegator_et label
+            {
+                font-weight: bold;
+            }
+            dl.delegator_et dd
+            {
+                float: left;
+                width: 69%;
+                margin: 0.5em 0 0 0;
+            }
+            #confirm_buttons
+            {
+                text-align: center;
+                padding: 1em 0;
+            }
+        </style>';
     $subActions[$sub_action]();
+}
 
 // Sixth, begin doing all the stuff that we want this action to display
 // Store the results of this stuff in the $context array.
 // This action's template(s) will display the contents of $context.
-
-}
 
 function delegator_main()                                      //glavna funkcija - prikaze taske
 {
@@ -206,7 +251,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                 ),
             ),
 
-	    'author' => array(      //AVTOR - dela!
+	       'author' => array(      //AVTOR - dela!
                 'header' => array(
                     'value' => $txt['delegator_author'],      //dodano v modification.xml
                 ),
@@ -243,18 +288,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                     'value' => $txt['delegator_priority'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						global $settings, $txt;
-
-						if ($row[\'priority\'] == 0)
-							$image = \'warning_watch\';
-						elseif ($row[\'priority\'] == 1)
-							$image = \'warn\';
-						elseif ($row[\'priority\'] == 2)
-							$image = \'warning_mute\';
-
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
-					'),
+                    'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -293,37 +327,6 @@ function add()   //ni se prava funkcija za dodajanje - samo za gumb?
         'url' => $scripturl . '?action=delegator;sa=add', //spet add
         'name' => $txt['delegator_task_add']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_add
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_add dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_add label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_add dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 }
 
 //Prava funkcija za dodajanje taska:
@@ -346,13 +349,13 @@ function add_task()
     $state = 0;
 
     if ($smcFunc['htmltrim']($_POST['name']) === '')
-        fatal_lang_error('to_do_empty_fields', false);
+        fatal_lang_error('delegator_empty_fields', false);
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
         array('id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string'),
         array( $_POST['id_proj'], $id_author, $name, $description, $deadline, $_POST['priority'], $state, date("Y-m-d")),
         array('id')
-    ); 
+    );
 
     $request = $smcFunc['db_query']('', '
     SELECT T1.id AS id_task FROM {db_prefix}tasks T1
@@ -362,7 +365,7 @@ function add_task()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    redirectexit('action=delegator;sa=vt&task_id='.$row['id_task']);     
+    redirectexit('action=delegator;sa=vt&task_id='.$row['id_task']);
 }
 
 // analogija funkciji add()
@@ -377,37 +380,6 @@ function proj()
         'url' => $scripturl . '?action=delegator;sa=proj',
         'name' => $txt['delegator_proj']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_proj
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_proj dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_proj label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_proj dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 }
 
 
@@ -428,9 +400,9 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     $start = $smcFunc['htmlspecialchars']($_POST['start']);
     $end = $smcFunc['htmlspecialchars']($_POST['end']);
 
-    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['duet2']) === '')
+    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['end']) === '')
         fatal_lang_error('delegator_empty_fields', false);
-// description manjka
+
     $smcFunc['db_insert']('', '{db_prefix}projects',
     array(
         'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date',
@@ -468,42 +440,7 @@ function vt()
         'url' => $scripturl . '?action=delegator;sa=vt',
         'name' => $txt['delegator_view_task']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_vt
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_vt dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_vt label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_vt dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 }
-
-##################################################################
-##################################################################
-##################################################################
 
 ##################################################################
 ################### view project #################################
@@ -518,37 +455,6 @@ function view_proj()
         'url' => $scripturl . '?action=delegator;sa=view_proj',
         'name' => $txt['delegator_view_proj']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_view_proj
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_view_proj dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_view_proj label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_view_proj dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 
 /////////////////////////////////////////////////////////////////////////////////////
 //////////////////// prikaz taskov v projektu  //////////////////////////////////////
@@ -693,18 +599,7 @@ function view_proj()
                     'value' => $txt['delegator_priority'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						global $settings, $txt;
-
-						if ($row[\'priority\'] == 0)
-							$image = \'warning_watch\';
-						elseif ($row[\'priority\'] == 1)
-							$image = \'warn\';
-						elseif ($row[\'priority\'] == 2)
-							$image = \'warning_mute\';
-
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
-					'),
+                    'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -748,37 +643,6 @@ function view_projects()
         'url' => $scripturl . '?action=delegator;sa=view_projects',
         'name' => $txt['delegator_view_projects']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_view_projects
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_view_projects dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_view_projects label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_view_projects dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 
     $list_options = array(
         'id' => 'list_of_projects',
@@ -848,23 +712,23 @@ function view_projects()
                 ),
             ),
 
-            'coordinator' => array(      //KOORDINATOR
-                'header' => array(
-                    'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
-                ),
-                'data' => array(
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_coord\'] .\'">\'.$row[\'coordinator\'].\'</a>\'; '
-
-					),
-                ),
-                'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
-                ),
+        'coordinator' => array(      //KOORDINATOR
+            'header' => array(
+                'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
             ),
+            'data' => array(
+                'function' => create_function('$row',
+                'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_coord\'] .\'">\'.$row[\'coordinator\'].\'</a>\'; '
 
-	    'start' => array(      
+				),
+            ),
+            'sort' =>  array(
+                'default' => 'name',
+                'reverse' => 'name DESC',
+            ),
+        ),
+
+	    'start' => array(
                 'header' => array(
                     'value' => $txt['delegator_project_start'],      //dodano v modification.xml
                 ),
@@ -879,19 +743,19 @@ function view_projects()
                 ),
             ),
 
-            'end' => array( 
-                'header' => array(
-                    'value' => $txt['delegator_project_end'],
-                ),
-                'data' => array(
-                    'function' => create_function('$row', ' return $row[\'end\'] '),
-                    'style' => 'width: 20%; text-align: center;',
-                ),
-                'sort' =>  array(
-                    'default' => 'end',
-                    'reverse' => 'end DESC',
-                ),
+        'end' => array(
+            'header' => array(
+                'value' => $txt['delegator_project_end'],
             ),
+            'data' => array(
+                'function' => create_function('$row', ' return $row[\'end\'] '),
+                'style' => 'width: 20%; text-align: center;',
+            ),
+            'sort' =>  array(
+                'default' => 'end',
+                'reverse' => 'end DESC',
+            ),
+        ),
 
             /*'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
                 'header' => array(
@@ -915,20 +779,13 @@ function view_projects()
 
 }
 
-
-
-
-##################################################################
-##################################################################
-##################################################################
-
 ##################################################################
 #################### view member #################################
 ##################################################################
 
 // oglej si delavca - lahko bi se prikazalo se kaj njegove statistike
 
-function view_worker() 
+function view_worker()
 {
 // More pokazat zadolzitve, pri katerih si worker...
 
@@ -939,41 +796,6 @@ function view_worker()
         'url' => $scripturl . '?action=delegator;sa=view_worker',
         'name' => $txt['delegator_view_worker']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_view_worker
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_view_worker dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_view_worker label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_view_worker dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
-
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////
 
     $id_member = $_GET['id_member'];
 
@@ -1118,18 +940,7 @@ function view_worker()
                     'value' => $txt['delegator_priority'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						global $settings, $txt;
-
-						if ($row[\'priority\'] == 0)
-							$image = \'warning_watch\';
-						elseif ($row[\'priority\'] == 1)
-							$image = \'warn\';
-						elseif ($row[\'priority\'] == 2)
-							$image = \'warning_mute\';
-
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
-					'),
+                    'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -1153,19 +964,12 @@ function view_worker()
         ),
     );
 
-
-    //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
-
     require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
-
 }
-
 
 function my_tasks()
 {
-
-
     global $smcFunc, $scripturl, $context, $txt, $sourcedir;
 
     $context['sub_template'] = 'my_tasks';
@@ -1348,18 +1152,7 @@ function my_tasks()
                     'value' => $txt['delegator_priority'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						global $settings, $txt;
-
-						if ($row[\'priority\'] == 0)
-							$image = \'warning_watch\';
-						elseif ($row[\'priority\'] == 1)
-							$image = \'warn\';
-						elseif ($row[\'priority\'] == 2)
-							$image = \'warning_mute\';
-
-						return \'<img src="\'. $settings[\'images_url\']. \'/\'. $image. \'.gif" title="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" alt="Priority: \' . $txt[\'delegator_priority_\' . $row[\'priority\']] . \'" /> \' . $txt[\'delegator_priority_\' . $row[\'priority\']];
-					'),
+                    'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -1411,40 +1204,6 @@ function et()
         'url' => $scripturl . '?action=delegator;sa=et',
         'name' => $txt['delegator_edit_task']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_et
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_et dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_et label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_et dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
-
-
-
 }
 
 function edit_task()
@@ -1456,20 +1215,21 @@ function edit_task()
     checkSession();
 
     $id_author = $context['user']['id'];
-    //var_dump($_GET); var_dump($_POST); die;
     $id_task = (int) $_POST['id_task'];
     $id_proj = $_POST['id_proj'];
 
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
-    //$deadline = $smcFunc['htmlspecialchars']($_POST['duet3'] . '-' . $_POST['duet1'] . '-' . $_POST['duet2']);
     $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
-    //$state = 0; // !!!!!!!!! POPRAVI V TEMPLATE-u
+
+    $priority = (int) $_POST['priority'];
 
     $smcFunc['db_query']('','
-        UPDATE {db_prefix}tasks T1
-        SET T1.name={string:name}, T1.description={string:description}, T1.deadline={string:deadline},  T1.id_proj={int:id_proj}
-        WHERE T1.id = {int:id_task}', array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task) );
+        UPDATE {db_prefix}tasks
+        SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}
+        WHERE id = {int:id_task}',
+        array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task, 'priority' => $priority)
+    );
 
     // Dodaj delegirane memberje
     $smcFunc['db_query']('', '

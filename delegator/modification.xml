@@ -155,7 +155,7 @@ $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do L
 $txt['permissionname_add_new_todo'] = 'Can add new to-do(s)';
 $txt['permissionhelp_add_new_todo'] = 'This permission allows users to can add new To-Do(s).';
 // Errors
-$txt['delegator_empty_fields'] = 'You left the subject/due date field(s) empty.';
+$txt['delegator_empty_fields'] = 'You left some mandatory fields empty.';
 $txt['cannot_view_todolist'] = 'Sorry, but you aren\'t allowed to view To-Do List.';
 $txt['cannot_add_new_todolist'] = 'Sorry, but you aren\'t allowed to add new To-Do(s).';]]></add>
 		</operation>
