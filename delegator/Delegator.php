@@ -1351,6 +1351,60 @@ function unclaim_task()
     redirectexit('action=delegator;sa=vt&task_id=' . $task_id);
 }
 
+// Tukaj bomo nalozili template za koncanje taska
+// Funkcija ustreza et, add, najbrz tudi proj
+function en()
+{
+    
+    // prebere podatke o tem tasku
+    // odpre template z vpisanimi podatki
+    // naredis UPDATE v bazi z novimi podatki -> funkcija edit_task
+
+    global $smcFunc, $scripturl, $context, $txt;
+
+    $context['sub_template'] = 'en';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=en',
+        'name' => $txt['delegator_end_task']
+    );
+    $context['html_headers'] .= '
+	<style type="text/css">
+		dl.delegator_en
+		{
+			margin: 0;
+			clear: right;
+			overflow: auto;
+		}
+		dl.delegator_en dt
+		{
+			float: left;
+			clear: both;
+			width: 30%;
+			margin: 0.5em 0 0 0;
+		}
+		dl.delegator_en label
+		{
+			font-weight: bold;
+		}
+		dl.delegator_en dd
+		{
+			float: left;
+			width: 69%;
+			margin: 0.5em 0 0 0;
+		}
+		#confirm_buttons
+		{
+			text-align: center;
+			padding: 1em 0;
+		}
+	</style>';
+
+    
+
+
+}
+
+
 is_not_guest();
 
 ?>

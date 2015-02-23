@@ -132,6 +132,7 @@ $txt['delegator_del_task'] = 'Delete Task';
 $txt['delegator_task_author'] = 'Task\'s Author';
 $txt['delegator_creation_date'] = 'Task\'s Creation Date';
 $txt['delegator_edit_task'] = 'Edit Task';
+$txt['delegator_end_task'] = 'End Task';
 $txt['delegator_view_task'] = 'View Task';
 $txt['delegator_view_worker'] = 'View Tasks of Worker';
 $txt['delegator_my_tasks'] = 'My Tasks';
