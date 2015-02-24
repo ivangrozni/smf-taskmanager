@@ -52,7 +52,7 @@ function isMemberWorker($id_task){
     $id_member = $context['user']['id'];
 
     $request = $smcFunc['db_query']('', '
-        SELECT id_worker FROM {db_prefix}workers
+        SELECT id_member AS id_worker FROM {db_prefix}workers
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
@@ -175,7 +175,7 @@ function delegator_main()                                      //glavna funkcija
             // FUNKCIJE
 /*
 query posodobljen - zdaj sta združeni tabela taskov in projektov
-nadalje moramo query urediti tako, da bo še dodana tabela memberjov
+nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
@@ -283,7 +283,7 @@ nadalje moramo query urediti tako, da bo še dodana tabela memberjov
                 ),
             ),
 
-            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne številke dneva v letu - EVO TUKI GIZMO!
+            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
                 'header' => array(
                     'value' => $txt['delegator_deadline'],
                 ),
@@ -594,7 +594,7 @@ function view_proj()
                 ),
             ),
 
-            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne številke dneva v letu - EVO TUKI GIZMO!
+            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
                 'header' => array(
                     'value' => $txt['delegator_deadline'],
                 ),
@@ -935,7 +935,7 @@ function view_worker()
                 ),
             ),
 
-            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne številke dneva v letu - EVO TUKI GIZMO!
+            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
                 'header' => array(
                     'value' => $txt['delegator_deadline'],
                 ),
@@ -1147,7 +1147,7 @@ function my_tasks()
                 ),
             ),
 
-            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne številke dneva v letu - EVO TUKI GIZMO!
+            'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
                 'header' => array(
                     'value' => $txt['delegator_deadline'],
                 ),

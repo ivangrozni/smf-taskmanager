@@ -139,11 +139,11 @@ $tables = array(
 				'type' => 'int',
 				'size' => '11',
 			),
-                        array(
-                            'name' => 'status',
-                            'type' => 'int',
-                            'size' => '3',
-                        ),
+            array(
+                'name' => 'status',
+                'type' => 'int',
+                'size' => '3',
+                    ),
 		),
 		'indexes' => array(
 			array(

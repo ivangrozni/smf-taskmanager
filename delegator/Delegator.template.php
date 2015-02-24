@@ -27,7 +27,7 @@ function isMemberWorker($id_task){
     $id_member = $context['user']['id'];
 
     $request = $smcFunc['db_query']('', '
-        SELECT id_worker FROM {db_prefix}workers
+        SELECT id_member AS id_worker FROM {db_prefix}workers
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);

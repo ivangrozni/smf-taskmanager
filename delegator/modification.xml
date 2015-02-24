@@ -152,6 +152,7 @@ $txt['delegator_edit_proj'] = 'Edit Project';
 $txt['delegator_del_proj'] = 'Delete Project';
 $txt['delegator_coordinator_name'] = 'Name of Coordinator';
 $txt['delegator_view_projects'] = 'View All Projects';
+$txt['delegator_projects'] = 'View Projects';
 $txt['projects_empty'] = 'No Projects';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
