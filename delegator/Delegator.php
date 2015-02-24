@@ -45,6 +45,23 @@ function getPriorityIcon($row) {
     return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
 };
 
+function isMemberWorker($id_task){
+    // Pogledamo, id memberja in ga primerjamo s taski v tabeli
+    // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
+    global $context, $smcFunc;
+    $id_member = $context['user']['id'];
+
+    $request = $smcFunc['db_query']('', '
+        SELECT id_worker FROM {db_prefix}workers
+        WHERE id_task = {int:id_task}', array('id_task' => $id_task));
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+    foreach ($row['id_worker'] as $id){
+         if ($id == $id_member) return TRUE;
+    }
+    return FALSE;
+}
+
 //Tu se zacne originalni To-Do list mod
 function Delegator()
 {
@@ -65,7 +82,7 @@ function Delegator()
         'proj' => 'proj',                     // template za vnos projekta
         'add_proj' => 'add_proj',             // funkcija ki vnese projekt
         'add_task' => 'add_task',             // funkcija, ki vnese task
-
+        'en' => 'en',                         // nalozi template za end_task
         'end_task' => 'end_task',             // MANJKA zakljucek zadolzitve
         'et' => 'et',                         // nalaganje edita - view
         'edit_task' => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
@@ -1401,7 +1418,7 @@ function en()
 	</style>';
 }
 
-function edit_task()
+function end_task()
 {
 
     global $smcFunc, $context;
@@ -1413,7 +1430,8 @@ function edit_task()
 
     $id_task = (int) $_POST['id_task'];
 
-    $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
+    if (isMemberWorker($id_task)){
+            $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
 
     $state = (int) $_POST['state'];
 
@@ -1425,7 +1443,9 @@ function edit_task()
     );
 
     redirectexit('action=delegator;sa=my_tasks');
-
+    }
+    else redirectexit('action=delegator;sa=vt&task_id='.$id_task)
+    
 }
 
 is_not_guest();

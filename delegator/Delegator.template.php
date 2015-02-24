@@ -20,6 +20,22 @@ function getPriorities($row, $txt)
     return $priorities;
 }
 
+function isMemberWorker($id_task){
+    // Pogledamo, id memberja in ga primerjamo s taski v tabeli
+    // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
+    global $context, $smcFunc;
+    $id_member = $context['user']['id'];
+
+    $request = $smcFunc['db_query']('', '
+        SELECT id_worker FROM {db_prefix}workers
+        WHERE id_task = {int:id_task}', array('id_task' => $id_task));
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+    foreach ($row['id_worker'] as $id){
+         if ($id == $id_member) return TRUE;
+    }
+    return FALSE;
+}
 
 /******************
  *    Templati    *
@@ -212,7 +228,7 @@ function template_vt() // id bi bil kar dober argument
 
 
     $request = $smcFunc['db_query']('', '
-SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
+        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS            deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author,            T1.creation_date AS creation_date, T1.description AS description, T1.id_proj             AS id_proj, T1.id_author AS id_author
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
@@ -280,7 +296,7 @@ SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline A
 		$delegates = implode(", ", $members);
 	}
 
-echo '
+    echo '
     <div id="container">
     <div class="cat_bar">
 		<h3 class="catbg"><span class="left"></span>
@@ -351,6 +367,9 @@ echo '
 				', $claimButton, '&nbsp;
                 <a href="index.php?action=delegator;sa=et;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
                 <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+            ';
+        if(isMemberWorker($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        echo '
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
@@ -653,8 +672,11 @@ function template_et()
 function template_en()
 {
 	global $scripturl, $context, $txt;
-        global $smcFunc;
+    global $smcFunc;
 
+	$session_var = $context['session_var'];
+	$session_id = $context['session_id'];
+        
        // rabim samo id_task-a, ki se zakljucuje
 
     $task_id = (int) $_GET['task_id'];
@@ -664,7 +686,7 @@ function template_en()
  **************************************************************************/
 
     $request = $smcFunc['db_query']('', '
-SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
+       SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
