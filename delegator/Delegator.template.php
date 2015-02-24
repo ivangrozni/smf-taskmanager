@@ -649,6 +649,7 @@ function template_et()
 	</div><br />';
 }
 
+//en je okrajsava za end task...
 function template_en()
 {
 	global $scripturl, $context, $txt;
@@ -661,8 +662,6 @@ function template_en()
 /***************************************************************************
  ******************* * Podvojeno iz vt *************************************
  **************************************************************************/
-
-
 
     $request = $smcFunc['db_query']('', '
 SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
@@ -840,47 +839,16 @@ $smcFunc['db_free_result']($request);
 					</dd>
                     <dt>
 		            	<label for="description"> End state (nacin zakljucka) </label>
+                        <!-- tukaj bo dolartxt spremenljivka -->
  					</dt>
                     <dd>
-                		<textarea name="description" rows="3" cols="30"></textarea>
-                    </dd>
-					<dt>
-						<label for="duet3">', $txt['delegator_deadline'], '</label><br />
-						<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-					</dt>
-					<dd>
-						<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
-						<div id="kalender"></div>
-					</dd>
-					<dt>
-						<label for="user">Delegirani uporabniki</label>
-					</dt>
-					<dd>
-						<input type="text" name="user" id="to-add">
-						<span id="user-list"></span>
-					</dd>
-					<dt>
-						<label for="priority">', $txt['delegator_priority'], '</label>
-					</dt>
-					<dd>
-						<ul class="reset">
-							<li><input type="radio" name="priority" id="priority_0" value="0" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_0'], '</li>
-							<li><input type="radio" name="priority" id="priority_1" value="1" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_priority_1'], '</li>
-							<li><input type="radio" name="priority" id="priority_2" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_priority_2'], '</li>
+                        	<ul class="reset">
+							<li><input type="radio" name="state" id="state_2" value="2" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_state_2'], '</li>
+							<li><input type="radio" name="state" id="state_3" value="3" class="input_radio" class="input_radio"  /> ', $txt['delegator_state_3'], '</li>
+							<li><input type="radio" name="state" id="state_4" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_state_4'], '</li>
 						</ul>
-					</dd>
-                    <dt>
-						<label for="id_proj">', $txt['delegator_project_name'], '</label>
-					</dt>
-					<dd>
-                       <select name="id_proj">'; // nadomestil navadno vejico
-					    while ($row = $smcFunc['db_fetch_assoc']($request)) {
-					        echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
-					        }
-					    $smcFunc['db_free_result']($request);
-        				echo '
-        				</select>
-					</dd>
+                    </dd>
+
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />

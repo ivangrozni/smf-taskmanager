@@ -61,7 +61,7 @@ function Delegator()
 
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
         'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-	'add' => 'add',                       // nalozi view za add task... al kaj
+        'add' => 'add',                       // nalozi view za add task... al kaj
         'proj' => 'proj',                     // template za vnos projekta
         'add_proj' => 'add_proj',             // funkcija ki vnese projekt
         'add_task' => 'add_task',             // funkcija, ki vnese task
@@ -872,11 +872,11 @@ function view_worker()
 
             'name' => array(		// TASK
                 'header' => array(
-                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                    'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'delegator_task_name\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
@@ -891,7 +891,7 @@ function view_worker()
                 ),
                 'data' => array(
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'delegator_project_name\'].\'</a>\'; '
 //'return parse_bbc($row[\'project_name\']);
 
 					),
@@ -1248,6 +1248,7 @@ function edit_task()
 }
 
 // To bomo smotrno preuredili!!!
+// Ta funkcija nima smisla...
 function didChange()
 {
     global $smcFunc;
@@ -1398,12 +1399,34 @@ function en()
 			padding: 1em 0;
 		}
 	</style>';
-
-    
-
-
 }
 
+function edit_task()
+{
+
+    global $smcFunc, $context;
+
+    //isAllowedTo('add_new_todo');
+    // PREVERI ALI JE UPORABNIK IZVAJALEC NALOGE...
+
+    checkSession();
+
+    $id_task = (int) $_POST['id_task'];
+
+    $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
+
+    $state = (int) $_POST['state'];
+
+    $smcFunc['db_query']('','
+        UPDATE {db_prefix}tasks
+        SET end_comment={string:end_comment}, end_date={string:end_date}, state={int:state}
+        WHERE id = {int:id_task}',
+                         array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task )
+    );
+
+    redirectexit('action=delegator;sa=my_tasks');
+
+}
 
 is_not_guest();
 

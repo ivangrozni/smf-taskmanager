@@ -137,6 +137,9 @@ $txt['delegator_view_task'] = 'View Task';
 $txt['delegator_view_worker'] = 'View Tasks of Worker';
 $txt['delegator_my_tasks'] = 'My Tasks';
 $txt['delegator_worker'] = 'Worker';
+$txt['delegator_state_2'] = 'Succesful';
+$txt['delegator_state_3'] = 'Unsuccesful';
+$txt['delegator_state_4'] = 'Canceled';
 // Projects
 $txt['delegator_project_add'] = 'Add Project';
 $txt['delegator_project_name'] = 'Project';
