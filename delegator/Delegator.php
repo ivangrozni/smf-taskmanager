@@ -238,7 +238,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 
             'name' => array(		// TASK
                 'header' => array(
-                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                    'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row',
@@ -395,7 +395,7 @@ function proj()
     $context['sub_template'] = 'proj';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=proj',
-        'name' => $txt['delegator_proj']
+        'name' => $txt['delegator_project_name']
     );
 }
 
@@ -470,7 +470,7 @@ function view_proj()
     $context['sub_template'] = 'view_proj';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=view_proj',
-        'name' => $txt['delegator_view_proj']
+        'name' => $txt['delegator_view_project']
     );
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -548,7 +548,7 @@ function view_proj()
 
             'name' => array(		// TASK
                 'header' => array(
-                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                    'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row',
@@ -710,13 +710,13 @@ function view_projects()
 				return $total_projects;
 			'),
         ),
-        'no_items_label' => $txt['projects_empty'],
+        'no_items_label' => $txt['delegator_projects_empty'],
         'columns' => array(
             // vsaka stvar v tabeli ima header, data, sort
 
             'name' => array(		// PROJECT
                 'header' => array(
-                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                    'value' => $txt['delegator_project_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array(
                     'function' => create_function('$row',
@@ -1101,7 +1101,7 @@ function my_tasks()
 
             'name' => array(		// TASK
                 'header' => array(
-                    'value' => $txt['name'],  //Napisi v header "Name"... potegne iz index.english.php
+                    'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row',
@@ -1433,18 +1433,19 @@ function end_task()
     if (isMemberWorker($id_task)){
             $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
 
-    $state = (int) $_POST['state'];
+            $state = (int) $_POST['state'];
 
-    $smcFunc['db_query']('','
-        UPDATE {db_prefix}tasks
-        SET end_comment={string:end_comment}, end_date={string:end_date}, state={int:state}
-        WHERE id = {int:id_task}',
+            $smcFunc['db_query']('','
+                  UPDATE {db_prefix}tasks
+                  SET end_comment={string:end_comment}, end_date={string:end_date}, state={int:state}
+                  WHERE id = {int:id_task}',
                          array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task )
     );
 
     redirectexit('action=delegator;sa=my_tasks');
     }
-    else redirectexit('action=delegator;sa=vt&task_id='.$id_task)
+
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task);
     
 }
 

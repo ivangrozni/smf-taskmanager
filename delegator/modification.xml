@@ -113,6 +113,11 @@ $txt['delegator_empty'] = !$context['user']['is_admin'] ? 'To-Do List is empty!'
 $txt['delegator_del'] = 'Delete';
 $txt['delegator_subject'] = 'Subject';
 $txt['delegator_due_time'] = 'Due date';
+
+$txt['delegator_due_year'] = 'Due year';
+$txt['delegator_due_month'] = 'Due month';
+$txt['delegator_due_day'] = 'Due day';
+
 $txt['delegator_deadline'] = 'Deadline';
 $txt['delegator_priority'] = 'Priority';
 $txt['delegator_priority_0'] = 'Please to do it';
@@ -146,7 +151,8 @@ $txt['delegator_project_name'] = 'Project';
 $txt['delegator_project_desc'] = 'Description';
 $txt['delegator_project_start'] = 'Project Start Date';
 $txt['delegator_project_end'] = 'Project End Date';
-$txt['delegator_view_proj'] = 'View Project';
+$txt['delegator_view_project'] = 'View Project';
+$txt['delegator_project'] = 'Project';
 $txt['delegator_project_coord'] = 'Project Coordinator';
 $txt['delegator_edit_proj'] = 'Edit Project';
 $txt['delegator_del_proj'] = 'Delete Project';
@@ -160,9 +166,13 @@ $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do L
 $txt['permissionname_add_new_todo'] = 'Can add new to-do(s)';
 $txt['permissionhelp_add_new_todo'] = 'This permission allows users to can add new To-Do(s).';
 // Errors
+$txt['autosuggest_delete_item'] = "Auto Suggest Delete Item";
+
 $txt['delegator_empty_fields'] = 'You left some mandatory fields empty.';
 $txt['cannot_view_todolist'] = 'Sorry, but you aren\'t allowed to view To-Do List.';
-$txt['cannot_add_new_todolist'] = 'Sorry, but you aren\'t allowed to add new To-Do(s).';]]></add>
+$txt['cannot_add_new_todolist'] = 'Sorry, but you aren\'t allowed to add new To-Do(s).';]]>
+
+			</add>
 		</operation>
 	</file>
 	<!--file name="$languagedir/Modifications.slovenian.php">

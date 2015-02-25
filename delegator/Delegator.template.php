@@ -84,7 +84,7 @@ function template_add()
 						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
 					</dd>
                     <dt>
-		            	<label for="description">', $txt['task_desc'], '</label>
+		            	<label for="description">', $txt['delegator_task_desc'], '</label>
  					</dt>
                     <dd>
                 		<textarea name="description" rows="3" cols="30"></textarea>
