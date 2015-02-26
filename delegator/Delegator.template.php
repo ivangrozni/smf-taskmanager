@@ -20,6 +20,7 @@ function getPriorities($row, $txt)
     return $priorities;
 }
 
+/*
 function isMemberWorker($id_task){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
@@ -35,7 +36,7 @@ function isMemberWorker($id_task){
          if ($id == $id_member) return TRUE;
     }
     return FALSE;
-}
+    }*/
 
 /******************
  *    Templati    *
@@ -368,7 +369,8 @@ function template_vt() // id bi bil kar dober argument
                 <a href="index.php?action=delegator;sa=et;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
                 <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
             ';
-        if(isMemberWorker($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+                                                                                  //if(isMemberWorker($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        if(TRUE) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -669,6 +671,7 @@ function template_et()
 }
 
 //en je okrajsava za end task...
+
 function template_en()
 {
 	global $scripturl, $context, $txt;
@@ -830,6 +833,7 @@ echo '
 $smcFunc['db_free_result']($request);
 
 
+
 /***************************************************************************
  ****************** Konec Podvojitve ***************************************
  **************************************************************************/
@@ -860,7 +864,7 @@ $smcFunc['db_free_result']($request);
 
 					</dd>
                     <dt>
-		            	<label for="description"> End state (nacin zakljucka) </label>
+		            	<label for="state"> End state (nacin zakljucka) </label>
                         <!-- tukaj bo dolartxt spremenljivka -->
  					</dt>
                     <dd>
@@ -874,7 +878,7 @@ $smcFunc['db_free_result']($request);
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
-				<input type="submit" name="submit" value="', $txt['delegator_task_add'], '" class="button_submit" />
+				<input type="submit" name="submit" value="', $txt['delegator_end_task'], '" class="button_submit" />
 			</div>
             <span class="botslice">&nbsp;</span>
 		</div>

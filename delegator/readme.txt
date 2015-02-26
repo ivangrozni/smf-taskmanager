@@ -9,9 +9,15 @@ Zato so bila testiranja neuspesna. Krivec je Jaka Perovsek. Pozabil je pobrisat 
 2015 02 21
 Torej, dobil sem novo idejo. Vsaj projektu bi lahko dali zraven še topic_id, v katerem bi potekala debata o tem projektu... Kjer bi bil pregled nad zadolžitvami projekta...
 
-TO DO:
- 1) edit_task
- 2) edit_proj, del_proj
- 3) tabela logov, kjer se vse vidi, kdo je kaj delal
- 4) php_sidebar
+DONE:
+edit_task
 
+TO DO:
+my_tasks (gumbek za myfinished tasks)
+isMemberWorker
+end_task
+tabela logov, kjer se vse vidi, kdo je kaj delal
+php_sidebar
+
+FUTURE
+edit_proj, del_proj

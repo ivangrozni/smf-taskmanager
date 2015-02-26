@@ -32,6 +32,7 @@ if (!defined('SMF'))
  * Helper funkcije *
  ******************/
 
+
 function getPriorityIcon($row) {
     global $settings, $txt;
 
@@ -45,6 +46,7 @@ function getPriorityIcon($row) {
     return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
 };
 
+/*
 function isMemberWorker($id_task){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
@@ -60,7 +62,8 @@ function isMemberWorker($id_task){
          if ($id == $id_member) return TRUE;
     }
     return FALSE;
-}
+    }*/
+
 
 //Tu se zacne originalni To-Do list mod
 function Delegator()
@@ -152,6 +155,7 @@ function Delegator()
             }
         </style>';
     $subActions[$sub_action]();
+
 }
 
 // Sixth, begin doing all the stuff that we want this action to display
@@ -215,10 +219,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT COUNT(*)
 					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state =0
-					OR T1.state =1\',
+					WHERE T1.state = 0 OR T1.state =1\',
 					array(
 					)
 				);
@@ -263,8 +264,8 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'project_name',
+                    'reverse' => 'project_name DESC',
                 ),
             ),
 
@@ -278,8 +279,8 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'author',
+                    'reverse' => 'author DESC',
                 ),
             ),
 
@@ -631,7 +632,8 @@ function view_proj()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+                        return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+
 					'),
 
                     'style' => 'width: 10%; text-align: center;',
@@ -673,7 +675,7 @@ function view_projects()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord  T2.real_name AS coordinator
+					SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord, T2.real_name AS coordinator
 					FROM {db_prefix}projects T1
 					LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member
 					ORDER BY {raw:sort}
@@ -720,12 +722,14 @@ function view_projects()
                 ),
                 'data' => array(
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'delegator_project_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'project_name',
-                    'reverse' => 'project_name DESC',
+                    'default' => 'name',
+                    'reverse' => 'name DESC',
+                    /*'default' => 'project_name',
+                      'reverse' => 'project_name DESC',*/
                 ),
             ),
 
@@ -774,20 +778,6 @@ function view_projects()
             ),
         ),
 
-            /*'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
-                'header' => array(
-                    'value' => $txt['delegator_actions'],
-                ),
-                'data' => array(
-                    'function' => create_function('$row', '
-						global $context, $settings, $scripturl;
-
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=delete;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
-					'),
-
-                    'style' => 'width: 10%; text-align: center;',
-                ),
-             ),*/
         ),
     );
 
@@ -831,7 +821,7 @@ function view_worker()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj
+                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
@@ -893,7 +883,7 @@ function view_worker()
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'delegator_task_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
@@ -908,7 +898,7 @@ function view_worker()
                 ),
                 'data' => array(
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'delegator_project_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
 //'return parse_bbc($row[\'project_name\']);
 
 					),
@@ -972,7 +962,9 @@ function view_worker()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+                        return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+
+
 					'),
 
                     'style' => 'width: 10%; text-align: center;',
@@ -1184,7 +1176,8 @@ function my_tasks()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-						return \'<a href="\'. $scripturl. \'?action=delegator;sa=did;id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'">wat</a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+                return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+
 					'),
 
                     'style' => 'width: 10%; text-align: center;',
@@ -1369,6 +1362,7 @@ function unclaim_task()
     redirectexit('action=delegator;sa=vt&task_id=' . $task_id);
 }
 
+
 // Tukaj bomo nalozili template za koncanje taska
 // Funkcija ustreza et, add, najbrz tudi proj
 function en()
@@ -1430,24 +1424,30 @@ function end_task()
 
     $id_task = (int) $_POST['id_task'];
 
-    if (isMemberWorker($id_task)){
-            $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
+    //if (isMemberWorker($id_task)){
+    if (TRUE){
+        $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
+        
+        $state = (int) $_POST['state'];
 
-            $state = (int) $_POST['state'];
-
-            $smcFunc['db_query']('','
+        $smcFunc['db_query']('','
                   UPDATE {db_prefix}tasks
                   SET end_comment={string:end_comment}, end_date={string:end_date}, state={int:state}
                   WHERE id = {int:id_task}',
-                         array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task )
+                             array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task )
     );
 
+        /*var_dump($state); 
+          var_dump($end_comment); 
+          die;*/
+           
     redirectexit('action=delegator;sa=my_tasks');
     }
 
     redirectexit('action=delegator;sa=vt&task_id='.$id_task);
     
 }
+
 
 is_not_guest();
 
