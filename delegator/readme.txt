@@ -11,8 +11,11 @@ Torej, dobil sem novo idejo. Vsaj projektu bi lahko dali zraven še topic_id, v 
 
 DONE:
 edit_task
+view_projects
+view_worker
 
 TO DO:
+claim/unclaim updejtata tabelo tasks state => 1
 my_tasks (gumbek za myfinished tasks)
 isMemberWorker
 end_task
@@ -21,3 +24,5 @@ php_sidebar
 
 FUTURE
 edit_proj, del_proj
+
+Dalo bi se naredit funkcijo, ki dobi kot argument string, ki je query za bazo podatkov, in vrne fetch results... Tako ne bi rabili tistih anonimnih funkcij skoz...

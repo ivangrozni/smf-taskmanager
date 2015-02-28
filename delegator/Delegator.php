@@ -46,7 +46,7 @@ function getPriorityIcon($row) {
     return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
 };
 
-/*
+/*//Bricka vse skupaj... najbrz zaradi foreach...
 function isMemberWorker($id_task){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
@@ -655,7 +655,9 @@ function view_proj()
 
 function view_projects()
 {
-    global $smcFunc, $scripturl, $context, $txt, $sourcedir;
+
+    global $context, $scripturl, $sourcedir, $smcFunc, $txt;   //globalne spremenljivke lahko kliceju funkcije iz zunaj kajne?
+    $id_member = 1; // kr neki...
 
     $context['sub_template'] = 'view_projects';
     $context['linktree'][] = array(
@@ -666,21 +668,21 @@ function view_projects()
     $list_options = array(
         'id' => 'list_of_projects',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_projects',       //prvi del URL-ja
         'default_sort_col' => 'end',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
-
-            'function' => create_function('$start, $items_per_page, $sort', '
+/*
+query posodobljen - zdaj sta združeni tabela taskov in projektov
+nadalje moramo query urediti tako, da bo se dodana tabela memberjov
+*/
+            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord, T2.real_name AS coordinator
-					FROM {db_prefix}projects T1
-					LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member
-					ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}\',
-					array(
+                    SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord, T2.real_name AS coordinator
+                    FROM {db_prefix}projects T1                                                                LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member                              ORDER BY {raw:sort}                                                                        LIMIT {int:start}, {int:per_page}\',                                   					array(
+						\'id_member\' => $id_member,
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -691,10 +693,9 @@ function view_projects()
 					$projects[] = $row;
 				$smcFunc[\'db_free_result\']($request);
 
-				return $projects;
-                                '),
+				return $projects;   '),
             'params' => array(
-                'id_member' => $context['user']['id'], // tega ne rabim, ane...
+                'id_member' => $context['user']['id'],
                  ),
         ),
 
@@ -703,8 +704,10 @@ function view_projects()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-			SELECT COUNT(*)
-			FROM {db_prefix}projects T1\', array()
+					SELECT COUNT(*)
+					FROM {db_prefix}projects T1\',
+					array(
+					)
 				);
 				list($total_projects) = $smcFunc[\'db_fetch_row\']($request);
 				$smcFunc[\'db_free_result\']($request);
@@ -714,49 +717,47 @@ function view_projects()
         ),
         'no_items_label' => $txt['delegator_projects_empty'],
         'columns' => array(
-            // vsaka stvar v tabeli ima header, data, sort
 
-            'name' => array(		// PROJECT
+            'project_name' => array(		// PROJECT
                 'header' => array(
                     'value' => $txt['delegator_project_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
-                'data' => array(
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
+                'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
+                    'function' => create_function('$row','
+                               return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
-                    /*'default' => 'project_name',
-                      'reverse' => 'project_name DESC',*/
+                    'default' => 'project_name',
+                    'reverse' => 'project_name DESC',
                 ),
             ),
 
-        'coordinator' => array(      //KOORDINATOR
-            'header' => array(
-                'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
-            ),
-            'data' => array(
-                'function' => create_function('$row',
-                'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_coord\'] .\'">\'.$row[\'coordinator\'].\'</a>\'; '
-
-				),
-            ),
-            'sort' =>  array(
-                'default' => 'name',
-                'reverse' => 'name DESC',
-            ),
-        ),
-
-	    'start' => array(
+	       'coordinator' => array(      
                 'header' => array(
-                    'value' => $txt['delegator_project_start'],      //dodano v modification.xml
+                    'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
                     'function' => create_function('$row', '
-                                                return $row[\'start\'] ;'
+                             return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_coord\'] .\'">\'.$row[\'coordinator\'].\'</a>\'; '
 					),
+                ),
+                'sort' =>  array(
+                    'default' => 'coordinator',
+                    'reverse' => 'coordinator DESC',
+                ),
+            ),
+
+            'start' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_project_start'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						$start = $row[\'start\'];
+                        return "$start";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
                     'default' => 'start',
@@ -764,26 +765,29 @@ function view_projects()
                 ),
             ),
 
-        'end' => array(
-            'header' => array(
-                'value' => $txt['delegator_project_end'],
+            'end' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_project_end'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+						$end = $row[\'end\'];
+                        return "$end";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'end',
+                    'reverse' => 'end DESC',
+                ),
             ),
-            'data' => array(
-                'function' => create_function('$row', ' return $row[\'end\'] '),
-                'style' => 'width: 20%; text-align: center;',
-            ),
-            'sort' =>  array(
-                'default' => 'end',
-                'reverse' => 'end DESC',
-            ),
-        ),
+
 
         ),
     );
 
     require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
-
 }
 
 ##################################################################
@@ -804,18 +808,18 @@ function view_worker()
         'name' => $txt['delegator_view_worker']
     );
 
-    $id_member = $_GET['id_member'];
+    $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
+    print_r($id_member);
+    // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
-        //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
-            // FUNKCIJE
 
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
@@ -830,7 +834,7 @@ function view_worker()
                                         ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
-						\'id_member\' => $id_member,
+						\'id_member\' => '. $id_member .',
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -855,12 +859,9 @@ function view_worker()
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT COUNT(*)
-					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state = 0
-					OR T1.state =1\',
-					array(
+					FROM {db_prefix}workers 
+                    WHERE id_member={int:id_member} \',
+                                          array( \'id_member\' => '. $id_member.',
 					)
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
@@ -962,7 +963,7 @@ function view_worker()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-                        return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+                        return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id_task\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 
 
 					'),
@@ -1035,7 +1036,7 @@ function my_tasks()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj
+                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
@@ -1044,7 +1045,7 @@ function my_tasks()
                                         ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
-						\'id_member\' => $id_member,
+						\'id_member\' => '.$id_member.',
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -1068,13 +1069,11 @@ function my_tasks()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
+
 					SELECT COUNT(*)
-					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state = 0
-					OR T1.state = 1\',
-					array(
+					FROM {db_prefix}workers 
+                    WHERE id_member={int:id_member} \',
+                                          array( \'id_member\' => '. $id_member.',
 					)
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
@@ -1091,7 +1090,7 @@ function my_tasks()
 	    // projekt zdaj dela
             // vsaka stvar v tabeli ima header, data, sort
 
-            'name' => array(		// TASK
+            'task_name' => array(		// TASK
                 'header' => array(
                     'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
@@ -1176,7 +1175,7 @@ function my_tasks()
                     'function' => create_function('$row', '
 						global $context, $settings, $scripturl;
 
-                return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
+                return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id_task\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
 
 					'),
 

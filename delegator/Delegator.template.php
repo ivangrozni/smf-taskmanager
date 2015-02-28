@@ -402,7 +402,7 @@ function template_view_proj()
 
     $row = $smcFunc['db_fetch_assoc']($request);
 
-echo '
+    echo '
     <div id="container">
     <div class="cat_bar">
 		<h3 class="catbg"><span class="left"></span>
@@ -457,9 +457,9 @@ echo '
 </div>
 ';
 
-$smcFunc['db_free_result']($request);
+    $smcFunc['db_free_result']($request);
 
-template_show_list('list_tasks_of_proj');
+    template_show_list('list_tasks_of_proj');
 }
 
 
@@ -483,9 +483,9 @@ function template_view_worker()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
 
-template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
 }
 
@@ -504,9 +504,9 @@ function template_my_tasks()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
 
-template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
 }
 
@@ -516,9 +516,10 @@ function template_view_projects()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
-echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
+    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
+    print_r ("template se nalozi");
 
-template_show_list('list_of_projects'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    template_show_list('list_of_projects'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
 }
 
