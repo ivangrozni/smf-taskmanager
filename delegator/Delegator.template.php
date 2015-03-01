@@ -20,23 +20,27 @@ function getPriorities($row, $txt)
     return $priorities;
 }
 
-/*
-function isMemberWorker($id_task){
+function isMemberWorker2($id_task) {
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
-    global $context, $smcFunc;
+
+    global $context, $smcFunc, $scripturl;
+    
     $id_member = $context['user']['id'];
 
     $request = $smcFunc['db_query']('', '
         SELECT id_member AS id_worker FROM {db_prefix}workers
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
-    $row = $smcFunc['db_fetch_assoc']($request);
-    $smcFunc['db_free_result']($request);
-    foreach ($row['id_worker'] as $id){
-         if ($id == $id_member) return TRUE;
-    }
+
+    while ($row = $smcFunc['db_fetch_assoc']($request) ) {
+        if ($row['id_worker'] == $id_member) 
+         {
+             $smcFunc['db_free_result']($request);
+             return TRUE;}
+             }
+             $smcFunc['db_free_result']($request);
     return FALSE;
-    }*/
+    }
 
 /******************
  *    Templati    *
@@ -369,8 +373,7 @@ function template_vt() // id bi bil kar dober argument
                 <a href="index.php?action=delegator;sa=et;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
                 <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
             ';
-                                                                                  //if(isMemberWorker($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
-        if(TRUE) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        if(isMemberWorker2($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -678,12 +681,12 @@ function template_en()
 	global $scripturl, $context, $txt;
     global $smcFunc;
 
-	$session_var = $context['session_var'];
-	$session_id = $context['session_id'];
+	//$session_var = $context['session_var'];
+	//$session_id = $context['session_id'];
         
        // rabim samo id_task-a, ki se zakljucuje
 
-    $task_id = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['task_id'];
 
 /***************************************************************************
  ******************* * Podvojeno iz vt *************************************
@@ -694,7 +697,7 @@ function template_en()
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-		WHERE T1.id = {int:task_id} ', array('task_id' => $task_id) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+		WHERE T1.id = {int:id_task} ', array('id_task' => $id_task) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 // id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
 
 // id od zeljenega taska potrebujemo podatke
@@ -708,8 +711,6 @@ function template_en()
 	elseif ($row['priority'] == 2)
 		$pimage = 'warning_mute';
 
-	$session_var = $context['session_var'];
-	$session_id = $context['session_id'];
 
 	// Imam task claiman?
 	$member_id = (int) $context['user']['id'];
@@ -717,20 +718,13 @@ function template_en()
 	$request = $smcFunc['db_query']('',
 		'SELECT id
 		FROM {db_prefix}workers
-		WHERE id_task = {int:task_id} AND id_member = {int:member_id}',
+		WHERE id_task = {int:id_task} AND id_member = {int:member_id}',
 		array(
-			'task_id' => $task_id,
+			'id_task' => $id_task,
 			'member_id' => $member_id
 		)
 	);
 
-    $amClaimed = $smcFunc['db_fetch_assoc']($request);
-
-    if ($amClaimed !== false) {
-		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;task_id=' . $task_id . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
-    } else {
-    	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;task_id=' . $task_id . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
-    }
 
     // Seznam delegatov
 
@@ -739,9 +733,9 @@ function template_en()
 		FROM {db_prefix}workers T1
 			LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
 
-		WHERE id_task = {int:task_id}',
+		WHERE id_task = {int:id_task}',
 		array(
-			'task_id' => $task_id
+			'id_task' => $id_task
 		)
 	);
 
@@ -823,9 +817,8 @@ echo '
 				</dd>
 			 </dl>
 			 <br />
-				', $claimButton, '&nbsp;
-                <a href="index.php?action=delegator;sa=et;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+        <!-- teh gumbkov ni vec, ker smo ze v end_task -->
+
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
@@ -862,7 +855,7 @@ $smcFunc['db_free_result']($request);
 					</dt>
 					<dd>
                          <textarea name="end_comment" rows="3" cols="30"></textarea>
-
+                         <input type="hidden" name="id_task" value ="'.$id_task.'" />
 					</dd>
                     <dt>
 		            	<label for="state"> End state (nacin zakljucka) </label>
@@ -870,9 +863,9 @@ $smcFunc['db_free_result']($request);
  					</dt>
                     <dd>
                         	<ul class="reset">
-							<li><input type="radio" name="state" id="state_2" value="2" class="input_radio" class="input_radio" checked="checked" /> ', $txt['delegator_state_2'], '</li>
-							<li><input type="radio" name="state" id="state_3" value="3" class="input_radio" class="input_radio"  /> ', $txt['delegator_state_3'], '</li>
-							<li><input type="radio" name="state" id="state_4" value="2" class="input_radio" class="input_radio" /> ', $txt['delegator_state_4'], '</li>
+							<li><input type="radio" name="state" value="2"  class="input_radio" checked="checked" /> ', $txt['delegator_state_2'], '</li>
+							<li><input type="radio" name="state"  value="3" class="input_radio" /> ', $txt['delegator_state_3'], '</li>
+							<li><input type="radio" name="state"  value="4" class="input_radio" /> ', $txt['delegator_state_4'], '</li>
 						</ul>
                     </dd>
 

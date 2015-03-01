@@ -44,25 +44,29 @@ function getPriorityIcon($row) {
         $image = 'warning_mute';
 
     return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
-};
+}
 
-/*//Bricka vse skupaj... najbrz zaradi foreach...
+//Bricka vse skupaj... najbrz zaradi foreach...
 function isMemberWorker($id_task){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
-    global $context, $smcFunc;
+    global $context, $smcFunc, $scripturl;
+    
     $id_member = $context['user']['id'];
 
     $request = $smcFunc['db_query']('', '
         SELECT id_member AS id_worker FROM {db_prefix}workers
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
-    $row = $smcFunc['db_fetch_assoc']($request);
+
+    while ($row = $smcFunc['db_fetch_assoc']($request) ) {
+        if ($row['id_worker'] == $id_member) 
+         {
+             $smcFunc['db_free_result']($request);
+             return TRUE;}
+             }
     $smcFunc['db_free_result']($request);
-    foreach ($row['id_worker'] as $id){
-         if ($id == $id_member) return TRUE;
-    }
     return FALSE;
-    }*/
+}
 
 
 //Tu se zacne originalni To-Do list mod
@@ -375,6 +379,15 @@ function add_task()
         array('id')
     );
 
+    // Dodaj delegirane memberje
+    /*
+    foreach ($_POST["member_add"] as $member) {
+        $smcFunc['db_insert']('', '{db_prefix}workers',
+            array('id_member' => 'int', 'id_task' => 'int'),
+            array((int) $member, $id_task)
+        );
+        }*/
+    
     $request = $smcFunc['db_query']('', '
     SELECT T1.id AS id_task FROM {db_prefix}tasks T1
     ORDER BY T1.id DESC
@@ -1256,41 +1269,6 @@ function edit_task()
     redirectexit('action=delegator;sa=vt&task_id='.$id_task);
 }
 
-// To bomo smotrno preuredili!!!
-// Ta funkcija nima smisla...
-function didChange()
-{
-    global $smcFunc;
-
-    checkSession('get');
-
-    $request = $smcFunc['db_query']('', '
-		SELECT id_todo, is_did
-		FROM {db_prefix}to_dos
-		WHERE id_todo = {int:id_todo}
-		LIMIT 1',
-    array(
-        'id_todo' => (int) $_GET['id'],
-    )
-    );
-    list ($id_todo, $is_did) = $smcFunc['db_fetch_row']($request);
-    $smcFunc['db_free_result']($request);
-
-    if (!empty($id_todo))
-	{
-            $smcFunc['db_query']('', '
-			UPDATE {db_prefix}ta
-			SET is_did = {int:is_did}
-			WHERE id_todo = {int:id_todo}',
-            array(
-                'id_todo' => $id_todo,
-                'is_did' => $is_did ? 0 : 1,
-            )
-            );
-	}
-
-    redirectexit('action=delegator');
-}
 
 function del_task()
 {
@@ -1322,12 +1300,8 @@ function claim_task()
     $member_id = (int) $context['user']['id'];
 
     $smcFunc['db_insert']('', '{db_prefix}workers',
-        array(
-            'id_member' => 'int', 'id_task' => 'int'
-        ),
-        array(
-            $member_id, $task_id
-        ),
+        array('id_member' => 'int', 'id_task' => 'int'),
+        array($member_id, $task_id),
         array('id')
     );
 
@@ -1414,17 +1388,13 @@ function en()
 function end_task()
 {
 
-    global $smcFunc, $context;
-
-    //isAllowedTo('add_new_todo');
-    // PREVERI ALI JE UPORABNIK IZVAJALEC NALOGE...
+    global $smcFunc, $context, $scripturl;
 
     checkSession();
 
     $id_task = (int) $_POST['id_task'];
 
-    //if (isMemberWorker($id_task)){
-    if (TRUE){
+    if (isMemberWorker($id_task)){
         $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
         
         $state = (int) $_POST['state'];
@@ -1433,12 +1403,8 @@ function end_task()
                   UPDATE {db_prefix}tasks
                   SET end_comment={string:end_comment}, end_date={string:end_date}, state={int:state}
                   WHERE id = {int:id_task}',
-                             array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task )
-    );
+                  array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task ));
 
-        /*var_dump($state); 
-          var_dump($end_comment); 
-          die;*/
            
     redirectexit('action=delegator;sa=my_tasks');
     }
