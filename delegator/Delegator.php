@@ -69,21 +69,21 @@ function isMemberWorker($id_task){
 }
 
 function writeLog($id_proj, $id_task, $action){
-    /*Input: (strings) torp - 'task' or 'project', $name - selfexplanatory, $action - selfexplanatory
-     Output: None
-     Action: Writes action into log table
-     Notacija: Kadar gre za akcijo na projektu je vrednost taska (-1) oz manjsa od nic!
-    */
+    // Input: $action - selfexplanatory
+    // Output: None
+    // What function does: Writes action into log table
+    // Notation: When there is action on project id_task is less than zero (-1)
+
     global $smcFunc, $context;
+
     $id_member = $context['user']['id'];
 
-    checkSession(); // ali to rabimo???
-    
-    $smcFunc['db_query']('','
-    INSERT {db_prefix}log
-    SET id_proj={int:id_proj}, id_task={int:id_task}, action={string:action}, id_member={int:id_proj}, action_date={datetime:action_date}',
-                         array('id_proj' => $id_proj, 'id_task' => $id_task, 'action' => $action, 'id_member'=> $id_member, 'action_date' => date("Y-m-d H:i:s"), )
-    );
+    //checkSession(); // ali to rabimo???
+
+    $smcFunc['db_insert']('', '{db_prefix}delegator_log',
+                          array('id_proj' => 'int', 'id_task' => 'int', 'action' => 'string', 'id_member' => 'int', 'action_date' => 'datetime', ),
+                          array( $id_proj, $id_task, $action, $id_member, date('Y-m-d H-i-s'),),
+                          array(), );
 
 }
 
@@ -202,7 +202,7 @@ function delegator_main()                                      //glavna funkcija
         'get_items' => array(
             // FUNKCIJE
 /*
-query posodobljen - zdaj sta združeni tabela taskov in projektov
+query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
@@ -711,7 +711,7 @@ function view_projects()
         'get_items' => array(
             // FUNKCIJE
 /*
-query posodobljen - zdaj sta združeni tabela taskov in projektov
+query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '

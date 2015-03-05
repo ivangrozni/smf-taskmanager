@@ -39,7 +39,7 @@ $tables = array(
 			array(
 				'name' => 'description', // Description of task
 				'type' => 'varchar',
-				'size' => '250',
+				'size' => '250'
 			),
 			array(
 				'name' => 'creation_date', // Date of creation
@@ -67,7 +67,7 @@ $tables = array(
 			),
 			array(
 				'name' => 'end_date', // Date when the task was finished
-				'type' => 'date',
+				'type' => 'date'
 			),
 			array(
 				'name' => 'end_comment',
@@ -103,7 +103,7 @@ $tables = array(
 			array(
 				'name' => 'description', // Description of the project
 				'type' => 'varchar',
-				'size' => '250',
+				'size' => '250'
 			),
 			array(
 				'name' => 'start', // Project start
@@ -144,7 +144,45 @@ $tables = array(
                 'type' => 'int',
                 'size' => '3',
                     ),
-		),
+    'delegator_log' => array(
+        'columns' => array(
+            array(
+                'id' => 'id',
+                'type' => 'int',
+                'size' => '11',
+                'auto' => true,
+            ),
+            array(
+                'name' => 'id_proj',
+                'type' => 'int',
+                'size' => '11',
+            ),
+            array(
+                'name' => 'id_task',
+                'type' => 'int',
+                'size' => '11',
+            ),
+            array(
+                'name' => 'action',
+                'type' => 'varchar',
+                'size' => '15',
+            ),
+            array(
+                'name' => 'id_member',
+                'type' => 'int',
+                'size' => '11',
+            ),
+            array(
+                'name' => 'action_date',
+                'type' => 'datetime',
+            )
+            
+        ),
+
+    ),
+            
+
+        ),
 		'indexes' => array(
 			array(
 				'type' => 'primary',
