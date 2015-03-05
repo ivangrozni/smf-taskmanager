@@ -65,6 +65,12 @@ Drop down menu: @Jaka - kaj rabimo?
                                             'show' => allowedTo('add_new_todo'),
                                             'is_last' => true,
                                         ),
+					'view_log' => array(
+                                            'title' => $txt['delegator_view_log'],
+                                            'href' => $scripturl . '?action=delegator;sa=view_log',
+                                            'show' => allowedTo('add_new_todo'),
+                                            'is_last' => true,
+                                        ),
 
 				),
 			),
@@ -106,7 +112,8 @@ Drop down menu: @Jaka - kaj rabimo?
 	<file name="$languagedir/Modifications.english.php">
 		<operation>
 			<search position="end" />
-			<add><![CDATA[$txt['delegator'] = 'Delegator';
+			<add><![CDATA[
+$txt['delegator'] = 'Delegator';
 $txt['delegator_actions'] = 'Actions';
 $txt['delegator_author'] = 'Author';
 $txt['delegator_empty'] = !$context['user']['is_admin'] ? 'To-Do List is empty!' : 'To-Do List is empty! Are you free man? :)';
@@ -159,7 +166,12 @@ $txt['delegator_del_proj'] = 'Delete Project';
 $txt['delegator_coordinator_name'] = 'Name of Coordinator';
 $txt['delegator_view_projects'] = 'View All Projects';
 $txt['delegator_projects'] = 'View Projects';
-$txt['projects_empty'] = 'No Projects';
+$txt['delegator_projects_empty'] = 'No Projects';
+// Log
+$txt['delegator_view_log'] = 'View log';
+$txt['delegator_log_empty'] = 'Log is empty.';
+$txt['delegator_action_date'] = 'Date and Time';
+$txt['delegator_member_name'] = 'Member';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';

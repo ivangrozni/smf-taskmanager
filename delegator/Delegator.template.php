@@ -520,10 +520,22 @@ function template_view_projects()
     global $smcFunc;
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
-    print_r ("template se nalozi");
+    //print_r ("template se nalozi");
 
     template_show_list('list_of_projects'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
+}
+
+function template_view_log()
+{
+
+    global $scripturl, $context, $txt;
+    global $smcFunc;
+
+    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_log'] .' </h2>';
+    //print_r ("template se nalozi");
+
+    template_show_list('log'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 }
 
 
