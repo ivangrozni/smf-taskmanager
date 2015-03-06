@@ -257,7 +257,7 @@ function template_vt() // id bi bil kar dober argument
 	$session_var = $context['session_var'];
 	$session_id = $context['session_id'];
 
-	// Imam task claiman?
+    // Imam task claiman?
 	$member_id = (int) $context['user']['id'];
 
 	$request = $smcFunc['db_query']('',
@@ -296,7 +296,7 @@ function template_vt() // id bi bil kar dober argument
     	$members[] = $m["real_name"];
     }
 
-	$delegates = "&nbsp;&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
+	$delegates = "&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
 	if (count($members)) {
 		$delegates = implode(", ", $members);
 	}
@@ -370,10 +370,11 @@ function template_vt() // id bi bil kar dober argument
 			 </dl>
 			 <br />
 				', $claimButton, '&nbsp;
-                <a href="index.php?action=delegator;sa=et;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+                <a href="index.php?action=delegator;sa=et;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> 
+               <!-- <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';sesc=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> -->
             ';
-        if(isMemberWorker2($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        if(isMemberWorker2($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -451,8 +452,8 @@ function template_view_proj()
             <br />
 			<a href="index.php?action=delegator;sa=add" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
 
-            <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
-            <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a>
+           <!-- <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
+            <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a> -->
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>

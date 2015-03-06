@@ -172,6 +172,7 @@ $txt['delegator_view_log'] = 'View log';
 $txt['delegator_log_empty'] = 'Log is empty.';
 $txt['delegator_action_date'] = 'Date and Time';
 $txt['delegator_member_name'] = 'Member';
+$txt['delegator_action'] = 'Action';
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';

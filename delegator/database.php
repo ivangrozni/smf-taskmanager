@@ -143,11 +143,19 @@ $tables = array(
                 'name' => 'status',
                 'type' => 'int',
                 'size' => '3',
-                    ),
+            ),
+        ),
+        'indexes' => array(
+			array(
+				'type' => 'primary',
+				'columns' => array('id'),
+			),
+        ),
+    ),
     'delegator_log' => array(
         'columns' => array(
             array(
-                'id' => 'id',
+                'name' => 'id',
                 'type' => 'int',
                 'size' => '11',
                 'auto' => true,
@@ -175,21 +183,17 @@ $tables = array(
             array(
                 'name' => 'action_date',
                 'type' => 'datetime',
-            )
+            ),
             
         ),
-
-    ),
-            
-
-        ),
-		'indexes' => array(
+        'indexes' => array(
 			array(
 				'type' => 'primary',
 				'columns' => array('id'),
 			),
-		),
-	)
+        ),
+    ),
+
 );
 
 foreach ($tables as $table => $data)

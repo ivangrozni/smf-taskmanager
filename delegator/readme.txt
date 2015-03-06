@@ -19,8 +19,6 @@ Kako ves, da je task v izvrsevanju - v tabeli workers je njegov id...
 
 Lahko bi stvar malce preuredili in end_comment, end_date ter end_state dodali k tabeli workers
 
-Ampak to ne spremeni dejstva, da end_task ne dela!
-
 Ena moznost je, da se da state v prikaz pod my_tasks -> tam zaenkrat se prikaze vse taske, ne glede na state.
 
 Claim in Unclaim morata spremenit state. Kjerkoli pac ze...
@@ -32,14 +30,15 @@ DONE:
 edit_task
 view_projects
 view_worker
+isMemberWorker
+tabela logov, kjer se vse vidi, kdo je kaj delal
 
 TO DO:
 claim/unclaim updejtata tabelo tasks state => 1
 my_tasks (gumbek za myfinished tasks)
-isMemberWorker
-end_task
-tabela logov, kjer se vse vidi, kdo je kaj delal
+end_task (koordinator, naj bi zakljucil nalogo)
 php_sidebar
+hrosci in to do je se v projektu Delegator 1.0
 
 FUTURE
 edit_proj, del_proj

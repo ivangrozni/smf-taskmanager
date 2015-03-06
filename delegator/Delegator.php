@@ -63,28 +63,40 @@ function isMemberWorker($id_task){
          {
              $smcFunc['db_free_result']($request);
              return TRUE;}
-             }
+    }
     $smcFunc['db_free_result']($request);
     return FALSE;
 }
 
-function writeLog($id_proj, $id_task, $action){
-    // Input: $action - selfexplanatory
+function zapisiLog($id_proj, $id_task, $action){
+    // Input: action - selfexplanatory
     // Output: None
     // What function does: Writes action into log table
     // Notation: When there is action on project id_task is less than zero (-1)
+    //           When project is unknown we put in -1 and we query for it
 
     global $smcFunc, $context;
 
     $id_member = $context['user']['id'];
 
     //checkSession(); // ali to rabimo???
+    //najbrz ne, ker se vedno klice samo v funkcijah, ki so ze preverile session, al kaj... 3h je slo za to!!!
 
+    if ($id_proj == -1){
+        $request = $smcFunc['db_query']('', '
+            SELECT id_proj FROM {db_prefix}tasks
+            WHERE id = {int:id_task}', array('id_task' => $id_task) );
+
+        $row = $smcFunc['db_fetch_assoc']($request);
+        $smcFunc['db_free_result']($request);
+        $id_proj = $row['id_proj'];
+    }
+    
     $smcFunc['db_insert']('', '{db_prefix}delegator_log',
-                          array('id_proj' => 'int', 'id_task' => 'int', 'action' => 'string', 'id_member' => 'int', 'action_date' => 'datetime', ),
-                          array( $id_proj, $id_task, $action, $id_member, date('Y-m-d H-i-s'),),
-                          array(), );
-
+                          array('id_proj' => 'int', 'id_task' => 'int', 'action' => 'string', 'id_member' => 'int', 'action_date' => 'string' ),
+                          array( $id_proj, $id_task, $action, $id_member, date('Y-m-d H-i-s') ),
+                          array('id') ); 
+    //  array( $id_proj, $id_task, $action, $id_member, date('Y-m-d') ),
 }
 
 
@@ -417,7 +429,7 @@ function add_task()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    writeLog($id_proj, $row['id_task'], 'add_task');
+    zapisiLog($id_proj, $row['id_task'], 'add_task');
     
     redirectexit('action=delegator;sa=vt&task_id='.$row['id_task']);
 }
@@ -477,7 +489,7 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    writeLog($id_proj, -1, 'add_proj');
+    zapisiLog($row['id_proj'], -1, 'add_proj');
     
     redirectexit('action=delegator;sa=view_proj;id_proj='.$row['id_proj']); // redirect exit - logicno
 }
@@ -1291,7 +1303,7 @@ function edit_task()
         );
     }
 
-    writeLog($id_proj, $row['id_task'], 'edit_task');
+    zapisiLog($id_proj, $id_task, 'edit_task');
     
     redirectexit('action=delegator;sa=vt&task_id='.$id_task);
 }
@@ -1314,7 +1326,7 @@ function del_task()
         )
     );
 
-    writeLog($id_proj, $row['id_task'], 'del_task');
+    zapisiLog(-1, $task_id, 'del_task');
     
     redirectexit('action=delegator');
 }
@@ -1331,14 +1343,10 @@ function claim_task()
     $smcFunc['db_insert']('', '{db_prefix}workers',
         array('id_member' => 'int', 'id_task' => 'int'),
         array($member_id, $task_id),
-        array('id')
-    );
+        array('id') );
 
-    $smcFunc['db_free_result']($request);
+    zapisiLog(-1, $task_id, 'claim_task');
 
-    writeLog($id_proj, $row['id_task'], 'claim_task');
-
-    //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
     redirectexit('action=delegator;sa=vt;task_id=' . $task_id);
 }
 
@@ -1351,6 +1359,7 @@ function unclaim_task()
     $task_id = (int) $_GET['task_id'];
     $member_id = (int) $context['user']['id'];
 
+    
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}workers
         WHERE id_task = {int:task_id} AND id_member = {int:member_id}',
@@ -1360,9 +1369,7 @@ function unclaim_task()
         )
     );
 
-    $smcFunc['db_free_result']($request);
-
-    writeLog($id_proj, $row['id_task'], 'unclaim_task');
+    zapisiLog(-1, $task_id, 'unclaim_task');
     //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
     redirectexit('action=delegator;sa=vt&task_id=' . $task_id);
 }
@@ -1422,9 +1429,9 @@ function end_task()
 
     global $smcFunc, $context, $scripturl;
 
-    checkSession();
+    checkSession(); // ali je to ok???
 
-    $id_task = (int) $_POST['id_task'];
+    $id_task = (int) $_POST['task_id'];
 
     if (isMemberWorker($id_task)){
         $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
@@ -1437,7 +1444,7 @@ function end_task()
                   WHERE id = {int:id_task}',
                   array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task ));
 
-        writeLog($id_proj, $row['id_task'], 'end_task');
+        zapisiLog(-1, $row['id_task'], 'end_task');
            
         redirectexit('action=delegator;sa=my_tasks');
     }
@@ -1462,7 +1469,6 @@ function view_log()
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
-        //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'log',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
@@ -1519,17 +1525,12 @@ function view_log()
         ),
         'no_items_label' => $txt['delegator_log_empty'],
         'columns' => array(
-            // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
-            // name, deadline, priority - so ze narejeni
-            // avtor, worker(s), stanje - se manjkajo - ugotoviti, kako jih zajeti
-	    // projekt zdaj dela
-            // vsaka stvar v tabeli ima header, data, sort
 
             'action_date' => array(		
                 'header' => array(
-                    'value' => $txt['delegator_action_date'],  //Napisi v header "Name"... potegne iz index.english.php
+                    'value' => $txt['delegator_action_date'],  
                 ),
-                'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
+                'data' => array( 
                     'function' => create_function('$row',
                     'return $row[\'action_date\'];'
 					),
@@ -1564,13 +1565,14 @@ function view_log()
                     'function' => create_function('$row',
                     'return $row[\'action\']; '
                     ),
+                ),
                 'sort' =>  array(
                     'default' => 'action',
                     'reverse' => 'action DESC',
                 ),
             ),
 
-            'project' => array(      //PROJEKT - dela!
+            'project' => array(   
                 'header' => array(
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
@@ -1585,7 +1587,7 @@ function view_log()
                     'default' => 'project_name',
                     'reverse' => 'project_name DESC',
                 ),
-
+            ),
             'task' => array( 
                 'header' => array(
                     'value' => $txt['delegator_task_name'],      //dodano v modification.xml
@@ -1603,13 +1605,9 @@ function view_log()
             
             ),
         'style' => 'width: 10%; text-align: center;',
-            ),
-            ),
         ),
     );
 
-
-    //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
 
     require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
