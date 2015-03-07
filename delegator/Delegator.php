@@ -1437,8 +1437,11 @@ function end_task()
 
     checkSession(); // ali je to ok???
 
-    $id_task = (int) $_POST['task_id'];
+    $id_task = (int) $_POST['id_task'];
 
+    //print_r($id_task);
+    //print_r(isMemberWorker($id_task));die;
+    
     if (isMemberWorker($id_task)){
         $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
         
@@ -1450,9 +1453,8 @@ function end_task()
                   WHERE id = {int:id_task}',
                   array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task ));
 
-        zapisiLog(-1, $row['id_task'], 'end_task');
+        zapisiLog(-1, $id_task, 'end_task');
 
-        print_r("Member is worker"); die;
         redirectexit('action=delegator;sa=my_tasks');
     }
     print_r("Member is not worker"); die;
