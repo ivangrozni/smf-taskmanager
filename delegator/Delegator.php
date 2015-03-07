@@ -59,10 +59,10 @@ function isMemberWorker($id_task){
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
 
     while ($row = $smcFunc['db_fetch_assoc']($request) ) {
-        if ($row['id_worker'] == $id_member) 
-         {
-             $smcFunc['db_free_result']($request);
-             return TRUE;}
+        if ($row['id_worker'] == $id_member) {
+            $smcFunc['db_free_result']($request);
+            return TRUE;
+        }
     }
     $smcFunc['db_free_result']($request);
     return FALSE;
@@ -73,7 +73,6 @@ function zapisiLog($id_proj, $id_task, $action){
     // Output: None
     // What function does: Writes action into log table
     // Notation: When there is action on project id_task is less than zero (-1)
-    //           When project is unknown we put in -1 and we query for it
 
     global $smcFunc, $context;
 
@@ -345,6 +344,10 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
                 ),
+                'sort' =>  array(
+                    'default' => 'priority',
+                    'reverse' => 'priority DESC',
+                ),
             ),
             // undefined index: task_actions
             // g1zmo - tole je ze delalo - ali sva pobrkala z verzijami???
@@ -536,7 +539,7 @@ function view_proj()
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks_of_proj',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
@@ -624,8 +627,8 @@ function view_proj()
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'project_name',
+                    'reverse' => 'project_name DESC',
                 ),
             ),
 
@@ -640,8 +643,8 @@ function view_proj()
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'author',
+                    'reverse' => 'author DESC',
                 ),
             ),
 
@@ -669,6 +672,10 @@ function view_proj()
                 'data' => array(
                     'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'priority',
+                    'reverse' => 'priority DESC',
                 ),
             ),
             // undefined index: task_actions
@@ -867,7 +874,7 @@ function view_worker()
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
 
@@ -922,12 +929,6 @@ function view_worker()
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
-            // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
-            // name, deadline, priority - so ze narejeni
-            // avtor, worker(s), stanje - se manjkajo - ugotoviti, kako jih zajeti
-	    // projekt zdaj dela
-            // vsaka stvar v tabeli ima header, data, sort
-
             'name' => array(		// TASK
                 'header' => array(
                     'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
@@ -955,8 +956,8 @@ function view_worker()
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'project_name',
+                    'reverse' => 'project_name DESC',
                 ),
             ),
 
@@ -971,8 +972,8 @@ function view_worker()
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'author',
+                    'reverse' => 'author DESC',
                 ),
             ),
 
@@ -1000,6 +1001,10 @@ function view_worker()
                 'data' => array(
                     'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'priority',
+                    'reverse' => 'priority DESC',
                 ),
             ),
             // undefined index: task_actions
@@ -1077,7 +1082,7 @@ function my_tasks()
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=my_tasks',       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
@@ -1162,17 +1167,15 @@ function my_tasks()
                 'data' => array(
                     'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-//'return parse_bbc($row[\'project_name\']);
-
-					),
+                    ),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'project_name',
+                    'reverse' => 'project_name DESC',
                 ),
             ),
 
-	    'author' => array(      //AVTOR - dela!
+            'author' => array(      //AVTOR - dela!
                 'header' => array(
                     'value' => $txt['delegator_author'],      //dodano v modification.xml
                 ),
@@ -1183,8 +1186,8 @@ function my_tasks()
 					),
                 ),
                 'sort' =>  array(
-                    'default' => 'name',
-                    'reverse' => 'name DESC',
+                    'default' => 'author',
+                    'reverse' => 'author DESC',
                 ),
             ),
 
@@ -1197,7 +1200,6 @@ function my_tasks()
 						$deadline = $row[\'deadline\'];
                         return "<span class=\"relative-time\">$deadline</span>";
 					'),
-                    'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
                     'default' => 'deadline',
@@ -1213,10 +1215,11 @@ function my_tasks()
                     'function' => getPriorityIcon,
                     'style' => 'width: 10%; text-align: center;',
                 ),
+                'sort' =>  array(
+                    'default' => 'priority',
+                    'reverse' => 'priority DESC',
+                ),
             ),
-            // undefined index: task_actions
-            // g1zmo - tole je ze delalo - ali sva pobrkala z verzijami???
-            // mislim da ne dela, ker v tabeli tasks ni stolpca actions... al kaj
             'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
                 'header' => array(
                     'value' => $txt['delegator_actions'],
@@ -1235,12 +1238,8 @@ function my_tasks()
         ),
     );
 
-
-    //require_once($sourcedir . '/Subs-List.php'); // recimo, da ne vem kaj je to in da ne rabim
-
     require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
-
 }
 
 
@@ -1326,7 +1325,7 @@ function del_task()
         )
     );
 
-    zapisiLog(-1, $task_id, 'del_task');
+    zapisiLog(-1, $row['id_task'], 'del_task');
     
     redirectexit('action=delegator');
 }
@@ -1337,16 +1336,21 @@ function claim_task()
 
     checkSession('get');
 
+    //print_r("do sem pride"); die;
+
     $task_id = (int) $_GET['task_id'];
     $member_id = (int) $context['user']['id'];
 
+    //print_r("do sem pride"); die;
     $smcFunc['db_insert']('', '{db_prefix}workers',
         array('id_member' => 'int', 'id_task' => 'int'),
         array($member_id, $task_id),
         array('id') );
+    //print_r("do sem pride"); die;
 
     zapisiLog(-1, $task_id, 'claim_task');
-
+    //print_r("do sem pride"); die;
+    //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
     redirectexit('action=delegator;sa=vt;task_id=' . $task_id);
 }
 
@@ -1368,6 +1372,8 @@ function unclaim_task()
             'member_id' => $member_id
         )
     );
+
+    //$smcFunc['db_free_result']($request);
 
     zapisiLog(-1, $task_id, 'unclaim_task');
     //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
@@ -1445,11 +1451,12 @@ function end_task()
                   array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task ));
 
         zapisiLog(-1, $row['id_task'], 'end_task');
-           
+
+        print_r("Member is worker"); die;
         redirectexit('action=delegator;sa=my_tasks');
     }
-
-    redirectexit('action=delegator;sa=vt&task_id='.$id_task);
+    print_r("Member is not worker"); die;
+    redirectexit('action=delegator;sa=vt;task_id='.$id_task);
     
 }
 
@@ -1471,7 +1478,7 @@ function view_log()
     $list_options = array(
         'id' => 'log',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_log',       //prvi del URL-ja
         'default_sort_col' => 'action_date',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE

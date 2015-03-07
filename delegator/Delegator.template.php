@@ -257,6 +257,10 @@ function template_vt() // id bi bil kar dober argument
 	$session_var = $context['session_var'];
 	$session_id = $context['session_id'];
 
+    print_r ($session_var);
+    print_r ('     ');
+    print_r ($session_id);
+
     // Imam task claiman?
 	$member_id = (int) $context['user']['id'];
 
@@ -296,7 +300,7 @@ function template_vt() // id bi bil kar dober argument
     	$members[] = $m["real_name"];
     }
 
-	$delegates = "&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
+	$delegates = "&nbsp;&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
 	if (count($members)) {
 		$delegates = implode(", ", $members);
 	}
