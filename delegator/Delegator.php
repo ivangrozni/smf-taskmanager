@@ -81,7 +81,7 @@ function zapisiLog($id_proj, $id_task, $action){
     //checkSession(); // ali to rabimo???
     //najbrz ne, ker se vedno klice samo v funkcijah, ki so ze preverile session, al kaj... 3h je slo za to!!!
 
-    if ($id_proj == -1){
+    if ($id_proj < 0){
         $request = $smcFunc['db_query']('', '
             SELECT id_proj FROM {db_prefix}tasks
             WHERE id = {int:id_task}', array('id_task' => $id_task) );
@@ -220,7 +220,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author
+					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
@@ -294,8 +294,6 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                 'data' => array(
                     'function' => create_function('$row',
                     'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-//'return parse_bbc($row[\'project_name\']);
-
 					),
                 ),
                 'sort' =>  array(
@@ -347,6 +345,22 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                 'sort' =>  array(
                     'default' => 'priority',
                     'reverse' => 'priority DESC',
+                ),
+            ),
+            'creation_date' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_creation_date'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+                        $creation_date=$row[\'creation_date\'];
+                        return "$creation_date";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'creation_date',
+                    'reverse' => 'creation_date DESC',
                 ),
             ),
             // undefined index: task_actions
@@ -416,13 +430,8 @@ function add_task()
     ); 
 
     // Dodaj delegirane memberje
-    /*
-    foreach ($_POST["member_add"] as $member) {
-        $smcFunc['db_insert']('', '{db_prefix}workers',
-            array('id_member' => 'int', 'id_task' => 'int'),
-            array((int) $member, $id_task)
-        );
-        }*/
+
+
     
     $request = $smcFunc['db_query']('', '
     SELECT T1.id AS id_task FROM {db_prefix}tasks T1
@@ -432,6 +441,13 @@ function add_task()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
+    foreach ($_POST["member_add"] as $member) {
+        $smcFunc['db_insert']('', '{db_prefix}workers',
+            array('id_member' => 'int', 'id_task' => 'int'),
+            array((int) $member, $row['id_task'])
+        );
+    }
+    
     zapisiLog($id_proj, $row['id_task'], 'add_task');
     
     redirectexit('action=delegator;sa=vt&task_id='.$row['id_task']);
@@ -548,7 +564,7 @@ function view_proj()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author
+					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
@@ -676,6 +692,22 @@ function view_proj()
                 'sort' =>  array(
                     'default' => 'priority',
                     'reverse' => 'priority DESC',
+                ),
+            ),
+            'creation_date' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_creation_date'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+                        $creation_date=$row[\'creation_date\'];
+                        return "$creation_date";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'creation_date',
+                    'reverse' => 'creation_date DESC',
                 ),
             ),
             // undefined index: task_actions
@@ -882,7 +914,7 @@ function view_worker()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author
+                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
@@ -1007,6 +1039,22 @@ function view_worker()
                     'reverse' => 'priority DESC',
                 ),
             ),
+            'creation_date' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_creation_date'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+                        $creation_date=$row[\'creation_date\'];
+                        return "$creation_date";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'creation_date',
+                    'reverse' => 'creation_date DESC',
+                ),
+            ),
             // undefined index: task_actions
             // g1zmo - tole je ze delalo - ali sva pobrkala z verzijami???
             // mislim da ne dela, ker v tabeli tasks ni stolpca actions... al kaj
@@ -1035,6 +1083,8 @@ function view_worker()
 
 function my_tasks()
 {
+
+    
     global $smcFunc, $scripturl, $context, $txt, $sourcedir;
 
     $context['sub_template'] = 'my_tasks';
@@ -1091,7 +1141,7 @@ function my_tasks()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author
+                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
@@ -1220,6 +1270,22 @@ function my_tasks()
                     'reverse' => 'priority DESC',
                 ),
             ),
+            'creation_date' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+                'header' => array(
+                    'value' => $txt['delegator_creation_date'],
+                ),
+                'data' => array(
+                    'function' => create_function('$row', '
+                        $creation_date=$row[\'creation_date\'];
+                        return "$creation_date";
+					'),
+                    'style' => 'width: 20%; text-align: center;',
+                ),
+                'sort' =>  array(
+                    'default' => 'creation_date',
+                    'reverse' => 'creation_date DESC',
+                ),
+            ),
             'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
                 'header' => array(
                     'value' => $txt['delegator_actions'],
@@ -1315,8 +1381,9 @@ function del_task()
     checkSession('get');
 
     $task_id = (int) $_GET['task_id'];
-    //$id_member = $context['user']['id'];
 
+    zapisiLog(-1, $task_id, 'del_task'); // Has to be before DELETE happens...
+    
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}tasks
         WHERE id = {int:task_id}',
@@ -1325,7 +1392,13 @@ function del_task()
         )
     );
 
-    zapisiLog(-1, $row['id_task'], 'del_task');
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}workers
+        WHERE id_task = {int:task_id}',
+        array(
+            'task_id' => $task_id
+        )
+    );
     
     redirectexit('action=delegator');
 }

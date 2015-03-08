@@ -691,7 +691,7 @@ function template_et()
 
 function template_en()
 {
-	global $scripturl, $context, $txt;
+	global $scripturl, $context, $txt, $settings;
     global $smcFunc;
 
 	//$session_var = $context['session_var'];
