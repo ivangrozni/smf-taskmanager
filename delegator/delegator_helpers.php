@@ -1,3 +1,4 @@
+<?php
 function getPriorityIcon($row) {
     global $settings, $txt;
 
@@ -33,6 +34,16 @@ function getStatus(){
     }
     else{
         $status = 0;
+    }
+    return $status;
+}
+
+function getStatus1(){
+    if( isset($_GET['status']) ){
+        $status = $_GET['status'];
+    }
+    else{
+        $status = 1;
     }
     return $status;
 }
@@ -103,3 +114,4 @@ function zapisiLog($id_proj, $id_task, $action){
                           array('id') ); 
     //  array( $id_proj, $id_task, $action, $id_member, date('Y-m-d') ),
 }
+?>

@@ -140,7 +140,7 @@ function delegator_main()                                      //glavna funkcija
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
     $status = getStatus();
-    
+    $id_member = $context['user']['id']; // ceprav ne rabim
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks',
@@ -153,7 +153,7 @@ function delegator_main()                                      //glavna funkcija
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
-            'function' => create_function('$start, $items_per_page, $sort, $status', '
+            'function' => create_function('$start, $items_per_page, $sort, $id_member, $status', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
@@ -165,7 +165,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 					ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
-						\'state\' => $status,
+						\'state\' => '.$status.',
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -1062,7 +1062,7 @@ function my_tasks()
 		}
 	</style>';
 
-    $status = getStatus();
+    $status = getStatus1();
 
     $id_member = $context['user']['id'];
 
@@ -1380,7 +1380,6 @@ function unclaim_task()
     $id_task = (int) $_GET['task_id'];
     $id_member = (int) $context['user']['id'];
 
-    
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}workers
         WHERE id_task = {int:id_task} AND id_member = {int:id_member}',
@@ -1389,8 +1388,9 @@ function unclaim_task()
             'id_member' => $id_member
         )
     );
+
     // preverim stevilo workerjev; ce jih je nic, updejtam v ena.
-    if(numberOfWorkers($id_task)== 0){
+    if(numberOfWorkers($id_task) == 0){
         $smcFunc['db_query']('','
         UPDATE {db_prefix}tasks
         SET state={int:state}
@@ -1399,9 +1399,9 @@ function unclaim_task()
     );
     }
 
-    zapisiLog(-1, $task_id, 'unclaim_task');
+    zapisiLog(-1, $id_task, 'unclaim_task');
     //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
-    redirectexit('action=delegator;sa=vt&task_id=' . $task_id);
+    redirectexit('action=delegator;sa=vt&task_id=' . $id_task);
 }
 
 
@@ -1482,10 +1482,6 @@ function end_task()
                   SET status={int:status}
                   WHERE id = {int:id_task}',
                   array( 'status' =>  $state , 'id_task' => $id_task ));
-
-
-    }
-        
 
         zapisiLog(-1, $id_task, 'end_task');
 

@@ -15,30 +15,31 @@ include "/../../Sources/delegator_helpers.php";
 
 function template_main()
 {
-    global $scripturl;
+    global $scripturl, $smcFunc, $txt;
 
 	//if (allowedTo('add_new_todo'))
     echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
     template_button_strip(array(array('text' => 'delegator_task_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
     template_button_strip(array(array('text' => 'delegator_project_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
+    
     $status = getStatus();
-
-        echo '<h2 style="font-size:1.5em" >'.$txt['delegator_state_'.$status].' &nbsp'.$txt['delegator_tasks'].'</br>'.$txt['delegator_state_'.$status].'</h2> <hr>';
+    
+    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_state_'.$status ].' &nbsp;'.$txt['delegator_tasks'].'</h2> <hr>';
     
     // Prestejem taske v posameznih stanjih :)
     $states = array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
         $request2 = $smcFunc['db_query']('', '
-            SELECT COUNT(id) FROM {db_prefix}workers
-            WHERE id_member={int:id_member} AND status = {int:status}',
-            array('id_member' => $id_member, 'status' => $status2) );
+            SELECT COUNT(id) FROM {db_prefix}tasks
+            WHERE  state = {int:state}',
+            array('state' => $status2) );
         $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
         $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
         $states[$status2] = $count;
         $smcFunc['db_free_result']($request2);
-        echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
+        echo '<a href="'.$scipturl.'?action=delegator;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp;'.$count.'</br>';
     }
     
     template_show_list('list_tasks');
@@ -481,13 +482,13 @@ function template_view_worker()
 
 function template_my_tasks()
 {
-
+    // Tukaj mora biti privzeit status 1!!!
     global $scripturl, $context, $txt;
     global $smcFunc;
 
     $id_member = $context['user']['id'];
 
-    $status = getStatus();
+    $status = getStatus1();
 
     $request = $smcFunc['db_query']('', '
     SELECT T1.real_name AS name FROM {db_prefix}members T1
@@ -511,17 +512,10 @@ function template_my_tasks()
         $states[$status2] = $count;
         $smcFunc['db_free_result']($request2);
 
-        echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=1">'.$txt['delegator_state_'$status2].'</a>:&nbsp'.$count.'</br>';
+        echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
     }
 
-    /*template_button_strip(array(array('text' => 'delegator_state_2', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=2', 'active'=> true)), 'right');
-    template_button_strip(array(array('text' => 'delegator_state_3', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=3', 'active'=> true)), 'right');
-    template_button_strip(array(array('text' => 'delegator_state_4', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=3', 'active'=> true)), 'right');*/
-
-    // tukaj link do posameznih nalog
-    
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
-
 }
 
 function template_view_projects()
