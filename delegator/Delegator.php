@@ -1081,6 +1081,9 @@ function view_worker()
     createList($list_options);
 }
 
+// tukaj bi lahko bil kak argument
+// na podlagi katerega lahko potem izberes koncane naloge...
+
 function my_tasks()
 {
 
@@ -1124,12 +1127,20 @@ function my_tasks()
 		}
 	</style>';
 
+    if( isset($_GET['status']) ){
+        $status = $_GET['status'];
+    }
+    else{
+        $status = 0;
+    }
+
+    //print_r($status); die;
+
     $id_member = $context['user']['id'];
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
-        //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator;sa=my_tasks',       //prvi del URL-ja
@@ -1137,7 +1148,7 @@ function my_tasks()
         'get_items' => array(
             // FUNKCIJE
 
-            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+            'function' => create_function('$start, $items_per_page, $sort, $id_member, $status', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
@@ -1146,13 +1157,14 @@ function my_tasks()
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
                                         LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
-                                        WHERE T1.id_member={int:id_member}
+                                        WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
                                         ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
 						\'id_member\' => '.$id_member.',
 						\'sort\' => $sort,
 						\'start\' => $start,
+                        \'status\' => '.$status.',
 						\'per_page\' => $items_per_page,
 					)
 				);
@@ -1177,8 +1189,8 @@ function my_tasks()
 
 					SELECT COUNT(*)
 					FROM {db_prefix}workers 
-                    WHERE id_member={int:id_member} \',
-                                          array( \'id_member\' => '. $id_member.',
+                    WHERE id_member={int:id_member} AND status = {int:status} \',
+                                          array( \'id_member\' => '. $id_member.', \'status\' => '.$status.'
 					)
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
@@ -1526,11 +1538,18 @@ function end_task()
                   WHERE id = {int:id_task}',
                   array( 'end_comment' => $end_comment, 'end_date' => date("Y-m-d"), 'state' => $state , 'id_task' => $id_task ));
 
+        $smcFunc['db_query']('','
+                  UPDATE {db_prefix}workers
+                  SET status={int:status}
+                  WHERE id = {int:id_task}',
+                  array( 'status' =>  $state , 'id_task' => $id_task ));
+
+
         zapisiLog(-1, $id_task, 'end_task');
 
         redirectexit('action=delegator;sa=my_tasks');
     }
-    print_r("Member is not worker"); die;
+
     redirectexit('action=delegator;sa=vt;task_id='.$id_task);
     
 }

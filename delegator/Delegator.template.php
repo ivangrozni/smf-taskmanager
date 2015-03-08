@@ -500,6 +500,12 @@ function template_my_tasks()
     global $smcFunc;
 
     $id_member = $context['user']['id'];
+    if( isset($_GET['status']) ){
+        $status = $_GET['status'];
+    }
+    else{
+        $status = 0;
+    }
 
     $request = $smcFunc['db_query']('', '
     SELECT T1.real_name AS name FROM {db_prefix}members T1
@@ -507,8 +513,28 @@ function template_my_tasks()
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
+    
+    // Prestejem taske v posameznih stanjih :)
+    $states = array (0 => 0, 2 => 0, 3 => 0, 4 => 0);
+    foreach ($states as $status2 => $count){
+         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
+        $request2 = $smcFunc['db_query']('', '
+            SELECT COUNT(id) FROM {db_prefix}workers
+            WHERE id_member={int:id_member} AND status = {int:status}',
+            array('id_member' => $id_member, 'status' => $status2) );
+        $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
+        $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
+        $states[$status2] = $count;
+        $smcFunc['db_free_result']($request2);
+    }
 
-    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+    /*template_button_strip(array(array('text' => 'delegator_state_2', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=2', 'active'=> true)), 'right');
+    template_button_strip(array(array('text' => 'delegator_state_3', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=3', 'active'=> true)), 'right');
+    template_button_strip(array(array('text' => 'delegator_state_4', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=3', 'active'=> true)), 'right');*/
+
+    // tukaj link do posameznih nalog
+    
+    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</br>'.$txt['delegator_state_'.$status].'</h2> <hr><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=0">'.$txt['delegator_state_0'].'</a>:&nbsp'.$states[0].'</br><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=2">'.$txt['delegator_state_2'].'</a>:&nbsp'.$states[2].'</br><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=3">'.$txt['delegator_state_3'].'</a>:&nbsp'.$states[3].'</br><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=4">'.$txt['delegator_state_4'].'</a>:&nbsp'.$states[4].'</br>';
 
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
