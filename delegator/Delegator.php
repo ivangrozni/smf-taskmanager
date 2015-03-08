@@ -32,72 +32,7 @@ if (!defined('SMF'))
  * Helper funkcije *
  ******************/
 
-
-function getPriorityIcon($row) {
-    global $settings, $txt;
-
-    if ($row['priority'] == 0)
-        $image = 'warning_watch';
-    elseif ($row['priority'] == 1)
-        $image = 'warn';
-    elseif ($row['priority'] == 2)
-        $image = 'warning_mute';
-
-    return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
-}
-
-// Lahko bi razsiril to funkcijo, da bi pregledala, ce je uporabnik koordinator - bi bila vec uporabna in povabljiva
-function isMemberWorker($id_task){
-    // Pogledamo, id memberja in ga primerjamo s taski v tabeli
-    // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
-    global $context, $smcFunc, $scripturl;
-    
-    $id_member = $context['user']['id'];
-
-    $request = $smcFunc['db_query']('', '
-        SELECT id_member AS id_worker FROM {db_prefix}workers
-        WHERE id_task = {int:id_task}', array('id_task' => $id_task));
-
-    while ($row = $smcFunc['db_fetch_assoc']($request) ) {
-        if ($row['id_worker'] == $id_member) {
-            $smcFunc['db_free_result']($request);
-            return TRUE;
-        }
-    }
-    $smcFunc['db_free_result']($request);
-    return FALSE;
-}
-
-function zapisiLog($id_proj, $id_task, $action){
-    // Input: action - selfexplanatory
-    // Output: None
-    // What function does: Writes action into log table
-    // Notation: When there is action on project id_task is less than zero (-1)
-
-    global $smcFunc, $context;
-
-    $id_member = $context['user']['id'];
-
-    //checkSession(); // ali to rabimo???
-    //najbrz ne, ker se vedno klice samo v funkcijah, ki so ze preverile session, al kaj... 3h je slo za to!!!
-
-    if ($id_proj < 0){
-        $request = $smcFunc['db_query']('', '
-            SELECT id_proj FROM {db_prefix}tasks
-            WHERE id = {int:id_task}', array('id_task' => $id_task) );
-
-        $row = $smcFunc['db_fetch_assoc']($request);
-        $smcFunc['db_free_result']($request);
-        $id_proj = $row['id_proj'];
-    }
-    
-    $smcFunc['db_insert']('', '{db_prefix}delegator_log',
-                          array('id_proj' => 'int', 'id_task' => 'int', 'action' => 'string', 'id_member' => 'int', 'action_date' => 'string' ),
-                          array( $id_proj, $id_task, $action, $id_member, date('Y-m-d H-i-s') ),
-                          array('id') ); 
-    //  array( $id_proj, $id_task, $action, $id_member, date('Y-m-d') ),
-}
-
+include 'delegator_helpers.php';
 
 //Tu se zacne originalni To-Do list mod
 function Delegator()
@@ -204,6 +139,8 @@ function delegator_main()                                      //glavna funkcija
 
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
+    $status = getStatus();
+    
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks',
@@ -216,7 +153,7 @@ function delegator_main()                                      //glavna funkcija
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
-            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+            'function' => create_function('$start, $items_per_page, $sort, $status', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
@@ -224,12 +161,11 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state =0
-					OR T1.state =1
+					WHERE T1.state = {int:state}
 					ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
-						\'id_member\' => $id_member,
+						\'state\' => $status,
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -254,8 +190,8 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT COUNT(*)
 					FROM {db_prefix}tasks T1
-					WHERE T1.state = 0 OR T1.state =1\',
-					array(
+					WHERE T1.state = {int:state}\',
+					array(\'state\' => '.$status.'
 					)
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
@@ -418,20 +354,19 @@ function add_task()
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $deadline = $smcFunc['htmlspecialchars']($_POST['duedate']);
-    $state = 0;
+    $members = $_POST["member_add"];
 
     if ($smcFunc['htmltrim']($_POST['name']) === '')
         fatal_lang_error('delegator_empty_fields', false);
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
         array('id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string'),
-        array( $id_proj, $id_author, $name, $description, $deadline, $_POST['priority'], $state, date("Y-m-d")),
+        array( $id_proj, $id_author, $name, $description, $deadline, $_POST['priority'], (count($members) ? 1 : 0 ), date("Y-m-d")),
         array('id')
     ); 
 
     // Dodaj delegirane memberje
-
-
+    // 
     
     $request = $smcFunc['db_query']('', '
     SELECT T1.id AS id_task FROM {db_prefix}tasks T1
@@ -441,7 +376,7 @@ function add_task()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    foreach ($_POST["member_add"] as $member) {
+    foreach ($members as $member) {
         $smcFunc['db_insert']('', '{db_prefix}workers',
             array('id_member' => 'int', 'id_task' => 'int'),
             array((int) $member, $row['id_task'])
@@ -1127,14 +1062,7 @@ function my_tasks()
 		}
 	</style>';
 
-    if( isset($_GET['status']) ){
-        $status = $_GET['status'];
-    }
-    else{
-        $status = 0;
-    }
-
-    //print_r($status); die;
+    $status = getStatus();
 
     $id_member = $context['user']['id'];
 
@@ -1354,6 +1282,8 @@ function edit_task()
     $id_task = (int) $_POST['id_task'];
     $id_proj = $_POST['id_proj'];
 
+    $members = $_POST["member_add"];
+    
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
@@ -1362,9 +1292,9 @@ function edit_task()
 
     $smcFunc['db_query']('','
         UPDATE {db_prefix}tasks
-        SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}
+        SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}, state={int:state}
         WHERE id = {int:id_task}',
-        array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task, 'priority' => $priority)
+                         array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task, 'priority' => $priority, 'state' => (count($members) ? 1 : 0 ) )
     );
 
     // Dodaj delegirane memberje
@@ -1373,7 +1303,7 @@ function edit_task()
             WHERE id_task={int:id_task}',
         array('id_task' => $id_task)
     );
-    foreach ($_POST["member_add"] as $member) {
+    foreach ( $members as $member) {
         $smcFunc['db_insert']('', '{db_prefix}workers',
             array('id_member' => 'int', 'id_task' => 'int'),
             array((int) $member, $id_task)
@@ -1421,22 +1351,24 @@ function claim_task()
 
     checkSession('get');
 
-    //print_r("do sem pride"); die;
-
-    $task_id = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['task_id'];
     $member_id = (int) $context['user']['id'];
 
-    //print_r("do sem pride"); die;
     $smcFunc['db_insert']('', '{db_prefix}workers',
         array('id_member' => 'int', 'id_task' => 'int'),
-        array($member_id, $task_id),
+        array($member_id, $id_task),
         array('id') );
-    //print_r("do sem pride"); die;
 
-    zapisiLog(-1, $task_id, 'claim_task');
-    //print_r("do sem pride"); die;
-    //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
-    redirectexit('action=delegator;sa=vt;task_id=' . $task_id);
+    $smcFunc['db_query']('','
+        UPDATE {db_prefix}tasks
+        SET state={int:state}
+        WHERE id = {int:id_task}',
+        array('state' => 1, 'id_task' => $id_task)
+    );
+    
+    zapisiLog(-1, $id_task, 'claim_task');
+
+    redirectexit('action=delegator;sa=vt;task_id=' . $id_task);
 }
 
 function unclaim_task()
@@ -1445,20 +1377,27 @@ function unclaim_task()
 
     checkSession('get');
 
-    $task_id = (int) $_GET['task_id'];
-    $member_id = (int) $context['user']['id'];
+    $id_task = (int) $_GET['task_id'];
+    $id_member = (int) $context['user']['id'];
 
     
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}workers
-        WHERE id_task = {int:task_id} AND id_member = {int:member_id}',
+        WHERE id_task = {int:id_task} AND id_member = {int:id_member}',
         array(
-            'task_id' => $task_id,
-            'member_id' => $member_id
+            'id_task' => $id_task,
+            'id_member' => $id_member
         )
     );
-
-    //$smcFunc['db_free_result']($request);
+    // preverim stevilo workerjev; ce jih je nic, updejtam v ena.
+    if(numberOfWorkers($id_task)== 0){
+        $smcFunc['db_query']('','
+        UPDATE {db_prefix}tasks
+        SET state={int:state}
+        WHERE id = {int:id_task}',
+        array('state' => 0, 'id_task' => $id_task)
+    );
+    }
 
     zapisiLog(-1, $task_id, 'unclaim_task');
     //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
@@ -1544,6 +1483,9 @@ function end_task()
                   WHERE id = {int:id_task}',
                   array( 'status' =>  $state , 'id_task' => $id_task ));
 
+
+    }
+        
 
         zapisiLog(-1, $id_task, 'end_task');
 

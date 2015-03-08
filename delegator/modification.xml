@@ -131,6 +131,7 @@ $txt['delegator_priority_0'] = 'Please to do it';
 $txt['delegator_priority_1'] = 'Do it';
 $txt['delegator_priority_2'] = 'Do it or gulag';
 // Tasks
+$txt['delegator_tasks'] = 'Tasks';
 $txt['delegator_tasks_empty'] = 'No tasks';
 $txt['delegator_task_name'] = 'Task name';
 $txt['delegator_task_desc'] = 'Task description';

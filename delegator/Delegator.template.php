@@ -5,42 +5,9 @@
  ******************/
 
 // Sestavi seznam prioritet (izbor)
-function getPriorities($row, $txt)
-{
-    $priorities = "";
-    for ($i = 0; $i < 3; $i++) {
-        $checked = ($i == $row["priority"]) ? "checked" : "";
-        $priorities .= '
-            <li>
-                <input type="radio" name="priority" id="priority_' . $i . '" value="' . $i . '" class="input_radio" class="input_radio"' . $checked . '/>
-                ' . $txt['delegator_priority_' . $i] . '
-            </li>
-        ';
-    }
-    return $priorities;
-}
 
-function isMemberWorker2($id_task) {
-    // Pogledamo, id memberja in ga primerjamo s taski v tabeli
-    // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
-
-    global $context, $smcFunc, $scripturl;
-    
-    $id_member = $context['user']['id'];
-
-    $request = $smcFunc['db_query']('', '
-        SELECT id_member AS id_worker FROM {db_prefix}workers
-        WHERE id_task = {int:id_task}', array('id_task' => $id_task));
-
-    while ($row = $smcFunc['db_fetch_assoc']($request) ) {
-        if ($row['id_worker'] == $id_member) 
-         {
-             $smcFunc['db_free_result']($request);
-             return TRUE;}
-             }
-             $smcFunc['db_free_result']($request);
-    return FALSE;
-    }
+include "/../../Sources/delegator_helpers.php";
+// Tukaj znajo biti se tezave...
 
 /******************
  *    Templati    *
@@ -55,6 +22,25 @@ function template_main()
     template_button_strip(array(array('text' => 'delegator_task_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
     template_button_strip(array(array('text' => 'delegator_project_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
+    $status = getStatus();
+
+        echo '<h2 style="font-size:1.5em" >'.$txt['delegator_state_'.$status].' &nbsp'.$txt['delegator_tasks'].'</br>'.$txt['delegator_state_'.$status].'</h2> <hr>';
+    
+    // Prestejem taske v posameznih stanjih :)
+    $states = array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0);
+    foreach ($states as $status2 => $count){
+         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
+        $request2 = $smcFunc['db_query']('', '
+            SELECT COUNT(id) FROM {db_prefix}workers
+            WHERE id_member={int:id_member} AND status = {int:status}',
+            array('id_member' => $id_member, 'status' => $status2) );
+        $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
+        $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
+        $states[$status2] = $count;
+        $smcFunc['db_free_result']($request2);
+        echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
+    }
+    
     template_show_list('list_tasks');
 }
 
@@ -374,7 +360,7 @@ function template_vt() // id bi bil kar dober argument
                 <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> 
                <!-- <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';sesc=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> -->
             ';
-        if(isMemberWorker2($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        if(isMemberWorker($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -500,12 +486,8 @@ function template_my_tasks()
     global $smcFunc;
 
     $id_member = $context['user']['id'];
-    if( isset($_GET['status']) ){
-        $status = $_GET['status'];
-    }
-    else{
-        $status = 0;
-    }
+
+    $status = getStatus();
 
     $request = $smcFunc['db_query']('', '
     SELECT T1.real_name AS name FROM {db_prefix}members T1
@@ -513,9 +495,11 @@ function template_my_tasks()
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
+
+    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</br>'.$txt['delegator_state_'.$status].'</h2> <hr>';
     
     // Prestejem taske v posameznih stanjih :)
-    $states = array (0 => 0, 2 => 0, 3 => 0, 4 => 0);
+    $states = array (1 => 0, 2 => 0, 3 => 0, 4 => 0);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
         $request2 = $smcFunc['db_query']('', '
@@ -526,6 +510,8 @@ function template_my_tasks()
         $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
         $states[$status2] = $count;
         $smcFunc['db_free_result']($request2);
+
+        echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=1">'.$txt['delegator_state_'$status2].'</a>:&nbsp'.$count.'</br>';
     }
 
     /*template_button_strip(array(array('text' => 'delegator_state_2', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=my_tasks;status=2', 'active'=> true)), 'right');
@@ -534,8 +520,6 @@ function template_my_tasks()
 
     // tukaj link do posameznih nalog
     
-    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</br>'.$txt['delegator_state_'.$status].'</h2> <hr><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=0">'.$txt['delegator_state_0'].'</a>:&nbsp'.$states[0].'</br><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=2">'.$txt['delegator_state_2'].'</a>:&nbsp'.$states[2].'</br><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=3">'.$txt['delegator_state_3'].'</a>:&nbsp'.$states[3].'</br><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=4">'.$txt['delegator_state_4'].'</a>:&nbsp'.$states[4].'</br>';
-
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
 }

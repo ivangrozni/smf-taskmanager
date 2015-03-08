@@ -10,6 +10,7 @@
 		<readme parsebbc="true" type="file">readme.txt</readme>
 		<modification>modification.xml</modification>
 		<require-file name="Delegator.php" destination="$sourcedir" />
+		<require-file name="delegator_helpers.php" destination="$sourcedir" />
 		<require-file name="Delegator.template.php" destination="$themedir" />
 		<require-file name="delegator.js" destination="$themedir/scripts" />
 		<require-file name="moment.min.js" destination="$themedir/scripts" />
@@ -24,6 +25,7 @@
 		<readme type="inline">This will uninstall the Delegator</readme>
 		<modification reverse="true">modification.xml</modification>
 		<remove-file name="$sourcedir/Delegator.php" />
+		<remove-file name="$sourcedir/delegator_helpers.php" />
 		<remove-file name="$themedir/Delegator.template.php" />
 		<remove-file name="$themedir/scripts/delegator.js" />
 		<remove-file name="$themedir/scripts/moment.min.js" />
