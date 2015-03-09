@@ -220,7 +220,7 @@ function template_vt() // id bi bil kar dober argument
 
 
     $request = $smcFunc['db_query']('', '
-        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS            deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author,            T1.creation_date AS creation_date, T1.description AS description, T1.id_proj             AS id_proj, T1.id_author AS id_author
+        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS            deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author,            T1.creation_date AS creation_date, T1.description AS description, T1.id_proj             AS id_proj, T1.id_author AS id_author, T1.end_comment, T1.end_date
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
@@ -268,11 +268,10 @@ function template_vt() // id bi bil kar dober argument
     // Seznam delegatov
 
     $request = $smcFunc['db_query']('',
-		'SELECT T2.real_name
-		FROM {db_prefix}workers T1
-			LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
-
-		WHERE id_task = {int:task_id}',
+		'SELECT T1.id_member, T2.real_name
+		 FROM {db_prefix}workers T1
+		 LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
+         WHERE id_task = {int:task_id}',
 		array(
 			'task_id' => $task_id
 		)
@@ -280,12 +279,18 @@ function template_vt() // id bi bil kar dober argument
 
     $members = array();
     while ($m = $smcFunc['db_fetch_assoc']($request)) {
-    	$members[] = $m["real_name"];
+    	$members[$m['id_member']] = $m["real_name"];
     }
 
-	$delegates = "&nbsp;&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
+	$delegates = "&nbsp;&nbsp; (\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
 	if (count($members)) {
-		$delegates = implode(", ", $members);
+        $delegates = ' ';
+		//$delegates = implode(", ", $members);
+        foreach( $members as $id_member => $real_name ){
+            $delegates = $delegates .  '<a href='. $scripturl .'?action=delegator;sa=view_worker;id_member='. $id_member .'">'.$real_name.'</a>&nbsp;';
+
+                       //<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_proj=\'. $row[\'id_member\'] .\'">\'.$row[\'member\'].\'</a>\'
+}
 	}
 
     echo '
@@ -353,15 +358,29 @@ function template_vt() // id bi bil kar dober argument
 				</dt>
 				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
                                        ', $row['state'] ,'
-				</dd>
-			 </dl>
-			 <br />
-				', $claimButton, '&nbsp;
+			</dd>';
+
+            if ($row['state'] > 1) echo '
+                 <dt>
+					<label for="end_date">', $txt['delegator_task_end_date'], '</label>
+				</dt>
+				<dd>  ', $row['end_date'] ,'
+                </dd>
+                 <dt>
+					<label for="end_comment">', $txt['delegator_task_end_comment'], '</label>
+				</dt>
+				<dd>  ', $row['end_comment'] ,'
+                </dd>';
+
+			echo '</dl> <br />';
+                 if( $row['state'] < 2) echo $claimButton, '&nbsp;
                 <a href="index.php?action=delegator;sa=et;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
                 <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> 
                <!-- <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';sesc=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> -->
             ';
-        if(isMemberWorker($task_id)) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+            // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
+            //if(isMemberCoordinator($task_id) and $row['state']>1) echo '<a href="index.php?action=delegator;sa=super_edit;task_id=', $task_id, '" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -385,6 +404,8 @@ function template_view_proj()
 
     $id_proj = (int) $_GET['id_proj'];
 
+    $status = getStatus();
+    
     $request = $smcFunc['db_query']('', '
         SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
 		FROM {db_prefix}projects T1
@@ -450,6 +471,23 @@ function template_view_proj()
 
     $smcFunc['db_free_result']($request);
 
+    $states = array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0);
+    foreach ($states as $status2 => $count){
+         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
+        $request2 = $smcFunc['db_query']('', '
+            SELECT COUNT(id) FROM {db_prefix}tasks
+            WHERE id_proj={int:id_proj} AND state = {int:state}',
+            array('id_proj' => $id_proj, 'state' => $status2) );
+        $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
+        $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
+        $states[$status2] = $count;
+        $smcFunc['db_free_result']($request2);
+
+        echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
+    }
+
+
+    
     template_show_list('list_tasks_of_proj');
 }
 

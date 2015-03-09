@@ -10,25 +10,26 @@
 				'delegator' => array('Delegator.php', 'Delegator'),]]></add>
 		</operation>
 	</file>
-	<!--
+	<!-- zakomentirano -->
 	<file name="$sourcedir/ManagePermissions.php">
+
 		<operation>
-			<search position="replace"><![CDATA[			'karma_edit' => array(false, 'general', 'moderate_general'),]]></search>
+			<search position="replace"><![CDATA['karma_edit' => array(false, 'general', 'moderate_general'),]]></search>
 			<add><![CDATA[
             'karma_edit' => array(false, 'general', 'moderate_general'),
 			'view_todo' => array(false, 'general', 'view_todolist'),
 			'add_new_todo' => array(false, 'general', 'add_new_todolist'),]]></add>
 		</operation>
 	</file>
-	-->
+	<!-- zakomentirano do sem -->
 	<file name="$sourcedir/Subs.php">
-		<!--
-		<operation>
+	  <!-- zakomentirano -->
+	    <operation>
 			<search position="replace"><![CDATA[	$context['allow_memberlist'] = allowedTo('view_mlist');]]></search>
 			<add><![CDATA[	$context['allow_memberlist'] = allowedTo('view_mlist');
             $context['allow_view_todolist'] = allowedTo('view_todo');]]></add>
 		</operation>
-		-->
+	<!-- zakomentirano do sem -->
 		<operation>
 			<search position="replace"><![CDATA['mlist' => array(]]></search>
 <!--
@@ -38,7 +39,7 @@ Drop down menu: @Jaka - kaj rabimo?
 			<add><![CDATA['delegator' => array(
 				'title' => function_exists('get_today_todos') ? get_today_todos() :  'DELEGATOR TODAY PLACEHOLDER',
 				'href' => $scripturl . '?action=delegator',
-				'show' => $context['allow_memberlist'], // @TODO: proper permission
+				'show' =>  $context['allow_memberlist'], // @TODO: proper permission
 				'sub_buttons' => array(
 					'add' => array(
 						'title' => $txt['delegator_task_add'],
@@ -156,6 +157,8 @@ $txt['delegator_state_1'] = 'Claimed';
 $txt['delegator_state_2'] = 'Succesful';
 $txt['delegator_state_3'] = 'Unsuccesful';
 $txt['delegator_state_4'] = 'Canceled';
+$txt['delegator_task_end_comment'] = 'End comment';
+$txt['delegator_task_end_date'] = 'End date';
 // Projects
 $txt['delegator_project_add'] = 'Add Project';
 $txt['delegator_project_name'] = 'Project';

@@ -378,8 +378,8 @@ function add_task()
 
     foreach ($members as $member) {
         $smcFunc['db_insert']('', '{db_prefix}workers',
-            array('id_member' => 'int', 'id_task' => 'int'),
-            array((int) $member, $row['id_task'])
+                              array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
+                              array((int) $member, $row['id_task'], 1)
         );
     }
     
@@ -484,6 +484,8 @@ function view_proj()
 
     $id_proj = $_GET['id_proj'];
 
+    $status = getStatus();
+    
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
@@ -495,7 +497,7 @@ function view_proj()
         'get_items' => array(
             // FUNKCIJE
 
-            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+            'function' => create_function('$start, $items_per_page, $sort, $status', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
@@ -503,11 +505,12 @@ function view_proj()
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE (T1.state = 0 OR T1.state =1) AND T1.id_proj = '.$id_proj.'
+					WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
 					ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
-						\'id_member\' => $id_member,
+						\'state\' => '.$status.',
+                        \'id_proj\' => '.$id_proj.',
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -530,12 +533,11 @@ function view_proj()
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
-			SELECT COUNT(*)
+			SELECT COUNT(id)
 			FROM {db_prefix}tasks T1
-			LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-			LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-			WHERE T1.state =0
-			OR T1.state =1\', array()
+			WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
+			\', array(\'state\' => '.$status.', 
+                      \'id_proj\' => '.$id_proj.')
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
 				$smcFunc[\'db_free_result\']($request);
@@ -700,12 +702,17 @@ function view_projects()
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
+            // $id_memberja tukaj res ne rabim...
             'function' => create_function('$start, $items_per_page, $sort, $id_member', '
 				global $smcFunc;
 
 				$request = $smcFunc[\'db_query\'](\'\', \'
                     SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord, T2.real_name AS coordinator
-                    FROM {db_prefix}projects T1                                                                LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member                              ORDER BY {raw:sort}                                                                        LIMIT {int:start}, {int:per_page}\',                                   					array(
+                    FROM {db_prefix}projects T1  
+                    LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member 
+                    ORDER BY {raw:sort}     
+                    LIMIT {int:start}, {int:per_page}\',    
+                    array(
 						\'id_member\' => $id_member,
 						\'sort\' => $sort,
 						\'start\' => $start,
@@ -1305,8 +1312,8 @@ function edit_task()
     );
     foreach ( $members as $member) {
         $smcFunc['db_insert']('', '{db_prefix}workers',
-            array('id_member' => 'int', 'id_task' => 'int'),
-            array((int) $member, $id_task)
+                              array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
+                              array((int) $member, $id_task, 1)
         );
     }
 
@@ -1355,8 +1362,8 @@ function claim_task()
     $member_id = (int) $context['user']['id'];
 
     $smcFunc['db_insert']('', '{db_prefix}workers',
-        array('id_member' => 'int', 'id_task' => 'int'),
-        array($member_id, $id_task),
+        array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
+        array($member_id, $id_task, 1),
         array('id') );
 
     $smcFunc['db_query']('','
@@ -1385,7 +1392,7 @@ function unclaim_task()
         WHERE id_task = {int:id_task} AND id_member = {int:id_member}',
         array(
             'id_task' => $id_task,
-            'id_member' => $id_member
+            'id_member' => $id_member,
         )
     );
 
@@ -1393,10 +1400,10 @@ function unclaim_task()
     if(numberOfWorkers($id_task) == 0){
         $smcFunc['db_query']('','
         UPDATE {db_prefix}tasks
-        SET state={int:state}
+        SET state = {int:state}
         WHERE id = {int:id_task}',
         array('state' => 0, 'id_task' => $id_task)
-    );
+        );
     }
 
     zapisiLog(-1, $id_task, 'unclaim_task');
@@ -1480,7 +1487,7 @@ function end_task()
         $smcFunc['db_query']('','
                   UPDATE {db_prefix}workers
                   SET status={int:status}
-                  WHERE id = {int:id_task}',
+                  WHERE id_task = {int:id_task}',
                   array( 'status' =>  $state , 'id_task' => $id_task ));
 
         zapisiLog(-1, $id_task, 'end_task');
@@ -1511,7 +1518,7 @@ function view_log()
         'id' => 'log',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator;sa=view_log',       //prvi del URL-ja
-        'default_sort_col' => 'action_date',                      //razvrsis taske po roku
+        'default_sort_col' => 'action_date DESC',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
 
@@ -1586,7 +1593,7 @@ function view_log()
                 ),
                 'data' => array(
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_proj=\'. $row[\'id_member\'] .\'">\'.$row[\'member\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_=member\'. $row[\'id_member\'] .\'">\'.$row[\'member\'].\'</a>\'; '
 
 					),
                 ),

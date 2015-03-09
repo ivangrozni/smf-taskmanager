@@ -74,7 +74,7 @@ function numberOfWorkers($id_task){
     // Presteje Stevilo Workerjev
     // Trenutno se uporabi zgolj v unclaim, saj smo add_task in edit_task resili bolj elegantno...
     global $context, $smcFunc;
-
+    
     $request = $smcFunc['db_query']('', '
         SELECT COUNT(id) AS numworkers FROM {db_prefix}workers
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
