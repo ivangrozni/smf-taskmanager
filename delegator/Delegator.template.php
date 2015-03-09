@@ -9,6 +9,30 @@
 include "/../../Sources/delegator_helpers.php";
 // Tukaj znajo biti se tezave...
 
+// @todo se bo v helper dalo, ampak bi sel rad spat zdaj :)
+// Vnesi javascript za autocomplete
+function generateMemberSuggest ($input, $container, $param) {
+    global $context, $txt;
+    return '
+		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \'' . $context['session_id'] . '\',
+				sSessionVar: \'' . $context['session_var'] . '\',
+				sSuggestId: \'' . $input . '\',
+				sControlId: \'' . $input . '\',
+				sSearchType: \'member\',
+				bItemList: true,
+				sPostName: \'' . $param . '\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+				sItemListContainerId: \'' . $container . '\',
+				aListItems: []
+			});
+        // ]]></script>';
+}
+
 /******************
  *    Templati    *
  ******************/
@@ -68,7 +92,7 @@ function template_add()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_add">
+				<dl class="delegator_et">
 					<dt>
                        <label for="name"> Zadolzitev </label>
 					</dt>
@@ -82,12 +106,10 @@ function template_add()
                 		<textarea name="description" rows="3" cols="30"></textarea>
                     </dd>
 					<dt>
-						<label for="duet3">', $txt['delegator_deadline'], '</label><br />
-						<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-					</dt>
+                        <label for="duedate">', $txt['delegator_deadline'], '</label>
+                    </dt>
 					<dd>
 						<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
-						<div id="kalender"></div>
 					</dd>
 					<dt>
 						<label for="user">Delegirani uporabniki</label>
@@ -121,27 +143,10 @@ function template_add()
 				<br />
 				<input type="submit" name="submit" value="', $txt['delegator_task_add'], '" class="button_submit" />
 			</div>
-            <span class="botslice">&nbsp;</span>
+            <span class="botslice"><span></span></span>
 		</div>
 		</form>
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to-add\',
-				sControlId: \'to-add\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'user-list\',
-				aListItems: []
-			});
-            console.log(oAddMemberSuggest);
-		// ]]></script>
+        ' . generateMemberSuggest("to-add", "user-list", "member_add") . '
 	</div><br />';
 }
 
@@ -162,7 +167,7 @@ function template_proj()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_add_proj">
+				<dl class="delegator_et">
 					<dt>
 						<label for="name">', $txt['delegator_project_name'], '</label>
 					</dt>
@@ -182,7 +187,7 @@ function template_proj()
 					<dd>
 						<input type="text" name="start" class="input_text kalender" />
 					</dd>
-<dt>
+                    <dt>
 						<label for="end">', $txt['delegator_project_end'], '</label>
 					</dt>
 					<dd>
@@ -303,7 +308,7 @@ function template_vt() // id bi bil kar dober argument
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_vt">
+			<dl class="delegator_et">
 				<dt>
 					<label for="name">', $txt['delegator_task_name'], '</label>
 				</dt>
@@ -424,7 +429,7 @@ function template_view_proj()
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_view_proj">
+			<dl class="delegator_et">
 				<dt>
 					<label for="name">', $txt['delegator_project_name'], '</label>
 				</dt>
@@ -645,62 +650,59 @@ function template_et()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_et">
-						<dt>
-                            <label for="name">', $txt['delegator_task_name'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
-                            <input type="hidden" name="id_task" value ="'.$id_task.'" />
-						</dd>
-                        <dt>
-                		    <label for="description">', $txt['delegator_task_desc'], '</label>
- 						</dt>
-                        <dd>
-                			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
-                        </dd>
-						<dt>
-							<label for="deadline">', $txt['delegator_deadline'], '</label>
-						</dt>
-						<dd>
-							<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
-                        </dd>
-						<dt>
-							<label for="user">', $txt['delegator_task_delegates'], '</label>
-						</dt>
-						<dd>
-							<input id="to-add" type="text" name="user">
-							<div id="user-list">
-                                ' . $delegates . '
-                            </div>
-						</dd>
-						<dt>
-							<label>', $txt['delegator_priority'], '</label>
-						</dt>
-						<dd>
-							<ul class="reset">
-								' . getPriorities($row, $txt) . '
-							</ul>
-						</dd>
-					</dl>
-                    <dt>
-						<label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
+                <dl class="delegator_et">
+					<dt>
+                        <label for="name">', $txt['delegator_task_name'], '</label>
 					</dt>
 					<dd>
-                    	<select name="id_proj">'; // nadomestil navadno vejico
-					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-					            if ($row_p['id'] == $row['id_proj']){
-					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
-					            }
-					            else {
-					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
-					            }
-					        }
-        					$smcFunc['db_free_result']($request_p);
-
-            			echo '
-            			</select>
+						<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
+                        <input type="hidden" name="id_task" value ="'.$id_task.'" />
 					</dd>
+                    <dt>
+               		    <label for="description">', $txt['delegator_task_desc'], '</label>
+ 					</dt>
+                    <dd>
+               			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
+                    </dd>
+					<dt>
+			    		<label for="deadline">', $txt['delegator_deadline'], '</label>
+					</dt>
+					<dd>
+						<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
+                    </dd>
+					<dt>
+						<label for="user">', $txt['delegator_task_delegates'], '</label>
+					</dt>
+					<dd>
+						<input id="to-add" type="text" name="user">
+						<div id="user-list">
+                            ' . $delegates . '
+                        </div>
+					</dd>
+					<dt>
+						<label>', $txt['delegator_priority'], '</label>
+					</dt>
+					<dd>
+						<ul class="reset">
+							' . getPriorities($row, $txt) . '
+						</ul>
+					</dd>
+                    <dt>
+                        <label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
+                    </dt>
+                    <dd>
+                        <select name="id_proj">'; // nadomestil navadno vejico
+                            while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
+                                if ($row_p['id'] == $row['id_proj']){
+                                    echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
+                                } else {
+                                    echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
+                                }
+                            }
+                            $smcFunc['db_free_result']($request_p);
+                            echo '
+                        </select>
+                    </dd>
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
@@ -709,23 +711,7 @@ function template_et()
 			<span class="botslice"><span></span></span>
 		</div>
 		</form>
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to-add\',
-				sControlId: \'to-add\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'user-list\',
-				aListItems: []
-			});
-		// ]]></script>
+    ' . generateMemberSuggest("to-add", "user-list", "member_add") .  '
 	</div><br />';
 }
 
@@ -904,7 +890,7 @@ $smcFunc['db_free_result']($request);
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_en">
+				<dl class="delegator_et">
 					<dt> <!-- tukaj more priti dolartxt[name]-->
                        <label for="name"> End Comment</label>
 					</dt>
