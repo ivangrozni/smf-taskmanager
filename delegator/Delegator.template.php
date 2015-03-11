@@ -287,7 +287,7 @@ function template_vt() // id bi bil kar dober argument
         $delegates = ' ';
 		//$delegates = implode(", ", $members);
         foreach( $members as $id_member => $real_name ){
-            $delegates = $delegates .  '<a href='. $scripturl .'?action=delegator;sa=view_worker;id_member='. $id_member .'">'.$real_name.'</a>&nbsp;';
+            $delegates = $delegates .  '<a href='. $scripturl .'?action=delegator;sa=view_worker;id_member='. $id_member .'">'.$real_name.'</a> &nbsp; ';
 
                        //<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_proj=\'. $row[\'id_member\'] .\'">\'.$row[\'member\'].\'</a>\'
 }
@@ -504,7 +504,8 @@ function template_view_worker()
     global $smcFunc;
 
     $id_member = (int) $_GET['id_member'];
-
+    $status = getStatus1();
+    
     $request = $smcFunc['db_query']('', '
     SELECT T1.real_name AS name FROM {db_prefix}members T1
     WHERE T1.id_member={int:id_member}', array('id_member' => $id_member));
@@ -512,7 +513,22 @@ function template_view_worker()
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2><hr>';
+
+    $states = array (1 => 0, 2 => 0, 3 => 0, 4 => 0);
+    foreach ($states as $status2 => $count){
+         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
+        $request2 = $smcFunc['db_query']('', '
+            SELECT COUNT(id) FROM {db_prefix}workers
+            WHERE id_member={int:id_member} AND status = {int:status}',
+            array('id_member' => $id_member, 'status' => $status2) );
+        $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
+        $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
+        $states[$status2] = $count;
+        $smcFunc['db_free_result']($request2);
+
+        echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
+    }
 
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
