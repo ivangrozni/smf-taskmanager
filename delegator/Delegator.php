@@ -145,7 +145,7 @@ function delegator_main()                                      //glavna funkcija
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;status='.$status,       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
@@ -492,7 +492,7 @@ function view_proj()
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id' => 'list_tasks_of_proj',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj.';status='.$status,       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
@@ -832,23 +832,23 @@ function view_worker()
 // More pokazat zadolzitve, pri katerih si worker...
 
     global $smcFunc, $scripturl, $context, $txt, $sourcedir;
-    
+
     $context['sub_template'] = 'view_worker';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=view_worker',
         'name' => $txt['delegator_view_worker']
     );
 
-    $status = getStatus1();
-    
     $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
+    print_r($id_member);
+    // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member .';status='.$status,       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
 
@@ -861,12 +861,11 @@ function view_worker()
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
                                         LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
-                                        WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
+                                        WHERE T1.id_member={int:id_member}
                                         ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}\',
 					array(
 						\'id_member\' => '. $id_member .',
-                        \'status\' => '. $status .',
 						\'sort\' => $sort,
 						\'start\' => $start,
 						\'per_page\' => $items_per_page,
@@ -892,9 +891,8 @@ function view_worker()
 				$request = $smcFunc[\'db_query\'](\'\', \'
 					SELECT COUNT(*)
 					FROM {db_prefix}workers 
-                    WHERE id_member={int:id_member} AND status = {int:status} \',
-                                          array( \'id_member\' => '. $id_member.'
-                                                 \'status\' => ' . $status .',
+                    WHERE id_member={int:id_member} \',
+                                          array( \'id_member\' => '. $id_member.',
 					)
 				);
 				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
@@ -1080,7 +1078,7 @@ function my_tasks()
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=my_tasks;status='.$status,       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=my_tasks',       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
@@ -1331,29 +1329,27 @@ function del_task()
 
     checkSession('get');
 
-    $id_task = (int) $_GET['task_id'];
+    $task_id = (int) $_GET['task_id'];
 
-    zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
+    zapisiLog(-1, $task_id, 'del_task'); // Has to be before DELETE happens...
     
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}tasks
-        WHERE id = {int:id_task}',
+        WHERE id = {int:task_id}',
         array(
-            'id_task' => $id_task
+            'task_id' => $task_id
         )
     );
 
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}workers
-        WHERE id_task = {int:id_task}',
+        WHERE id_task = {int:task_id}',
         array(
-            'id_task' => $id_task
+            'task_id' => $task_id
         )
     );
-
+    
     redirectexit('action=delegator');
-    // Would have probably be fine, if it would redirect to view_proj
-    // Project from which the task have been deleted...
 }
 
 function claim_task()
@@ -1522,7 +1518,7 @@ function view_log()
         'id' => 'log',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator;sa=view_log',       //prvi del URL-ja
-        'default_sort_col' => 'action_date',                      //razvrsis taske po roku
+        'default_sort_col' => 'action_date DESC',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
 

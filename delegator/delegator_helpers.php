@@ -98,7 +98,7 @@ function zapisiLog($id_proj, $id_task, $action){
     //checkSession(); // ali to rabimo???
     //najbrz ne, ker se vedno klice samo v funkcijah, ki so ze preverile session, al kaj... 3h je slo za to!!!
 
-    if ($id_proj == -1){
+    if ($id_proj < 0){
         $request = $smcFunc['db_query']('', '
             SELECT id_proj FROM {db_prefix}tasks
             WHERE id = {int:id_task}', array('id_task' => $id_task) );
