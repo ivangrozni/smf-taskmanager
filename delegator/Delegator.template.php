@@ -385,7 +385,7 @@ function template_vt() // id bi bil kar dober argument
             ';
         if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
             // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
-            //if(isMemberCoordinator($task_id) and $row['state']>1) echo '<a href="index.php?action=delegator;sa=super_edit;task_id=', $task_id, '" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+            if(isMemberCoordinator($task_id) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=super_edit" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -939,6 +939,173 @@ $smcFunc['db_free_result']($request);
 	</div><br />';
 }
 
+function template_se()
+{
+
+    global $scripturl, $context, $txt;
+    global $smcFunc;
+
+    $id_task = (int) $_GET['task_id'];
+
+    $request = $smcFunc['db_query']('', '
+        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority, T1.id_proj, T1.state, T1.start_date, T1.end_date, T1.end_comment
+		FROM {db_prefix}tasks T1
+		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
+        WHERE T1.id = {int:id_task}',
+        array( 'id_task' => $id_task)
+    );
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+
+    // Delegirani uporabniki
+    $request_d = $smcFunc['db_query']('', '
+        SELECT T1.id_member, T2.real_name
+        FROM {db_prefix}workers T1
+        LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
+        WHERE T1.id_task = {int:id_task}',
+        array('id_task' => $id_task)
+    );
+
+    $delegates = "";
+    while ($member = $smcFunc['db_fetch_assoc']($request_d)) {
+        $id = $member["id_member"];
+        $name = $member["real_name"];
+        $delegates .=
+            '<div id="suggest_to-add_' . $id . '">
+                <input name="member_add[]" value="' . $id . '" type="hidden">
+                <a href="index.php?action=profile;u=' . $id . '" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">' . $name . '</a>
+                <img src="Themes/default/images/pm_recipient_delete.gif" alt="Delete Item" title="Delete Item" onclick="return oAddMemberSuggest.deleteAddedItem(' . $id . ');">
+            </div>';
+    }
+    $smcFunc['db_free_result']($request_d);
+
+    $request_p = $smcFunc['db_query']('', '
+        SELECT id, name
+        FROM  {db_prefix}projects'
+    );
+
+	echo '
+	<div id="container">
+		<div class="cat_bar">
+			<h3 class="catbg"><span class="left"></span>
+				', $context['page_title'], '
+			</h3>
+		</div>
+		<form action="', $scripturl, '?action=delegator;sa=edit_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
+		<div class="windowbg">
+			<span class="topslice"><span></span></span>
+			<div class="content">
+					<dl class="delegator_et">
+						<dt>
+                            <label for="name">', $txt['delegator_task_name'], '</label>
+						</dt>
+						<dd>
+							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
+                            <input type="hidden" name="id_task" value ="'.$id_task.'" />
+						</dd>
+                        <dt>
+                		    <label for="description">', $txt['delegator_task_desc'], '</label>
+ 						</dt>
+                        <dd>
+                			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
+                        </dd>
+						<dt>
+							<label for="deadline">', $txt['delegator_deadline'], '</label>
+						</dt>
+						<dd>
+							<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
+                        </dd>
+						<dt>
+							<label for="user">', $txt['delegator_task_delegates'], '</label>
+						</dt>
+						<dd>
+							<input id="to-add" type="text" name="user">
+							<div id="user-list">
+                                ' . $delegates . '
+                            </div>
+						</dd>
+						<dt>
+							<label>', $txt['delegator_priority'], '</label>
+						</dt>
+						<dd>
+							<ul class="reset">
+								' . getPriorities($row, $txt) . '
+							</ul>
+						</dd>
+					</dl>
+                    <dt>
+						<label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
+					</dt>
+					<dd>
+                    	<select name="id_proj">'; // nadomestil navadno vejico
+					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
+					            if ($row_p['id'] == $row['id_proj']){
+					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
+					            }
+					            else {
+					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
+					            }
+					        }
+        					$smcFunc['db_free_result']($request_p);
+
+            			echo '
+            			</select>
+					</dd>
+						<dt>
+							<label for="start_date">', $txt['delegator_task_start_date'], '</label>
+						</dt>
+						<dd>
+							<input class="kalender" type="text" name="start_date" value="' . $row['start_date'] . '"/>
+                        </dd>
+
+                       <dt>
+							<label for="end_date">', $txt['delegator_task_end_date'], '</label>
+						</dt>
+						<dd>
+							<input class="kalender" type="text" name="en_ddate" value="'. $row['start_date'] . '"/>
+
+                        </dd>
+
+                        <dt>
+                		    <label for="description">', $txt['delegator_end_comment'], '</label>
+ 						</dt>
+                        <dd>
+                			<textarea name="end_comment" rows="3" cols="30" > '.$row['end_comment'].' </textarea>
+                        </dd>
+
+
+
+				</dl>
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<br />
+				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
+			</div>
+			<span class="botslice"><span></span></span>
+		</div>
+		</form>
+		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \'', $context['session_id'], '\',
+				sSessionVar: \'', $context['session_var'], '\',
+				sSuggestId: \'to-add\',
+				sControlId: \'to-add\',
+				sSearchType: \'member\',
+				bItemList: true,
+				sPostName: \'member_add\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
+				sItemListContainerId: \'user-list\',
+				aListItems: []
+			});
+		// ]]></script>
+	</div><br />';
+}
+
+//en je okrajsava za end task...
 
 
 ?>
