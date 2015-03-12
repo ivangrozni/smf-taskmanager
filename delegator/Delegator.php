@@ -840,7 +840,6 @@ function view_worker()
     );
 
     $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
-    print_r($id_member);
     // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
@@ -1658,6 +1657,79 @@ function view_log()
     require_once($sourcedir . '/Subs-List.php');
     createList($list_options);
 }
+
+function se()
+{
+    // Super edit funkcija - koordinator lahko vrne projekt v nedokončano stanje
+
+    global $smcFunc, $scripturl, $context, $txt;
+
+    $context['sub_template'] = 'se';
+    $cnotext['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=se',
+        'name' => $txt['delegator_edit_task']
+    );
+}
+
+function super_edit()
+{
+    global $smcFunc, $context;
+
+    //isAllowedTo('add_new_todo');
+
+    checkSession();
+
+    if (isMemberCoordinator){
+    
+        $id_author = $context['user']['id'];
+        $id_task = (int) $_POST['id_task'];
+        $id_proj = $_POST['id_proj'];
+
+        $members = $_POST["member_add"];
+    
+        $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
+        $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
+        $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
+
+        $priority = (int) $_POST['priority'];
+
+        $state = (int) $_POST['state'];
+        $start_date = (string) $_POST['start_date'];
+        $end_date = (string) $_POST['end_date'];
+        $end_comment = (string) $_POST['end_comment'];
+
+    // Preveri, ce obstajajo workerji in je slucajno stanje nic
+    // To ne gre...
+        if (count($members) AND $state==0) $state = 1;    
+    
+        $smcFunc['db_query']('','
+        UPDATE {db_prefix}tasks
+        SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}, state={int:state}, start_date = {string:start_date}, end_date = {string:end_date}, end_comment = {string:end_comment}
+        WHERE id = {int:id_task}',
+                         array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task, 'priority' => $priority, 'state' => $state, 'start_date' => $start_date, 'end_date' => $end_date, 'end_comment' => $end_comment  )
+    );
+
+    // Dodaj delegirane memberje
+        $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}workers
+            WHERE id_task={int:id_task}',
+        array('id_task' => $id_task)
+    );
+        foreach ( $members as $member) {
+        $smcFunc['db_insert']('', '{db_prefix}workers',
+                              array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
+                              array((int) $member, $id_task, 1)
+        );
+    }
+
+        zapisiLog($id_proj, $id_task, 'super_edit');
+    
+        redirectexit('action=delegator;sa=vt&task_id='.$id_task);
+    }
+    else redirectexit('action=delegator;sa=vt&task_id='.$id_task);
+    
+}
+
 
 is_not_guest();
 
