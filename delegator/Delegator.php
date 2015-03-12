@@ -49,25 +49,25 @@ function Delegator()
     $context['page_title'] = $txt['delegator'];   //poberes page title iz $txt['delegator']
 
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
-        'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-        'add' => 'add',                       // nalozi view za add task... al kaj
-        'proj' => 'proj',                     // template za vnos projekta
-        'add_proj' => 'add_proj',             // funkcija ki vnese projekt
-        'add_task' => 'add_task',             // funkcija, ki vnese task
-        'en' => 'en',                         // nalozi template za end_task
-        'end_task' => 'end_task',             // MANJKA zakljucek zadolzitve
-        'et' => 'et',                         // nalaganje edita - view
-        'edit_task' => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
-        'del_task' => 'del_task',
-        'claim_task' => 'claim_task',         //vzemi odgovornost v svoje roke!
-        'unclaim_task' => 'unclaim_task',     //ali pa si premisli
-        'edit_proj' => 'edit_proj',           //MANJKA in BO SE MANJKALO editanje projekta
-        'view_proj' => 'view_proj',           // podrobnosti projekta
-        'vt' => 'vt',                         // nalozi view za ogled zadolzitve
-        'view_worker' => 'view_worker',       // prikaze naloge enega workerja
-        'my_tasks' => 'my_tasks',             // moje naloge
+        'delegator'     => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
+        'add'           => 'add',                       // nalozi view za add task... al kaj
+        'proj'          => 'proj',                     // template za vnos projekta
+        'add_proj'      => 'add_proj',             // funkcija ki vnese projekt
+        'add_task'      => 'add_task',             // funkcija, ki vnese task
+        'en'            => 'en',                         // nalozi template za end_task
+        'end_task'      => 'end_task',             // MANJKA zakljucek zadolzitve
+        'et'            => 'et',                         // nalaganje edita - view
+        'edit_task'     => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
+        'del_task'      => 'del_task',
+        'claim_task'    => 'claim_task',         //vzemi odgovornost v svoje roke!
+        'unclaim_task'  => 'unclaim_task',     //ali pa si premisli
+        'edit_proj'     => 'edit_proj',           //MANJKA in BO SE MANJKALO editanje projekta
+        'view_proj'     => 'view_proj',           // podrobnosti projekta
+        'vt'            => 'vt',                         // nalozi view za ogled zadolzitve
+        'view_worker'   => 'view_worker',       // prikaze naloge enega workerja
+        'my_tasks'      => 'my_tasks',             // moje naloge
         'view_projects' => 'view_projects',   // seznam vseh projektov
-        'view_log' => 'view_log',   // seznam vseh projektov
+        'view_log'      => 'view_log',   // seznam vseh projektov
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -153,7 +153,7 @@ function delegator_main()                                      //glavna funkcija
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
-            'function' => ($start, $items_per_page, $sort, $id_member, $status) {
+            'function' => function ($start, $items_per_page, $sort, $id_member, $status) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
@@ -783,7 +783,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_project_start'],
                 ),
                 'data' => array(
-                    'function' => function($row) { return $row['start']; }
+                    'function' => function($row) { return '<span class="format-time">' . $row['start'] . '</span>'; },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -797,8 +797,8 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_project_end'],
                 ),
                 'data' => array(
-                    'function' => function($row) { return $row['end']; }
-                    'style' => 'width: 20%; text-align: center;',
+                    'function' => function($row) { return '<span class="format-time">' . $row['end'] . '</span>'; },
+                    'style' => 'width: 20%; text-align: center;'
                 ),
                 'sort' =>  array(
                     'default' => 'end',
@@ -833,7 +833,6 @@ function view_worker()
     );
 
     $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
-    print_r($id_member);
     // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
