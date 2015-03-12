@@ -157,6 +157,7 @@ $txt['delegator_state_1'] = 'Claimed';
 $txt['delegator_state_2'] = 'Succesful';
 $txt['delegator_state_3'] = 'Unsuccesful';
 $txt['delegator_state_4'] = 'Canceled';
+$txt['delegator_task_start_date'] = 'Task's start date';
 $txt['delegator_task_end_comment'] = 'End comment';
 $txt['delegator_task_end_date'] = 'End date';
 // Projects

@@ -958,7 +958,7 @@ function view_worker()
                     'function' => create_function('$row', '
 						$deadline = $row[\'deadline\'];
                         return "<span class=\"relative-time\">$deadline</span>";
-					'),
+ls					'),
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(

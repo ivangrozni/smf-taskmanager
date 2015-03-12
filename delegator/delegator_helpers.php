@@ -70,6 +70,24 @@ function isMemberWorker($id_task){
     return FALSE;
 }
 
+function isMemberCoordinator( $id_proj){
+    // Pogledamo, id memberja in ga primerjamo s taski v tabeli
+    // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
+    global $context, $smcFunc, $scripturl;
+    
+    $id_member = $context['user']['id'];
+
+    $request = $smcFunc['db_query']('', '
+        SELECT id_coord  FROM {db_prefix}projects
+        WHERE id_proj = {int:id_proj}', array('id_proj' => $id_proj));
+
+    $row = $smcFunc['db_fetch_assoc']($request) 
+    $smcFunc['db_free_result']($request);
+
+    ($row['id_coord'] == $id_member ? return TRUE : return FALSE );
+}
+
+
 function numberOfWorkers($id_task){
     // Presteje Stevilo Workerjev
     // Trenutno se uporabi zgolj v unclaim, saj smo add_task in edit_task resili bolj elegantno...
