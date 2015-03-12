@@ -951,6 +951,7 @@ function view_worker()
 						$deadline = $row['deadline'];
                         return "<span class=\"relative-time\">$deadline</span>";
                     },
+                ),
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
