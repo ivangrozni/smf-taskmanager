@@ -49,25 +49,27 @@ function Delegator()
     $context['page_title'] = $txt['delegator'];   //poberes page title iz $txt['delegator']
 
     $subActions = array(                      //definira se vse funkcije v sklopu delegatorja
-        'delegator' => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
-        'add' => 'add',                       // nalozi view za add task... al kaj
-        'proj' => 'proj',                     // template za vnos projekta
-        'add_proj' => 'add_proj',             // funkcija ki vnese projekt
-        'add_task' => 'add_task',             // funkcija, ki vnese task
-        'en' => 'en',                         // nalozi template za end_task
-        'end_task' => 'end_task',             // MANJKA zakljucek zadolzitve
-        'et' => 'et',                         // nalaganje edita - view
-        'edit_task' => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
-        'del_task' => 'del_task',
-        'claim_task' => 'claim_task',         //vzemi odgovornost v svoje roke!
-        'unclaim_task' => 'unclaim_task',     //ali pa si premisli
-        'edit_proj' => 'edit_proj',           //MANJKA in BO SE MANJKALO editanje projekta
-        'view_proj' => 'view_proj',           // podrobnosti projekta
-        'vt' => 'vt',                         // nalozi view za ogled zadolzitve
-        'view_worker' => 'view_worker',       // prikaze naloge enega workerja
-        'my_tasks' => 'my_tasks',             // moje naloge
+        'delegator'     => 'delegator_main',      //tukaj bo pregled nad projekti in nedokoncanimi zadolzitvami
+        'add'           => 'add',                       // nalozi view za add task... al kaj
+        'proj'          => 'proj',                     // template za vnos projekta
+        'add_proj'      => 'add_proj',             // funkcija ki vnese projekt
+        'add_task'      => 'add_task',             // funkcija, ki vnese task
+        'en'            => 'en',                         // nalozi template za end_task
+        'end_task'      => 'end_task',             // MANJKA zakljucek zadolzitve
+        'et'            => 'et',                         // nalaganje edita - view
+        'edit_task'     => 'edit_task',           // editanje taska - funkcija, ki update-a bazo
+        'del_task'      => 'del_task',
+        'claim_task'    => 'claim_task',         //vzemi odgovornost v svoje roke!
+        'unclaim_task'  => 'unclaim_task',     //ali pa si premisli
+        'edit_proj'     => 'edit_proj',           //MANJKA in BO SE MANJKALO editanje projekta
+        'view_proj'     => 'view_proj',           // podrobnosti projekta
+        'vt'            => 'vt',                         // nalozi view za ogled zadolzitve
+        'view_worker'   => 'view_worker',       // prikaze naloge enega workerja
+        'my_tasks'      => 'my_tasks',             // moje naloge
         'view_projects' => 'view_projects',   // seznam vseh projektov
-        'view_log' => 'view_log',   // seznam vseh projektov
+        'view_log'      => 'view_log',   // seznam vseh projektov
+        'se'            => 'se',
+        'super_edit'    => 'super_edit'
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -139,66 +141,65 @@ function delegator_main()                                      //glavna funkcija
 
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
-    $status = getStatus();
-    $id_member = $context['user']['id']; // ceprav ne rabim
+    $state       =  getStatus();
+    //print_r('state_prvic'); print_r($state);
+    //$id_member    = $context['user']['id']; // ceprav ne rabim
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
-        'id' => 'list_tasks',
-        'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'id'               => 'list_tasks',
+        'items_per_page'   => 30,                                //stevilo taskov na stran
+        'base_href'        => $scripturl . '?action=delegator;status='.$state,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
-        'get_items' => array(
+        'get_items'        => array(
             // FUNKCIJE
 /*
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
-            'function' => create_function('$start, $items_per_page, $sort, $id_member, $status', '
+            'function' => function ($start, $items_per_page, $sort) use ($state) {
 				global $smcFunc;
-
-				$request = $smcFunc[\'db_query\'](\'\', \'
+                //print_r('glavna');print_r($state);die;
+				$request = $smcFunc['db_query']('', '
 					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
+					LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
 					WHERE T1.state = {int:state}
 					ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}\',
+					LIMIT {int:start}, {int:per_page}',
 					array(
-						\'state\' => '.$status.',
-						\'sort\' => $sort,
-						\'start\' => $start,
-						\'per_page\' => $items_per_page,
+						'state'    => $state,
+						'sort'     => $sort,
+						'start'    => $start,
+						'per_page' => $items_per_page,
 					)
 				);
 				$tasks = array();
-				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request) )
 					$tasks[] = $row;
-				$smcFunc[\'db_free_result\']($request);
+				$smcFunc['db_free_result']($request);
 
-				return $tasks;                                    //funkcija vrne taske
-                                '),
+				return $tasks;               //funkcija vrne taske
+            },
             'params' => array(
                 'id_member' => $context['user']['id'],
-                 ),
+             ),
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => create_function('', '
+            'function' => function() use ($state) {
 				global $smcFunc;
-
-				$request = $smcFunc[\'db_query\'](\'\', \'
+                //print_r('stete drugic');print_r($state);die;
+				$request = $smcFunc['db_query']('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}tasks T1
-					WHERE T1.state = {int:state}\',
-					array(\'state\' => '.$status.'
-					)
-				);
-				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+					WHERE T1.state={int:state}',
+                    array( 'state' => $state, ) );
+				list($total_tasks) = $smcFunc['db_fetch_row']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $total_tasks;
-			'),
+            },
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
@@ -213,9 +214,9 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=vt;task_id='. $row['id'] .'">'.$row['task_name'].'</a>';
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'task_name',
@@ -228,9 +229,10 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=view_proj;id_proj='. $row['id_proj'] .'">'.$row['project_name'].'</a>';
+//'return parse_bbc($row[\'project_name\']);
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'project_name',
@@ -243,9 +245,9 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_author'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-                                                return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_author'] .'">'.$row['author'].'</a>';
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'author',
@@ -258,10 +260,10 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_deadline'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						$deadline = $row[\'deadline\'];
+                    'function' => function($row) {
+						$deadline = $row['deadline'];
                         return "<span class=\"relative-time\">$deadline</span>";
-					'),
+                    },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -307,11 +309,11 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_actions'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
+                    'function' => function($row) {
 						global $context, $settings, $scripturl;
 
-						return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
-					'),
+						return '<a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '"><img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '"><img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" /></a>';
+                    },
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -490,61 +492,62 @@ function view_proj()
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
-        'id' => 'list_tasks_of_proj',
-        'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj,       //prvi del URL-ja
+        'id'               => 'list_tasks_of_proj',
+        'items_per_page'   => 30,                                //stevilo taskov na stran
+        'base_href'        => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj.';status='.$status,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
-        'get_items' => array(
+        'get_items'        => array(
             // FUNKCIJE
 
-            'function' => create_function('$start, $items_per_page, $sort, $status', '
+            'function' => function($start, $items_per_page, $sort) use ($status, $id_proj) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
 					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
 					WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
 					ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}\',
+					LIMIT {int:start}, {int:per_page}',
 					array(
-						\'state\' => '.$status.',
-                        \'id_proj\' => '.$id_proj.',
-						\'sort\' => $sort,
-						\'start\' => $start,
-						\'per_page\' => $items_per_page,
+						'state'    => $status,
+                        'id_proj'  => $id_proj,
+						'sort'     => $sort,
+						'start'    => $start,
+						'per_page' => $items_per_page
 					)
 				);
 				$tasks = array();
-				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$tasks[] = $row;
-				$smcFunc[\'db_free_result\']($request);
+				$smcFunc['db_free_result']($request);
 
-				return $tasks;                                    //funkcija vrne taske
-                                '),
+				return $tasks;                         //funkcija vrne taske
+            },
             'params' => array(
                 'id_member' => $context['user']['id'],
-                 ),
+            ),
         ),
-
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => create_function('', '
+            'function' => function() use ($status, $id_proj) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
 			SELECT COUNT(id)
 			FROM {db_prefix}tasks T1
 			WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
-			\', array(\'state\' => '.$status.', 
-                      \'id_proj\' => '.$id_proj.')
+                    ', array(
+                        'state'   => $status,
+                        'id_proj' => $id_proj,
+                    )
 				);
-				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list($total_tasks) = $smcFunc['db_fetch_row']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $total_tasks;
-			'),
-        ),
+            }
+		),
         'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
             // ocitno imamo header, data in sort znotraj posamezne vrednosti v tabeli
@@ -558,9 +561,9 @@ function view_proj()
                     'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=vt;task_id='. $row['id'] .'">'.$row['task_name'].'</a>'; 
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'task_name',
@@ -573,11 +576,10 @@ function view_proj()
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-//'return parse_bbc($row[\'project_name\']);
-
-					),
+                    'function' => function($row) {
+                            return '<a href="'. $scripturl .'?action=delegator;sa=view_proj;id_proj='. $row['id_proj'] .'">'.$row['project_name'].'</a>';
+                    }
+//'return parse_bbc($row['project_name\']);
                 ),
                 'sort' =>  array(
                     'default' => 'project_name',
@@ -590,10 +592,10 @@ function view_proj()
                     'value' => $txt['delegator_author'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-                                                return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_author'] .'">'.$row['author'].'</a>';
                     //return parse_bbc($row[\'author\']);
-					),
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'author',
@@ -606,10 +608,10 @@ function view_proj()
                     'value' => $txt['delegator_deadline'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						$deadline = $row[\'deadline\'];
+                    'function' => function($row) {
+						$deadline = $row['deadline'];
                         return "<span class=\"relative-time\">$deadline</span>";
-					'),
+                    },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -636,10 +638,7 @@ function view_proj()
                     'value' => $txt['delegator_creation_date'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-                        $creation_date=$row[\'creation_date\'];
-                        return "$creation_date";
-					'),
+                    'function' => function ($row) { return $row['creation_date']; },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -655,13 +654,15 @@ function view_proj()
                     'value' => $txt['delegator_actions'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
+                    'function' => function($row) {
 						global $context, $settings, $scripturl;
 
-                        return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
-
-					'),
-
+                        return
+                        '<a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
+                        </a>';
+                    },
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -692,59 +693,59 @@ function view_projects()
     );
 
     $list_options = array(
-        'id' => 'list_of_projects',
-        'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=view_projects',       //prvi del URL-ja
+        'id'               => 'list_of_projects',
+        'items_per_page'   => 30,                                //stevilo taskov na stran
+        'base_href'        => $scripturl . '?action=delegator;sa=view_projects',       //prvi del URL-ja
         'default_sort_col' => 'end',                      //razvrsis taske po roku
-        'get_items' => array(
+        'get_items'        => array(
             // FUNKCIJE
 /*
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
             // $id_memberja tukaj res ne rabim...
-            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+            'function' => function($start, $items_per_page, $sort, $id_member) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
                     SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord, T2.real_name AS coordinator
                     FROM {db_prefix}projects T1  
                     LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member 
                     ORDER BY {raw:sort}     
-                    LIMIT {int:start}, {int:per_page}\',    
+                    LIMIT {int:start}, {int:per_page}',    
                     array(
-						\'id_member\' => $id_member,
-						\'sort\' => $sort,
-						\'start\' => $start,
-						\'per_page\' => $items_per_page,
+						'id_member' => $id_member,
+						'sort'      => $sort,
+						'start'     => $start,
+						'per_page'  => $items_per_page,
 					)
 				);
 				$projects = array();
-				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$projects[] = $row;
-				$smcFunc[\'db_free_result\']($request);
+				$smcFunc['db_free_result']($request);
 
-				return $projects;   '),
+                return $projects;
+            },
             'params' => array(
                 'id_member' => $context['user']['id'],
-                 ),
+             ),
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => create_function('', '
+            'function' => function() {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
 					SELECT COUNT(*)
-					FROM {db_prefix}projects T1\',
-					array(
-					)
+					FROM {db_prefix}projects T1',
+					array()
 				);
-				list($total_projects) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list($total_projects) = $smcFunc['db_fetch_row']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $total_projects;
-			'),
+            }
         ),
         'no_items_label' => $txt['delegator_projects_empty'],
         'columns' => array(
@@ -754,9 +755,9 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_project_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row','
-                               return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=view_proj;id_proj='. $row['id'] .'">'.$row['project_name'].'</a>';
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'project_name',
@@ -769,9 +770,9 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-                             return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_coord\'] .\'">\'.$row[\'coordinator\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                            return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_coord'] .'">'.$row['coordinator'].'</a>';
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'coordinator',
@@ -784,10 +785,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_project_start'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						$start = $row[\'start\'];
-                        return "$start";
-					'),
+                    'function' => function($row) { return '<span class="format-time">' . $row['start'] . '</span>'; },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -801,11 +799,8 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                     'value' => $txt['delegator_project_end'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						$end = $row[\'end\'];
-                        return "$end";
-					'),
-                    'style' => 'width: 20%; text-align: center;',
+                    'function' => function($row) { return '<span class="format-time">' . $row['end'] . '</span>'; },
+                    'style' => 'width: 20%; text-align: center;'
                 ),
                 'sort' =>  array(
                     'default' => 'end',
@@ -840,6 +835,7 @@ function view_worker()
     );
 
     $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
+    $status = getStatus1();
     // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
@@ -847,58 +843,60 @@ function view_worker()
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member,       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
 
-            'function' => create_function('$start, $items_per_page, $sort, $id_member', '
+            'function' => function($start, $items_per_page, $sort) use ( $id_member, $status) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
                                         SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
                                         LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
-                                        WHERE T1.id_member={int:id_member}
+                                        WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
                                         ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}\',
+					LIMIT {int:start}, {int:per_page}',
 					array(
-						\'id_member\' => '. $id_member .',
-						\'sort\' => $sort,
-						\'start\' => $start,
-						\'per_page\' => $items_per_page,
+						'id_member' => $id_member,
+                        'status' => $status,
+						'sort'      => $sort,
+						'start'     => $start,
+						'per_page'  => $items_per_page,
 					)
 				);
 
 				$tasks = array();
-				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$tasks[] = $row;
-				$smcFunc[\'db_free_result\']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $tasks;                                    //funkcija vrne taske
-                                '),
+            },
             'params' => array(
                 'id_member' => $context['user']['id'],
-                 ),
+             ),
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => create_function('', '
+            'function' => function() use ($id_member, $status) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}workers 
-                    WHERE id_member={int:id_member} \',
-                                          array( \'id_member\' => '. $id_member.',
+                    WHERE id_member={int:id_member} AND status = {int:status} ',
+                                          array( 'id_member' =>  $id_member,
+                                                 'status' => $status,
 					)
 				);
-				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list($total_tasks) = $smcFunc['db_fetch_row']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $total_tasks;
-			'),
+            }
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
@@ -907,9 +905,9 @@ function view_worker()
                     'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=vt;task_id='. $row['id_task'] .'">'.$row['task_name'].'</a>';
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'task_name',
@@ -922,11 +920,10 @@ function view_worker()
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-//'return parse_bbc($row[\'project_name\']);
-
-					),
+                    'function' => function($row) {
+                            return '<a href="'. $scripturl .'?action=delegator;sa=view_proj;id_proj='. $row['id_proj'] .'">'.$row['project_name'].'</a>';
+                    }
+//'return parse_bbc($row['project_name\']);
                 ),
                 'sort' =>  array(
                     'default' => 'project_name',
@@ -939,10 +936,10 @@ function view_worker()
                     'value' => $txt['delegator_author'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '
+                    'function' => function($row) {
+                            return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_author'] .'">'.$row['author'].'</a>';
+                    }
 //return parse_bbc($row[\'author\']);
-					),
                 ),
                 'sort' =>  array(
                     'default' => 'author',
@@ -955,10 +952,10 @@ function view_worker()
                     'value' => $txt['delegator_deadline'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						$deadline = $row[\'deadline\'];
+                    'function' => function($row) {
+						$deadline = $row['deadline'];
                         return "<span class=\"relative-time\">$deadline</span>";
-ls					'),
+                    },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -985,10 +982,7 @@ ls					'),
                     'value' => $txt['delegator_creation_date'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-                        $creation_date=$row[\'creation_date\'];
-                        return "$creation_date";
-					'),
+                    'function' => function($row) { return $row['creation_date']; },
                     'style' => 'width: 20%; text-align: center;',
                 ),
                 'sort' =>  array(
@@ -1004,14 +998,17 @@ ls					'),
                     'value' => $txt['delegator_actions'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
+                    'function' => function($row) {
 						global $context, $settings, $scripturl;
 
-                        return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id_task\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
-
-
-					'),
-
+                        return '
+                        <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
+                        </a>
+                        <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
+                        </a>';
+                    },
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -1036,56 +1033,25 @@ function my_tasks()
         'url' => $scripturl . '?action=delegator;sa=my_tasks',
         'name' => $txt['delegator_my_tasks']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_my_tasks
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_my_tasks dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_my_tasks label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_my_tasks dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 
     $status = getStatus1();
 
     $id_member = $context['user']['id'];
-
+    
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=my_tasks',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=my_tasks;status='.$status,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
-
-            'function' => create_function('$start, $items_per_page, $sort, $id_member, $status', '
+     
+            'function' => function($start, $items_per_page, $sort ) use ($status, $id_member) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
                                         SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
                                         FROM {db_prefix}workers T1
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
@@ -1093,45 +1059,44 @@ function my_tasks()
                                         LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
                                         WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
                                         ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}\',
+					LIMIT {int:start}, {int:per_page}',
 					array(
-						\'id_member\' => '.$id_member.',
-						\'sort\' => $sort,
-						\'start\' => $start,
-                        \'status\' => '.$status.',
-						\'per_page\' => $items_per_page,
+						'id_member' => $id_member,
+						'sort'      => $sort,
+						'start'     => $start,
+                        'status'    => $status,
+						'per_page'  => $items_per_page,
 					)
 				);
 
 				$tasks = array();
-				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$tasks[] = $row;
-				$smcFunc[\'db_free_result\']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $tasks;                                    //funkcija vrne taske
-                                '),
+            },
             'params' => array(
                 'id_member' => $context['user']['id'],
-                 ),
+            ),
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => create_function('', '
+            'function' => function() use ($id_member, $status) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
 
 					SELECT COUNT(*)
 					FROM {db_prefix}workers 
-                    WHERE id_member={int:id_member} AND status = {int:status} \',
-                                          array( \'id_member\' => '. $id_member.', \'status\' => '.$status.'
-					)
+                    WHERE id_member={int:id_member} AND status = {int:status} ',
+                        array( 'id_member' => $id_member, 'status' => $status)
 				);
-				list($total_tasks) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list($total_tasks) = $smcFunc['db_fetch_row']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $total_tasks;
-			'),
+            }
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
@@ -1146,9 +1111,9 @@ function my_tasks()
                     'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=vt;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
-					),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=vt;task_id='. $row['id_task'] .'">'.$row['task_name'].'</a>';
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'task_name',
@@ -1161,9 +1126,10 @@ function my_tasks()
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_proj;id_proj=\'. $row[\'id_proj\'] .\'">\'.$row[\'project_name\'].\'</a>\'; '
-                    ),
+                    'function' => function($row) {
+                        return '<a href="'. $scripturl .'?action=delegator;sa=view_proj;id_proj='. $row['id_proj'] .'">'.$row['project_name'].'</a>';
+                    }
+//'return parse_bbc($row[\'project_name\']);
                 ),
                 'sort' =>  array(
                     'default' => 'project_name',
@@ -1176,10 +1142,10 @@ function my_tasks()
                     'value' => $txt['delegator_author'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_member=\'. $row[\'id_author\'] .\'">\'.$row[\'author\'].\'</a>\'; '
+                    'function' => function($row) {
+						return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_author'] .'">'.$row['author'].'</a>';
 //return parse_bbc($row[\'author\']);
-					),
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'author',
@@ -1192,10 +1158,10 @@ function my_tasks()
                     'value' => $txt['delegator_deadline'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
-						$deadline = $row[\'deadline\'];
+                    'function' => function($row) {
+						$deadline = $row['deadline'];
                         return "<span class=\"relative-time\">$deadline</span>";
-					'),
+                    }
                 ),
                 'sort' =>  array(
                     'default' => 'deadline',
@@ -1237,13 +1203,17 @@ function my_tasks()
                     'value' => $txt['delegator_actions'],
                 ),
                 'data' => array(
-                    'function' => create_function('$row', '
+                    'function' => function($row) {
 						global $context, $settings, $scripturl;
 
-                return \'<a title="Edit task" href="\'. $scripturl. \'?action=delegator;sa=et;task_id=\'. $row[\'id_task\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/buttons/im_reply_all.gif" alt="Edit task" /></a><a title="Delete task" href="\'. $scripturl. \'?action=delegator;sa=del_task;task_id=\'. $row[\'id\']. \';\' . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \'"><img src="\'. $settings[\'images_url\']. \'/icons/quick_remove.gif" alt="Delete task" /></a>\';
-
-					'),
-
+                        return '
+                        <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
+                        </a>
+                        <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
+                        </a>';
+                    },
                     'style' => 'width: 10%; text-align: center;',
                 ),
             ),
@@ -1328,23 +1298,23 @@ function del_task()
 
     checkSession('get');
 
-    $task_id = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['task_id'];
 
-    zapisiLog(-1, $task_id, 'del_task'); // Has to be before DELETE happens...
+    zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
     
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}tasks
-        WHERE id = {int:task_id}',
+        WHERE id = {int:id_task}',
         array(
-            'task_id' => $task_id
+            'id_task' => $id_task
         )
     );
 
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}workers
-        WHERE id_task = {int:task_id}',
+        WHERE id_task = {int:id_task}',
         array(
-            'task_id' => $task_id
+            'id_task' => $id_task
         )
     );
     
@@ -1427,37 +1397,6 @@ function en()
         'url' => $scripturl . '?action=delegator;sa=en',
         'name' => $txt['delegator_end_task']
     );
-    $context['html_headers'] .= '
-	<style type="text/css">
-		dl.delegator_en
-		{
-			margin: 0;
-			clear: right;
-			overflow: auto;
-		}
-		dl.delegator_en dt
-		{
-			float: left;
-			clear: both;
-			width: 30%;
-			margin: 0.5em 0 0 0;
-		}
-		dl.delegator_en label
-		{
-			font-weight: bold;
-		}
-		dl.delegator_en dd
-		{
-			float: left;
-			width: 69%;
-			margin: 0.5em 0 0 0;
-		}
-		#confirm_buttons
-		{
-			text-align: center;
-			padding: 1em 0;
-		}
-	</style>';
 }
 
 function end_task()
@@ -1467,11 +1406,8 @@ function end_task()
 
     checkSession(); // ali je to ok???
 
-    $id_task = (int) $_POST['id_task'];
+    $id_task = (int) $_POST['id_task']; // @todo vse task_id je treba dat v id_task!
 
-    //print_r($id_task);
-    //print_r(isMemberWorker($id_task));die;
-    
     if (isMemberWorker($id_task)){
         $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
         
@@ -1517,7 +1453,7 @@ function view_log()
         'id' => 'log',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator;sa=view_log',       //prvi del URL-ja
-        'default_sort_col' => 'action_date DESC',                      //razvrsis taske po roku
+        'default_sort_col' => 'action_date',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
 

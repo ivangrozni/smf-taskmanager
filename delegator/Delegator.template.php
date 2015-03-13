@@ -9,6 +9,30 @@
 include "/../../Sources/delegator_helpers.php";
 // Tukaj znajo biti se tezave...
 
+// @todo se bo v helper dalo, ampak bi sel rad spat zdaj :)
+// Vnesi javascript za autocomplete
+function generateMemberSuggest ($input, $container, $param) {
+    global $context, $txt;
+    return '
+		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \'' . $context['session_id'] . '\',
+				sSessionVar: \'' . $context['session_var'] . '\',
+				sSuggestId: \'' . $input . '\',
+				sControlId: \'' . $input . '\',
+				sSearchType: \'member\',
+				bItemList: true,
+				sPostName: \'' . $param . '\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+				sItemListContainerId: \'' . $container . '\',
+				aListItems: []
+			});
+        // ]]></script>';
+}
+
 /******************
  *    Templati    *
  ******************/
@@ -52,6 +76,9 @@ function template_add()
 
         // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
         global $smcFunc;
+
+        $id_proj=(isset($_GET['id_proj']) ? $_GET['id_proj'] : FALSE ) ;
+
         $request = $smcFunc['db_query']('', '
                  SELECT id, name
                  FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
@@ -68,7 +95,7 @@ function template_add()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_add">
+				<dl class="delegator_et">
 					<dt>
                        <label for="name"> Zadolzitev </label>
 					</dt>
@@ -82,12 +109,10 @@ function template_add()
                 		<textarea name="description" rows="3" cols="30"></textarea>
                     </dd>
 					<dt>
-						<label for="duet3">', $txt['delegator_deadline'], '</label><br />
-						<span class="smalltext">', $txt['delegator_due_year'], ' - ', $txt['delegator_due_month'], ' - ', $txt['delegator_due_day'], '</span>
-					</dt>
+                        <label for="duedate">', $txt['delegator_deadline'], '</label>
+                    </dt>
 					<dd>
 						<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
-						<div id="kalender"></div>
 					</dd>
 					<dt>
 						<label for="user">Delegirani uporabniki</label>
@@ -110,7 +135,12 @@ function template_add()
 					<dd>
                        <select name="id_proj">'; // nadomestil navadno vejico
 					    while ($row = $smcFunc['db_fetch_assoc']($request)) {
-					        echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
+                            if ($row['id'] == $id_proj){
+                                    echo '<option value="'.$row['id'].'" selected >--'.$row['name'].'--</option> ';
+                                } else {
+                                    echo '<option value="'.$row['id'].'" > '.$row['name'].'</option> ';
+                                }
+                            
 					        }
 					    $smcFunc['db_free_result']($request);
         				echo '
@@ -121,27 +151,10 @@ function template_add()
 				<br />
 				<input type="submit" name="submit" value="', $txt['delegator_task_add'], '" class="button_submit" />
 			</div>
-            <span class="botslice">&nbsp;</span>
+            <span class="botslice"><span></span></span>
 		</div>
 		</form>
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to-add\',
-				sControlId: \'to-add\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'user-list\',
-				aListItems: []
-			});
-            console.log(oAddMemberSuggest);
-		// ]]></script>
+        ' . generateMemberSuggest("to-add", "user-list", "member_add") . '
 	</div><br />';
 }
 
@@ -162,7 +175,7 @@ function template_proj()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_add_proj">
+				<dl class="delegator_et">
 					<dt>
 						<label for="name">', $txt['delegator_project_name'], '</label>
 					</dt>
@@ -182,7 +195,7 @@ function template_proj()
 					<dd>
 						<input type="text" name="start" class="input_text kalender" />
 					</dd>
-<dt>
+                    <dt>
 						<label for="end">', $txt['delegator_project_end'], '</label>
 					</dt>
 					<dd>
@@ -303,7 +316,7 @@ function template_vt() // id bi bil kar dober argument
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_vt">
+			<dl class="delegator_et">
 				<dt>
 					<label for="name">', $txt['delegator_task_name'], '</label>
 				</dt>
@@ -380,7 +393,7 @@ function template_vt() // id bi bil kar dober argument
             ';
         if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
             // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
-            if(isMemberCoordinator($task_id) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=super_edit" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+                                                                             if(isMemberCoordinator($task_id) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=se;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -424,7 +437,7 @@ function template_view_proj()
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_view_proj">
+			<dl class="delegator_et">
 				<dt>
 					<label for="name">', $txt['delegator_project_name'], '</label>
 				</dt>
@@ -458,7 +471,7 @@ function template_view_proj()
 
 			</dl>
             <br />
-			<a href="index.php?action=delegator;sa=add" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
+			<a href="index.php?action=delegator;sa=add;id_proj=',$id_proj,'" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
 
            <!-- <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
             <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a> -->
@@ -470,7 +483,9 @@ function template_view_proj()
 ';
 
     $smcFunc['db_free_result']($request);
-
+    // This part shows number of tasks in different state
+    // @todo this part should be part of some upper div...
+    // also upper div should be edited properly and nicely
     $states = array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
@@ -485,8 +500,6 @@ function template_view_proj()
 
         echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
     }
-
-
     
     template_show_list('list_tasks_of_proj');
 }
@@ -513,6 +526,21 @@ function template_view_worker()
     $smcFunc['db_free_result']($request);
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+
+    $states = array (1 => 0, 2 => 0, 3 => 0, 4 => 0);
+    foreach ($states as $status2 => $count){
+         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
+        $request2 = $smcFunc['db_query']('', '
+            SELECT COUNT(id) FROM {db_prefix}workers
+            WHERE id_member={int:id_member} AND status = {int:status}',
+            array('id_member' => $id_member, 'status' => $status2) );
+        $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
+        $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
+        $states[$status2] = $count;
+        $smcFunc['db_free_result']($request2);
+
+        echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
+    }
 
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
@@ -645,62 +673,59 @@ function template_et()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_et">
-						<dt>
-                            <label for="name">', $txt['delegator_task_name'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
-                            <input type="hidden" name="id_task" value ="'.$id_task.'" />
-						</dd>
-                        <dt>
-                		    <label for="description">', $txt['delegator_task_desc'], '</label>
- 						</dt>
-                        <dd>
-                			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
-                        </dd>
-						<dt>
-							<label for="deadline">', $txt['delegator_deadline'], '</label>
-						</dt>
-						<dd>
-							<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
-                        </dd>
-						<dt>
-							<label for="user">', $txt['delegator_task_delegates'], '</label>
-						</dt>
-						<dd>
-							<input id="to-add" type="text" name="user">
-							<div id="user-list">
-                                ' . $delegates . '
-                            </div>
-						</dd>
-						<dt>
-							<label>', $txt['delegator_priority'], '</label>
-						</dt>
-						<dd>
-							<ul class="reset">
-								' . getPriorities($row, $txt) . '
-							</ul>
-						</dd>
-					</dl>
-                    <dt>
-						<label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
+                <dl class="delegator_et">
+					<dt>
+                        <label for="name">', $txt['delegator_task_name'], '</label>
 					</dt>
 					<dd>
-                    	<select name="id_proj">'; // nadomestil navadno vejico
-					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-					            if ($row_p['id'] == $row['id_proj']){
-					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
-					            }
-					            else {
-					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
-					            }
-					        }
-        					$smcFunc['db_free_result']($request_p);
-
-            			echo '
-            			</select>
+						<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
+                        <input type="hidden" name="id_task" value ="'.$id_task.'" />
 					</dd>
+                    <dt>
+               		    <label for="description">', $txt['delegator_task_desc'], '</label>
+ 					</dt>
+                    <dd>
+               			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
+                    </dd>
+					<dt>
+			    		<label for="deadline">', $txt['delegator_deadline'], '</label>
+					</dt>
+					<dd>
+						<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
+                    </dd>
+					<dt>
+						<label for="user">', $txt['delegator_task_delegates'], '</label>
+					</dt>
+					<dd>
+						<input id="to-add" type="text" name="user">
+						<div id="user-list">
+                            ' . $delegates . '
+                        </div>
+					</dd>
+					<dt>
+						<label>', $txt['delegator_priority'], '</label>
+					</dt>
+					<dd>
+						<ul class="reset">
+							' . getPriorities($row, $txt) . '
+						</ul>
+					</dd>
+                    <dt>
+                        <label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
+                    </dt>
+                    <dd>
+                        <select name="id_proj">'; // nadomestil navadno vejico
+                            while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
+                                if ($row_p['id'] == $row['id_proj']){
+                                    echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
+                                } else {
+                                    echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
+                                }
+                            }
+                            $smcFunc['db_free_result']($request_p);
+                            echo '
+                        </select>
+                    </dd>
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
@@ -709,23 +734,7 @@ function template_et()
 			<span class="botslice"><span></span></span>
 		</div>
 		</form>
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to-add\',
-				sControlId: \'to-add\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'user-list\',
-				aListItems: []
-			});
-		// ]]></script>
+    ' . generateMemberSuggest("to-add", "user-list", "member_add") .  '
 	</div><br />';
 }
 
@@ -904,7 +913,7 @@ $smcFunc['db_free_result']($request);
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_en">
+				<dl class="delegator_et">
 					<dt> <!-- tukaj more priti dolartxt[name]-->
                        <label for="name"> End Comment</label>
 					</dt>
