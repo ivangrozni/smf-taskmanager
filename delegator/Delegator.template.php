@@ -76,6 +76,9 @@ function template_add()
 
         // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
         global $smcFunc;
+
+        $id_proj=(isset($_GET['id_proj']) ? $_GET['id_proj'] : FALSE ) ;
+
         $request = $smcFunc['db_query']('', '
                  SELECT id, name
                  FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
@@ -132,7 +135,12 @@ function template_add()
 					<dd>
                        <select name="id_proj">'; // nadomestil navadno vejico
 					    while ($row = $smcFunc['db_fetch_assoc']($request)) {
-					        echo '<option value="'.$row['id'].'">'.$row['name'].'</option> ';
+                            if ($row['id'] == $id_proj){
+                                    echo '<option value="'.$row['id'].'" selected >--'.$row['name'].'--</option> ';
+                                } else {
+                                    echo '<option value="'.$row['id'].'" > '.$row['name'].'</option> ';
+                                }
+                            
 					        }
 					    $smcFunc['db_free_result']($request);
         				echo '
@@ -385,7 +393,7 @@ function template_vt() // id bi bil kar dober argument
             ';
         if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
             // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
-            if(isMemberCoordinator($task_id) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=super_edit" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+                                                                             if(isMemberCoordinator($task_id) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=se;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -463,7 +471,7 @@ function template_view_proj()
 
 			</dl>
             <br />
-			<a href="index.php?action=delegator;sa=add" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
+			<a href="index.php?action=delegator;sa=add;id_proj=',$id_proj,'" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
 
            <!-- <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
             <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a> -->
@@ -475,7 +483,9 @@ function template_view_proj()
 ';
 
     $smcFunc['db_free_result']($request);
-
+    // This part shows number of tasks in different state
+    // @todo this part should be part of some upper div...
+    // also upper div should be edited properly and nicely
     $states = array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
@@ -490,8 +500,6 @@ function template_view_proj()
 
         echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
     }
-
-
     
     template_show_list('list_tasks_of_proj');
 }
@@ -518,6 +526,21 @@ function template_view_worker()
     $smcFunc['db_free_result']($request);
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+
+    $states = array (1 => 0, 2 => 0, 3 => 0, 4 => 0);
+    foreach ($states as $status2 => $count){
+         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
+        $request2 = $smcFunc['db_query']('', '
+            SELECT COUNT(id) FROM {db_prefix}workers
+            WHERE id_member={int:id_member} AND status = {int:status}',
+            array('id_member' => $id_member, 'status' => $status2) );
+        $row2 = $smcFunc['db_fetch_assoc']($request2); // tole zna da ne bo delal
+        $count = $row2['COUNT(id)']; //kao bi moral ze to spremenit $states, ampak jih ne
+        $states[$status2] = $count;
+        $smcFunc['db_free_result']($request2);
+
+        echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$count.'</br>';
+    }
 
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 

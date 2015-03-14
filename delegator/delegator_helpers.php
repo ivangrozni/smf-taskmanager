@@ -79,12 +79,14 @@ function isMemberCoordinator( $id_proj){
 
     $request = $smcFunc['db_query']('', '
         SELECT id_coord  FROM {db_prefix}projects
-        WHERE id_proj = {int:id_proj}', array('id_proj' => $id_proj));
+        WHERE id = {int:id_proj}',
+        array('id_proj' => $id_proj, ) );
 
-    $row = $smcFunc['db_fetch_assoc']($request) 
+    $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
-    ($row['id_coord'] == $id_member ? return TRUE : return FALSE );
+    $ret = ($row['id_coord'] == $id_member ? TRUE : FALSE );
+    return $ret;
 }
 
 
@@ -129,7 +131,7 @@ function zapisiLog($id_proj, $id_task, $action){
     $smcFunc['db_insert']('', '{db_prefix}delegator_log',
                           array('id_proj' => 'int', 'id_task' => 'int', 'action' => 'string', 'id_member' => 'int', 'action_date' => 'string' ),
                           array( $id_proj, $id_task, $action, $id_member, date('Y-m-d H-i-s') ),
-                          array('id') ); 
+                          array() ); 
     //  array( $id_proj, $id_task, $action, $id_member, date('Y-m-d') ),
 }
 ?>

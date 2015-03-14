@@ -34,6 +34,8 @@ if (!defined('SMF'))
 
 include 'delegator_helpers.php';
 
+
+
 //Tu se zacne originalni To-Do list mod
 function Delegator()
 {
@@ -68,6 +70,8 @@ function Delegator()
         'my_tasks'      => 'my_tasks',             // moje naloge
         'view_projects' => 'view_projects',   // seznam vseh projektov
         'view_log'      => 'view_log',   // seznam vseh projektov
+        'se'            => 'se',
+        'super_edit'    => 'super_edit'
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -139,13 +143,14 @@ function delegator_main()                                      //glavna funkcija
 
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
-    $status       = getStatus();
-    $id_member    = $context['user']['id']; // ceprav ne rabim
+    $state       =  getStatus();
+    //print_r('state_prvic'); print_r($state);
+    //$id_member    = $context['user']['id']; // ceprav ne rabim
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id'               => 'list_tasks',
         'items_per_page'   => 30,                                //stevilo taskov na stran
-        'base_href'        => $scripturl . '?action=delegator',       //prvi del URL-ja
+        'base_href'        => $scripturl . '?action=delegator;status='.$state,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items'        => array(
             // FUNKCIJE
@@ -153,26 +158,26 @@ function delegator_main()                                      //glavna funkcija
 query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
 nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 */
-            'function' => function ($start, $items_per_page, $sort, $id_member, $status) {
+            'function' => function ($start, $items_per_page, $sort) use ($state) {
 				global $smcFunc;
-
+                //print_r('glavna');print_r($state);die;
 				$request = $smcFunc['db_query']('', '
 					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
 					FROM {db_prefix}tasks T1
 					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
+					LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
 					WHERE T1.state = {int:state}
 					ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}',
 					array(
-						'state'    => $status,
+						'state'    => $state,
 						'sort'     => $sort,
 						'start'    => $start,
 						'per_page' => $items_per_page,
 					)
 				);
 				$tasks = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request) )
 					$tasks[] = $row;
 				$smcFunc['db_free_result']($request);
 
@@ -184,20 +189,19 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => function($status) {
+            'function' => function() use ($state) {
 				global $smcFunc;
-
+                //print_r('stete drugic');print_r($state);die;
 				$request = $smcFunc['db_query']('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}tasks T1
-					WHERE T1.state = {int:state}',
-					array('state' => $status)
-				);
+					WHERE T1.state={int:state}',
+                    array( 'state' => $state, ) );
 				list($total_tasks) = $smcFunc['db_fetch_row']($request);
 				$smcFunc['db_free_result']($request);
 
 				return $total_tasks;
-            }
+            },
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
         'columns' => array(
@@ -492,12 +496,12 @@ function view_proj()
         //'id' => 'list_todos',                                //stara To-Do List koda
         'id'               => 'list_tasks_of_proj',
         'items_per_page'   => 30,                                //stevilo taskov na stran
-        'base_href'        => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj,       //prvi del URL-ja
+        'base_href'        => $scripturl . '?action=delegator;sa=view_proj;id_proj=' . $id_proj.';status='.$status,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items'        => array(
             // FUNKCIJE
 
-            'function' => function($start, $items_per_page, $sort, $status) {
+            'function' => function($start, $items_per_page, $sort) use ($status, $id_proj) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
@@ -513,7 +517,7 @@ function view_proj()
                         'id_proj'  => $id_proj,
 						'sort'     => $sort,
 						'start'    => $start,
-						'per_page' => $items_per_page,
+						'per_page' => $items_per_page
 					)
 				);
 				$tasks = array();
@@ -528,7 +532,7 @@ function view_proj()
             ),
         ),
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => function($status) {
+            'function' => function() use ($status, $id_proj) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
@@ -537,7 +541,7 @@ function view_proj()
 			WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
                     ', array(
                         'state'   => $status,
-                        'id_proj' => $id_proj
+                        'id_proj' => $id_proj,
                     )
 				);
 				list($total_tasks) = $smcFunc['db_fetch_row']($request);
@@ -833,6 +837,7 @@ function view_worker()
     );
 
     $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
+    $status = getStatus1();
     // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
@@ -840,11 +845,11 @@ function view_worker()
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member,       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
 
-            'function' => function($start, $items_per_page, $sort, $id_member) {
+            'function' => function($start, $items_per_page, $sort) use ( $id_member, $status) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
@@ -853,11 +858,12 @@ function view_worker()
                                         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
                                         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
                                         LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
-                                        WHERE T1.id_member={int:id_member}
+                                        WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
                                         ORDER BY {raw:sort}
 					LIMIT {int:start}, {int:per_page}',
 					array(
 						'id_member' => $id_member,
+                        'status' => $status,
 						'sort'      => $sort,
 						'start'     => $start,
 						'per_page'  => $items_per_page,
@@ -877,14 +883,15 @@ function view_worker()
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => function() {
+            'function' => function() use ($id_member, $status) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
 					SELECT COUNT(*)
 					FROM {db_prefix}workers 
-                    WHERE id_member={int:id_member} ',
-                                          array( 'id_member' => '. $id_member.',
+                    WHERE id_member={int:id_member} AND status = {int:status} ',
+                                          array( 'id_member' =>  $id_member,
+                                                 'status' => $status,
 					)
 				);
 				list($total_tasks) = $smcFunc['db_fetch_row']($request);
@@ -1033,18 +1040,18 @@ function my_tasks()
     $status = getStatus1();
 
     $id_member = $context['user']['id'];
-
+    
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
         'id' => 'list_tasks_of_worker',
         'items_per_page' => 30,                                //stevilo taskov na stran
-        'base_href' => $scripturl . '?action=delegator;sa=my_tasks',       //prvi del URL-ja
+        'base_href' => $scripturl . '?action=delegator;sa=my_tasks;status='.$status,       //prvi del URL-ja
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
-
-            'function' => function($start, $items_per_page, $sort, $id_member, $status) {
+     
+            'function' => function($start, $items_per_page, $sort ) use ($status, $id_member) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
@@ -1078,7 +1085,7 @@ function my_tasks()
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => function($id_member, $status) {
+            'function' => function() use ($id_member, $status) {
 				global $smcFunc;
 
 				$request = $smcFunc['db_query']('', '
@@ -1294,23 +1301,23 @@ function del_task()
 
     checkSession('get');
 
-    $task_id = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['task_id'];
 
-    zapisiLog(-1, $task_id, 'del_task'); // Has to be before DELETE happens...
+    zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
     
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}tasks
-        WHERE id = {int:task_id}',
+        WHERE id = {int:id_task}',
         array(
-            'task_id' => $task_id
+            'id_task' => $id_task
         )
     );
 
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}workers
-        WHERE id_task = {int:task_id}',
+        WHERE id_task = {int:id_task}',
         array(
-            'task_id' => $task_id
+            'id_task' => $id_task
         )
     );
     
@@ -1402,11 +1409,8 @@ function end_task()
 
     checkSession(); // ali je to ok???
 
-    $id_task = (int) $_POST['id_task'];
+    $id_task = (int) $_POST['id_task']; // @todo vse task_id je treba dat v id_task!
 
-    //print_r($id_task);
-    //print_r(isMemberWorker($id_task));die;
-    
     if (isMemberWorker($id_task)){
         $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
         
@@ -1452,7 +1456,7 @@ function view_log()
         'id' => 'log',
         'items_per_page' => 30,                                //stevilo taskov na stran
         'base_href' => $scripturl . '?action=delegator;sa=view_log',       //prvi del URL-ja
-        'default_sort_col' => 'action_date DESC',                      //razvrsis taske po roku
+        'default_sort_col' => 'action_date',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
 
