@@ -10,28 +10,6 @@ include "/../../Sources/delegator_helpers.php";
 // Tukaj znajo biti se tezave...
 
 // @todo se bo v helper dalo, ampak bi sel rad spat zdaj :)
-// Vnesi javascript za autocomplete
-function generateMemberSuggest ($input, $container, $param) {
-    global $context, $txt;
-    return '
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'' . $context['session_id'] . '\',
-				sSessionVar: \'' . $context['session_var'] . '\',
-				sSuggestId: \'' . $input . '\',
-				sControlId: \'' . $input . '\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'' . $param . '\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
-				sItemListContainerId: \'' . $container . '\',
-				aListItems: []
-			});
-        // ]]></script>';
-}
 
 /******************
  *    Templati    *
@@ -941,24 +919,7 @@ $smcFunc['db_free_result']($request);
             <span class="botslice">&nbsp;</span>
 		</div>
 		</form>
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to-add\',
-				sControlId: \'to-add\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'user-list\',
-				aListItems: []
-			});
-            console.log(oAddMemberSuggest);
-		// ]]></script>
+        ' . generateMemberSuggest('to-add', 'user-list',  'member_add') . '
 	</div><br />';
 }
 
@@ -1126,23 +1087,7 @@ function template_se()
 			<span class="botslice"><span></span></span>
 		</div>
 		</form>
-		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
-		<script type="text/javascript"><!-- // --><![CDATA[
-			var oAddMemberSuggest = new smc_AutoSuggest({
-				sSelf: \'oAddMemberSuggest\',
-				sSessionId: \'', $context['session_id'], '\',
-				sSessionVar: \'', $context['session_var'], '\',
-				sSuggestId: \'to-add\',
-				sControlId: \'to-add\',
-				sSearchType: \'member\',
-				bItemList: true,
-				sPostName: \'member_add\',
-				sURLMask: \'action=profile;u=%item_id%\',
-				sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
-				sItemListContainerId: \'user-list\',
-				aListItems: []
-			});
-		// ]]></script>
+        ' . generateMemberSuggest('to-add', 'user-list', 'member_add') . '
 	</div><br />';
 }
 

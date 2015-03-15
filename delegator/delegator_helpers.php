@@ -251,7 +251,9 @@ function ret_num($status, $what, $value){
 
 // status bi lahko bil argument in glede na to vrnil deadline...
 // NE DELA PRAV!!!
-function show_list(){
+function show_task_list() {
+
+    global $txt, $scripturl;
 
     $columns = array(
         'name' => array(		// TASK
@@ -367,6 +369,34 @@ function show_list(){
     return $columns;
 }
 
+/**************************************************
+ * Vnesi javascript za autocomplete               *
+ *                                                *
+ * input     - input box, za vpis memberja        *
+ * container - prostor za rezultate               *
+ * param     - parameter ki nosi seznam memberjev *
+ *************************************************/
+function generateMemberSuggest ($input, $container, $param) {
+    global $context, $txt;
+    return '
+		<script type="text/javascript" src="Themes/default/scripts/suggest.js?fin20"></script>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			var oAddMemberSuggest = new smc_AutoSuggest({
+				sSelf: \'oAddMemberSuggest\',
+				sSessionId: \'' . $context['session_id'] . '\',
+				sSessionVar: \'' . $context['session_var'] . '\',
+				sSuggestId: \'' . $input . '\',
+				sControlId: \'' . $input . '\',
+				sSearchType: \'member\',
+				bItemList: true,
+				sPostName: \'' . $param . '\',
+				sURLMask: \'action=profile;u=%item_id%\',
+				sTextDeleteItem: \'' . $txt['autosuggest_delete_item'] . '\',
+				sItemListContainerId: \'' . $container . '\',
+				aListItems: []
+			});
+        // ]]></script>';
+}
 
 
 ?>
