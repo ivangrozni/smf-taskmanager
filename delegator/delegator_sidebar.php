@@ -6,7 +6,7 @@
  * Moje Zadolzitve za rokom obarva rdece                         *
  *****************************************************************/
 
-function getPriorityIcon($row) {
+function getPriorityIcon2($row) {
     global $settings, $txt;
 
     if ($row['priority'] == 0)
@@ -65,7 +65,7 @@ function show(){
         if ($today > $row['deadline']) echo '<font color="red">' .$row['deadline'].'</font></td>';
         else echo $row['deadline'].'</td>';
         //echo '<td>'.$row['priority'].'</td></tr>';
-        echo  '<td>'. getPriorityIcon($row) . '</td></tr>';
+        echo  '<td>'. getPriorityIcon2($row) . '</td></tr>';
 }
     echo '</table>';
     $smcFunc['db_free_result']($request);

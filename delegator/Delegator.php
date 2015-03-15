@@ -155,29 +155,7 @@ function delegator_main()                                      //glavna funkcija
             // FUNKCIJE
 
             'function' => function ($start, $items_per_page, $sort) use ($state) {
-				global $smcFunc;
-                //print_r('glavna');print_r($state);die;
-				$request = $smcFunc['db_query']('', '
-					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
-					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-					WHERE T1.state = {int:state}
-					ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}',
-					array(
-						'state'    => $state,
-						'sort'     => $sort,
-						'start'    => $start,
-						'per_page' => $items_per_page,
-					)
-				);
-				$tasks = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request) )
-					$tasks[] = $row;
-				$smcFunc['db_free_result']($request);
-
-				return $tasks;               //funkcija vrne taske
+                return ret_tasks($state, "None", 1, $sort, $start, $items_per_page);
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -186,17 +164,7 @@ function delegator_main()                                      //glavna funkcija
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($state) {
-				global $smcFunc;
-                //print_r('stete drugic');print_r($state);die;
-				$request = $smcFunc['db_query']('', '
-					SELECT COUNT(*)
-					FROM {db_prefix}tasks T1
-					WHERE T1.state={int:state}',
-                    array( 'state' => $state, ) );
-				list($total_tasks) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
-				return $total_tasks;
+				return ret_num($state, "None", 1);
             },
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
@@ -383,30 +351,7 @@ function view_proj()
             // FUNKCIJE
 
             'function' => function($start, $items_per_page, $sort) use ($status, $id_proj) {
-				global $smcFunc;
-
-				$request = $smcFunc['db_query']('', '
-					SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
-					FROM {db_prefix}tasks T1
-					LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-					LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
-					WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
-					ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}',
-					array(
-						'state'    => $status,
-                        'id_proj'  => $id_proj,
-						'sort'     => $sort,
-						'start'    => $start,
-						'per_page' => $items_per_page
-					)
-				);
-				$tasks = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$tasks[] = $row;
-				$smcFunc['db_free_result']($request);
-
-				return $tasks;                         //funkcija vrne taske
+                return ret_tasks($status, "Project", $id_proj, $sort, $start, $items_per_page);
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -414,21 +359,7 @@ function view_proj()
         ),
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($status, $id_proj) {
-				global $smcFunc;
-
-				$request = $smcFunc['db_query']('', '
-			SELECT COUNT(id)
-			FROM {db_prefix}tasks T1
-			WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
-                    ', array(
-                        'state'   => $status,
-                        'id_proj' => $id_proj,
-                    )
-				);
-				list($total_tasks) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
-				return $total_tasks;
+                return ret_num($status, "Project", $id_proj);
             }
 		),
         'no_items_label' => $txt['delegator_tasks_empty'],
@@ -668,32 +599,7 @@ function my_tasks()
             // FUNKCIJE
      
             'function' => function($start, $items_per_page, $sort ) use ($status, $id_member) {
-				global $smcFunc;
-
-				$request = $smcFunc['db_query']('', '
-                                        SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
-                                        FROM {db_prefix}workers T1
-                                        LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
-                                        LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
-                                        LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
-                                        WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
-                                        ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}',
-					array(
-						'id_member' => $id_member,
-						'sort'      => $sort,
-						'start'     => $start,
-                        'status'    => $status,
-						'per_page'  => $items_per_page,
-					)
-				);
-
-				$tasks = array();
-				while ($row = $smcFunc['db_fetch_assoc']($request))
-					$tasks[] = $row;
-				$smcFunc['db_free_result']($request);
-
-				return $tasks;                                    //funkcija vrne taske
+                return ret_tasks($status, "Worker", $id_member);
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -702,19 +608,7 @@ function my_tasks()
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($id_member, $status) {
-				global $smcFunc;
-
-				$request = $smcFunc['db_query']('', '
-
-					SELECT COUNT(*)
-					FROM {db_prefix}workers 
-                    WHERE id_member={int:id_member} AND status = {int:status} ',
-                        array( 'id_member' => $id_member, 'status' => $status)
-				);
-				list($total_tasks) = $smcFunc['db_fetch_row']($request);
-				$smcFunc['db_free_result']($request);
-
-				return $total_tasks;
+                return ret_num($status, "Worker", $id_member);
             }
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
