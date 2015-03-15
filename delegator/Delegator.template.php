@@ -1076,6 +1076,24 @@ function template_se()
             			echo '
             			</select>
 					</dd>
+
+						<dt>
+							<label for="state">', $txt['delegator_state'], '</label>
+						</dt>
+						<dd>
+                            <select name="state">';
+
+                        for ($i = 0; $i <= 5; $i++){
+                            if ($row['state'] == $i) echo '<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> ';
+                            else echo '<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ';
+                            
+                        }
+
+
+                        echo   ' </select>
+
+                        </dd>
+
 						<dt>
 							<label for="start_date">', $txt['delegator_task_start_date'], '</label>
 						</dt>

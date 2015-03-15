@@ -134,4 +134,239 @@ function zapisiLog($id_proj, $id_task, $action){
                           array() ); 
     //  array( $id_proj, $id_task, $action, $id_member, date('Y-m-d') ),
 }
+
+// Prva Funkcija dobi argument status in optional id_member, Vrne taske!
+// Druga Funkcija dobi iste argumente in vrne stevilo taskov...
+// Fora je, da se bo dalo rezultate obeh funkcij združit/seštet...
+
+
+function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
+    /*****************************************
+    Input: $status (int), $what(string) $value(int)
+    !!! Much attention needed: $what = [None, Project, Worker]
+
+     **************************************** */
+
+    global $smcFunc;
+
+    if ($what == "None") {
+
+        $query = '
+		SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
+		FROM {db_prefix}tasks T1
+		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
+		WHERE T1.state = {int:state}
+		ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:per_page}';
+
+        $values = array (
+            'state' => $status,
+            'sort'      => $sort,
+            'start'     => $start,
+            'per_page'  => $items_per_page,);
+
+    }
+
+    elseif ($what == "Project") {
+       $query = '
+           SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
+		   FROM {db_prefix}tasks T1
+		   LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+		   LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
+		   WHERE T1.state = {int:state} AND T1.id_proj = {int:id_proj}
+		   ORDER BY {raw:sort}
+		   LIMIT {int:start}, {int:per_page}';
+
+       $values = array(
+						'state'    => $status,
+                        'id_proj'  => $value,
+						'sort'     => $sort,
+						'start'    => $start,
+						'per_page' => $items_per_page);
+    }
+
+    elseif ($what == "Worker"){
+        $query = 'SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
+        FROM {db_prefix}workers T1
+        LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
+        LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
+        LEFT JOIN {db_prefix}members T4 ON T2.id_author = T4.id_member
+        WHERE T1.id_member={int:id_member} AND T1.status = {int:status}
+        ORDER BY {raw:sort}
+		LIMIT {int:start}, {int:per_page}';
+
+    $values = array(
+            'id_member' => $value,
+            'status' => $status,
+            'sort'      => $sort,
+            'start'     => $start,
+            'per_page'  => $items_per_page,
+    );
+    }
+
+    else {return "Wrng input";  }
+             
+    
+    $request = $smcFunc['db_query']('', $query , $values );
+
+    $tasks = array();
+    while ($row = $smcFunc['db_fetch_assoc']($request))
+        $tasks[] = $row;
+    $smcFunc['db_free_result']($request);
+    
+    return $tasks;                                    //funkcija vrne taske
+   
+    }
+
+function ret_num($status, $what, $value){
+    global $smcFunc;
+
+    $query = 'SELECT COUNT(id) FROM {db_prefix}';
+    
+    if ($what == "None") {
+        $query = $query . 'tasks WHERE state={int:state}';
+        $values = array ('state' => $status );
+        
+    }
+    elseif ($what == "Project") {
+        $query = $query . 'tasks WHERE state = {int:state} AND id_proj = {int:id_proj}';
+        $values = array ('state'   => $status,
+                         'id_proj' => $value,);
+    }
+    elseif ($what == "Worker"){
+        $query = $query . 'workers 
+                    WHERE id_member={int:id_member} AND status = {int:status}';
+        $values = array ('id_member' =>  $value,
+                         'status' => $status,);
+    }
+
+    $request = $smcFunc['db_query']('', $query , $values );
+    list($total_tasks) = $smcFunc['db_fetch_row']($request);
+    $smcFunc['db_free_result']($request);
+
+    return $total_tasks;
+}
+
+
+// status bi lahko bil argument in glede na to vrnil deadline...
+// NE DELA PRAV!!!
+function show_list(){
+
+    $columns = array(
+        'name' => array(		// TASK
+            'header' => array(
+                'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
+            ),
+            'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
+                'function' => function($row) {
+                    return '<a href="'. $scripturl .'?action=delegator;sa=vt;task_id='. $row['id_task'] .'">'.$row['task_name'].'</a>';
+                }
+            ),
+            'sort' =>  array(
+                'default' => 'task_name',
+                'reverse' => 'task_name DESC',
+            ),
+        ),
+
+        'project' => array(      //PROJEKT - dela!
+            'header' => array(
+                'value' => $txt['delegator_project_name'],      //dodano v modification.xml
+            ),
+            'data' => array(
+                'function' => function($row) {
+                    return '<a href="'. $scripturl .'?action=delegator;sa=view_proj;id_proj='. $row['id_proj'] .'">'.$row['project_name'].'</a>';
+                }
+            ),
+            'sort' =>  array(
+                'default' => 'project_name',
+                'reverse' => 'project_name DESC',
+            ),
+        ),
+
+	    'author' => array(      //AVTOR - dela!
+            'header' => array(
+                'value' => $txt['delegator_author'],      //dodano v modification.xml
+            ),
+            'data' => array(
+                'function' => function($row) {
+                    return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_author'] .'">'.$row['author'].'</a>';
+                }
+            ),
+            'sort' =>  array(
+                'default' => 'author',
+                'reverse' => 'author DESC',
+            ),
+        ),
+
+        'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+            'header' => array(
+                'value' => $txt['delegator_deadline'],
+            ),
+            'data' => array(
+                'function' => function($row) {
+                    $deadline = $row['deadline'];
+                    return "<span class=\"relative-time\">$deadline</span>";
+                },
+            ),
+            //'style' => 'width: 20%; text-align: center;',
+
+            'sort' =>  array(
+                'default' => 'deadline',
+                'reverse' => 'deadline DESC',
+            ),
+        ),
+             // spet undefined index priority je v errolog-u
+        'priority' => array(      //POMEMBNOST
+            'header' => array(
+                'value' => $txt['delegator_priority'],
+            ),
+            'data' => array(
+                    'function' => getPriorityIcon,
+                    'style' => 'width: 10%; text-align: center;',
+            ),
+            'sort' =>  array(
+                'default' => 'priority',
+                'reverse' => 'priority DESC',
+            ),
+        ),
+        'creation_date' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+            'header' => array(
+                'value' => $txt['delegator_creation_date'],
+            ),
+            'data' => array(
+                'function' => function($row) { return $row['creation_date']; },
+                'style' => 'width: 20%; text-align: center;',
+            ),
+            'sort' =>  array(
+                'default' => 'creation_date',
+                'reverse' => 'creation_date DESC',
+            ),
+        ),
+        'actions' => array(      //Zakljuci/Skenslaj (se koda od To-Do Lista)
+            'header' => array(
+                'value' => $txt['delegator_actions'],
+            ),
+            'data' => array(
+                'function' => function($row) {
+                    global $context, $settings, $scripturl;
+
+                    return '
+                        <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
+                        </a>
+                        <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
+                        </a>';
+                    },
+                    'style' => 'width: 10%; text-align: center;',
+            ),
+        ),
+    );
+
+    return $columns;
+}
+
+
+
 ?>

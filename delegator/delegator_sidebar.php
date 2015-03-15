@@ -6,6 +6,19 @@
  * Moje Zadolzitve za rokom obarva rdece                         *
  *****************************************************************/
 
+function getPriorityIcon($row) {
+    global $settings, $txt;
+
+    if ($row['priority'] == 0)
+        $image = 'warning_watch';
+    elseif ($row['priority'] == 1)
+        $image = 'warn';
+    elseif ($row['priority'] == 2)
+        $image = 'warning_mute';
+
+    return '<img src="'. $settings['images_url']. '/'. $image. '.gif" title="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" alt="Priority: ' . $txt['delegator_priority_' . $row['priority']] . '" /> ';
+}
+
 function show(){
     
     global $smcFunc, $context, $txt, $scipturl;
@@ -51,7 +64,8 @@ function show(){
           <td>';
         if ($today > $row['deadline']) echo '<font color="red">' .$row['deadline'].'</font></td>';
         else echo $row['deadline'].'</td>';
-        echo '<td>'.$row['priority'].'</td></tr>';
+        //echo '<td>'.$row['priority'].'</td></tr>';
+        echo  '<td>'. getPriorityIcon($row) . '</td></tr>';
 }
     echo '</table>';
     $smcFunc['db_free_result']($request);
