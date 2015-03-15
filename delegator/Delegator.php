@@ -532,7 +532,7 @@ function view_worker()
     );
 
     $id_member = (int) $_GET['id_member']; // valda, tole vrne kr neki...
-    $status = getStatus1();
+    $status = getStatus(true);
     // id_member ze ima pravo vradnost, a ocitno se query izvrsi za trenutnega uporabnika
 
     //print_r("PRED VSEM"); die;
@@ -574,8 +574,6 @@ function view_worker()
 
 function my_tasks()
 {
-
-    
     global $smcFunc, $scripturl, $context, $txt, $sourcedir;
 
     $context['sub_template'] = 'my_tasks';
@@ -584,7 +582,7 @@ function my_tasks()
         'name' => $txt['delegator_my_tasks']
     );
 
-    $status = getStatus1();
+    $status = getStatus(true);
 
     $id_member = $context['user']['id'];
     
@@ -599,7 +597,7 @@ function my_tasks()
             // FUNKCIJE
      
             'function' => function($start, $items_per_page, $sort ) use ($status, $id_member) {
-                return ret_tasks($status, "Worker", $id_member);
+                return ret_tasks($status, "Worker", $id_member, $sort, $start, $items_per_page);
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
