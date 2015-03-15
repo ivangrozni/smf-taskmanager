@@ -27,23 +27,14 @@ function getPriorities($row, $txt)
     return $priorities;
 }
 
-function getStatus(){
+// Get status (ce gledas memberja, podas true in gre od 1 naprej)
+function getStatus($isMember = false){
 
     if( isset($_GET['status']) ){
         $status = $_GET['status'];
     }
     else{
-        $status = 0;
-    }
-    return $status;
-}
-
-function getStatus1(){
-    if( isset($_GET['status']) ){
-        $status = $_GET['status'];
-    }
-    else{
-        $status = 1;
+        $status = ($isMember) ? 1 : 0;
     }
     return $status;
 }
