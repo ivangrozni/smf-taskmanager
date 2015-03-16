@@ -28,6 +28,7 @@ function getPriorities($row, $txt)
 }
 
 // Get status (ce gledas memberja, podas true in gre od 1 naprej)
+// @todo Preveri ali je int ali ni!!!
 function getStatus($isMember = false){
 
     if( isset($_GET['status']) ){
@@ -143,7 +144,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
     if ($what == "None") {
 
         $query = '
-		SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
+		SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
@@ -161,7 +162,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
 
     elseif ($what == "Project") {
        $query = '
-           SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
+           SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
 		   FROM {db_prefix}tasks T1
 		   LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		   LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
@@ -348,7 +349,7 @@ function show_task_list() {
                         <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                             <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
                         </a>
-                        <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                        <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                             <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
                         </a>';
                     },

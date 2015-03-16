@@ -143,7 +143,7 @@ function delegator_main()                                      //glavna funkcija
 
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
-    $state       =  getStatus();
+    $state       =  getStatus(false);
 
     $list_options = array(
         //'id' => 'list_todos',                                //stara To-Do List koda
@@ -155,7 +155,19 @@ function delegator_main()                                      //glavna funkcija
             // FUNKCIJE
 
             'function' => function ($start, $items_per_page, $sort) use ($state) {
-                return ret_tasks($state, "None", 1, $sort, $start, $items_per_page);
+                if ($state=="unfinished") {
+                        $tasks0 = ret_tasks(0, "None", 1, $sort, $start, $items_per_page);
+                        $tasks1 = ret_tasks(1, "None", 1, $sort, $start, $items_per_page);
+                        return array_merge($tasks0, $tasks1);
+                    }
+                elseif ($state=="finished") {
+                        $tasks2 = ret_tasks(2, "None", 1, $sort, $start, $items_per_page);
+                        $tasks3 = ret_tasks(3, "None", 1, $sort, $start, $items_per_page);
+                        $tasks4 = ret_tasks(4, "None", 1, $sort, $start, $items_per_page);
+                        return (array_merge($tasks2, $tasks3, $tasks4));
+                        
+                    }
+                else return ret_tasks($state, "None", 1, $sort, $start, $items_per_page);
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -164,7 +176,13 @@ function delegator_main()                                      //glavna funkcija
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($state) {
-				return ret_num($state, "None", 1);
+                if ($state=="unfinished") {
+                    return (ret_num(0, "None", 1) + ret_num(1, "None", 1));
+                }
+                elseif ($state=="finished") {
+                    return (ret_num(2, "None", 1) + ret_num(3, "None", 1) + ret_num(4, "None", 1) );
+                }
+                else return ret_num($state, "None", 1);
             },
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
@@ -351,7 +369,19 @@ function view_proj()
             // FUNKCIJE
 
             'function' => function($start, $items_per_page, $sort) use ($status, $id_proj) {
-                return ret_tasks($status, "Project", $id_proj, $sort, $start, $items_per_page);
+                if ($status=="unfinished") {
+                    $tasks0 = ret_tasks(0, "Project", $id_proj, $sort, $start, $items_per_page);
+                    $tasks1 = ret_tasks(1, "Project", $id_proj, $sort, $start, $items_per_page);
+                    return array_merge($tasks0, $tasks1);
+                }
+                elseif ($status=="finished") {
+                    $tasks2 = ret_tasks(2, "Project", $id_proj, $sort, $start, $items_per_page);
+                    $tasks3 = ret_tasks(3, "Project", $id_proj, $sort, $start, $items_per_page);
+                    $tasks4 = ret_tasks(4, "Project", $id_proj, $sort, $start, $items_per_page);
+                    return (array_merge($tasks2, $tasks3, $tasks4));
+                        
+                    }
+                else return ret_tasks($status, "Project", $id_proj, $sort, $start, $items_per_page);
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -359,7 +389,13 @@ function view_proj()
         ),
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($status, $id_proj) {
-                return ret_num($status, "Project", $id_proj);
+                if ($status=="unfinished") {
+                    return (ret_num(0, "Project", $id_proj) + ret_num(1, "Project", $id_proj) );
+                }
+                elseif ($status=="finished") {
+                    return (ret_num(2, "Project", $id_proj) + ret_num(3, "Project", $id_proj) + ret_num(4, "Project", $id_proj) );
+                }
+                else return ret_num($status, "Project", $id_proj);
             }
 		),
         'no_items_label' => $txt['delegator_tasks_empty'],
@@ -546,8 +582,19 @@ function view_worker()
         'get_items' => array(
 
             'function' => function($start, $items_per_page, $sort) use ( $id_member, $status) {
-                //print_r("tasks"); die;
-				return ret_tasks($status, "Worker", $id_member, $sort, $start, $items_per_page);                                    //funkcija vrne taske
+                if ($status=="unfinished") {
+                    $tasks0 = ret_tasks(0, "Worker", $id_member, $sort, $start, $items_per_page);
+                    $tasks1 = ret_tasks(1, "Worker", $id_member, $sort, $start, $items_per_page);
+                    return array_merge($tasks0, $tasks1);
+                }
+                elseif ($status=="finished") {
+                    $tasks2 = ret_tasks(2, "Worker", $id_member, $sort, $start, $items_per_page);
+                    $tasks3 = ret_tasks(3, "Worker", $id_member, $sort, $start, $items_per_page);
+                    $tasks4 = ret_tasks(4, "Worker", $id_member, $sort, $start, $items_per_page);
+                    return (array_merge($tasks2, $tasks3, $tasks4));
+                }
+
+                else return ret_tasks($status, "Worker", $id_member, $sort, $start, $items_per_page);                                    //funkcija vrne taske
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -556,8 +603,14 @@ function view_worker()
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($id_member, $status) {
-                //print_r("count"); die;
-				return ret_num($status, "Worker", $id_member);
+                if ($status=="unfinished") {
+                    return (ret_num(0, "Worker", $id_member) + ret_num(1, "Worker", $id_member) );
+                }
+                elseif ($status=="finished") {
+                    return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker", $id_member) + ret_num(4, "Project", $id_proj) );
+                }
+                else return ret_num($status, "Worker", $id_member);
+
             }
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
@@ -597,7 +650,19 @@ function my_tasks()
             // FUNKCIJE
      
             'function' => function($start, $items_per_page, $sort ) use ($status, $id_member) {
-                return ret_tasks($status, "Worker", $id_member, $sort, $start, $items_per_page);
+                if ($status=="unfinished") {
+                    $tasks0 = ret_tasks(0, "Worker", $id_member, $sort, $start, $items_per_page);
+                    $tasks1 = ret_tasks(1, "Worker", $id_member, $sort, $start, $items_per_page);
+                    return array_merge($tasks0, $tasks1);
+                }
+                elseif ($status=="finished") {
+                    $tasks2 = ret_tasks(2, "Worker", $id_member, $sort, $start, $items_per_page);
+                    $tasks3 = ret_tasks(3, "Worker", $id_member, $sort, $start, $items_per_page);
+                    $tasks4 = ret_tasks(4, "Worker", $id_member, $sort, $start, $items_per_page);
+                    return array_merge($tasks2, $tasks3, $tasks4);
+                }
+
+                else return ret_tasks($status, "Worker", $id_member, $sort, $start, $items_per_page);                                    //funkcija vrne taske
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -606,7 +671,13 @@ function my_tasks()
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($id_member, $status) {
-                return ret_num($status, "Worker", $id_member);
+                if ($status=="unfinished") {
+                    return (ret_num(0, "Worker",$id_member) + ret_num(1, "Worker",$id_member) );
+                }
+                elseif ($status=="finished") {
+                    return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker",$id_member) + ret_num(4, "Worker",$id_member) );
+                }
+                else return ret_num($status, "Worker", $id_member);
             }
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
