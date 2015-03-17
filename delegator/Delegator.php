@@ -143,31 +143,32 @@ function delegator_main()                                      //glavna funkcija
 
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
-    $state       =  getStatus(false);
-
+    $status       =  getStatus(false);
+    //print_r($status); print_r($status=="unfinished");
     $list_options = array(
-        //'id' => 'list_todos',                                //stara To-Do List koda
+
         'id'               => 'list_tasks',
         'items_per_page'   => 30, 
-        'base_href'        => $scripturl . '?action=delegator;status='.$state,      
+        'base_href'        => $scripturl . '?action=delegator;status='.$status,      
         'default_sort_col' => 'deadline',                      
         'get_items'        => array(
-            // FUNKCIJE
 
-            'function' => function ($start, $items_per_page, $sort) use ($state) {
-                if ($state=="unfinished") {
-                        $tasks0 = ret_tasks(0, "None", 1, $sort, $start, $items_per_page);
-                        $tasks1 = ret_tasks(1, "None", 1, $sort, $start, $items_per_page);
-                        return array_merge($tasks0, $tasks1);
+            'function' => function ($start, $items_per_page, $sort) use ($status) {
+                if ($status==="unfinished") {
+                    $tasks0 = ret_tasks(0, "None", 1, $sort, $start, $items_per_page);
+                    $tasks1 = ret_tasks(1, "None", 1, $sort, $start, $items_per_page);
+                    return array_merge($tasks0, $tasks1);
                     }
-                elseif ($state=="finished") {
-                        $tasks2 = ret_tasks(2, "None", 1, $sort, $start, $items_per_page);
-                        $tasks3 = ret_tasks(3, "None", 1, $sort, $start, $items_per_page);
-                        $tasks4 = ret_tasks(4, "None", 1, $sort, $start, $items_per_page);
-                        return (array_merge($tasks2, $tasks3, $tasks4));
+                elseif ($status==="finished") {
+                    $tasks2 = ret_tasks(2, "None", 1, $sort, $start, $items_per_page);
+                    $tasks3 = ret_tasks(3, "None", 1, $sort, $start, $items_per_page);
+                    $tasks4 = ret_tasks(4, "None", 1, $sort, $start, $items_per_page);
+                    return (array_merge($tasks2, $tasks3, $tasks4));
                         
                     }
-                else return ret_tasks($state, "None", 1, $sort, $start, $items_per_page);
+                else {
+                    return ret_tasks($status, "None", 1, $sort, $start, $items_per_page);
+                }
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
@@ -175,18 +176,20 @@ function delegator_main()                                      //glavna funkcija
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => function() use ($state) {
-                if ($state=="unfinished") {
+            'function' => function() use ($status) {
+                if ($status==="unfinished") {
+                    //print_r("state unfinished - count"); print_r($status);
                     return (ret_num(0, "None", 1) + ret_num(1, "None", 1));
                 }
-                elseif ($state=="finished") {
+                elseif ($status==="finished") {
+                    //print_r("state finished - count");
                     return (ret_num(2, "None", 1) + ret_num(3, "None", 1) + ret_num(4, "None", 1) );
                 }
-                else return ret_num($state, "None", 1);
+                else return ret_num($status, "None", 1);
             },
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
-        'columns' => show_task_list()
+        'columns' => show_task_list($status)
     );
 
     require_once($sourcedir . '/Subs-List.php');
@@ -369,12 +372,12 @@ function view_proj()
             // FUNKCIJE
 
             'function' => function($start, $items_per_page, $sort) use ($status, $id_proj) {
-                if ($status=="unfinished") {
+                if ($status==="unfinished") {
                     $tasks0 = ret_tasks(0, "Project", $id_proj, $sort, $start, $items_per_page);
                     $tasks1 = ret_tasks(1, "Project", $id_proj, $sort, $start, $items_per_page);
                     return array_merge($tasks0, $tasks1);
                 }
-                elseif ($status=="finished") {
+                elseif ($status==="finished") {
                     $tasks2 = ret_tasks(2, "Project", $id_proj, $sort, $start, $items_per_page);
                     $tasks3 = ret_tasks(3, "Project", $id_proj, $sort, $start, $items_per_page);
                     $tasks4 = ret_tasks(4, "Project", $id_proj, $sort, $start, $items_per_page);
@@ -389,17 +392,17 @@ function view_proj()
         ),
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($status, $id_proj) {
-                if ($status=="unfinished") {
+                if ($status==="unfinished") {
                     return (ret_num(0, "Project", $id_proj) + ret_num(1, "Project", $id_proj) );
                 }
-                elseif ($status=="finished") {
+                elseif ($status==="finished") {
                     return (ret_num(2, "Project", $id_proj) + ret_num(3, "Project", $id_proj) + ret_num(4, "Project", $id_proj) );
                 }
                 else return ret_num($status, "Project", $id_proj);
             }
 		),
         'no_items_label' => $txt['delegator_tasks_empty'],
-        'columns' => show_task_list()
+        'columns' => show_task_list($status)
     );
 
     require_once($sourcedir . '/Subs-List.php');
@@ -582,12 +585,12 @@ function view_worker()
         'get_items' => array(
 
             'function' => function($start, $items_per_page, $sort) use ( $id_member, $status) {
-                if ($status=="unfinished") {
+                if ($status==="unfinished") {
                     $tasks0 = ret_tasks(0, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks1 = ret_tasks(1, "Worker", $id_member, $sort, $start, $items_per_page);
                     return array_merge($tasks0, $tasks1);
                 }
-                elseif ($status=="finished") {
+                elseif ($status==="finished") {
                     $tasks2 = ret_tasks(2, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks3 = ret_tasks(3, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks4 = ret_tasks(4, "Worker", $id_member, $sort, $start, $items_per_page);
@@ -603,10 +606,10 @@ function view_worker()
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($id_member, $status) {
-                if ($status=="unfinished") {
+                if ($status==="unfinished") {
                     return (ret_num(0, "Worker", $id_member) + ret_num(1, "Worker", $id_member) );
                 }
-                elseif ($status=="finished") {
+                elseif ($status==="finished") {
                     return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker", $id_member) + ret_num(4, "Project", $id_proj) );
                 }
                 else return ret_num($status, "Worker", $id_member);
@@ -615,7 +618,7 @@ function view_worker()
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
 
-        'columns' => show_task_list()
+        'columns' => show_task_list($status)
     );
 
     require_once($sourcedir . '/Subs-List.php');
@@ -649,13 +652,14 @@ function my_tasks()
         'get_items' => array(
             // FUNKCIJE
      
-            'function' => function($start, $items_per_page, $sort ) use ($status, $id_member) {
-                if ($status=="unfinished") {
+            'function' => function($start, $items_per_page, $sort ) use ($id_member, $status) {
+                
+                if ($status==="unfinished") {
                     $tasks0 = ret_tasks(0, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks1 = ret_tasks(1, "Worker", $id_member, $sort, $start, $items_per_page);
                     return array_merge($tasks0, $tasks1);
                 }
-                elseif ($status=="finished") {
+                elseif ($status==="finished") {
                     $tasks2 = ret_tasks(2, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks3 = ret_tasks(3, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks4 = ret_tasks(4, "Worker", $id_member, $sort, $start, $items_per_page);
@@ -671,17 +675,17 @@ function my_tasks()
 
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($id_member, $status) {
-                if ($status=="unfinished") {
-                    return (ret_num(0, "Worker",$id_member) + ret_num(1, "Worker",$id_member) );
+                if ($status==="unfinished") {
+                    return (ret_num(0, "Worker", $id_member) + ret_num(1, "Worker", $id_member) );
                 }
-                elseif ($status=="finished") {
-                    return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker",$id_member) + ret_num(4, "Worker",$id_member) );
+                elseif ($status==="finished") {
+                    return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker", $id_member) + ret_num(4, "Worker", $id_member) );
                 }
                 else return ret_num($status, "Worker", $id_member);
             }
         ),
         'no_items_label' => $txt['delegator_tasks_empty'],
-        'columns' => show_task_list()
+        'columns' => show_task_list($status)
     );
 
     require_once($sourcedir . '/Subs-List.php');
@@ -1061,6 +1065,26 @@ function view_log()
     createList($list_options);
 }
 
+function del_log()
+{
+    global $smcFunc, $context;
+
+    //checkSession('get');
+
+    $smcFunc['db_query']('', '
+        DELETE * FROM {db_prefix}delegator_log',
+        array());
+    //        TRUNCATE {db_prefix}delegator_log
+    redirectexit('action=delegator');
+}
+
+
+
+
+/************************************************************
+ *** ******************* Super Edit *************************
+ ************************************************************/
+
 function se()
 {
     // Super edit funkcija - koordinator lahko vrne projekt v nedokončano stanje
@@ -1105,7 +1129,7 @@ function super_edit()
 
     // Preveri, ce obstajajo workerji in je slucajno stanje nic
     // To ne gre...
-        if (count($members) AND $state==0) $state = 1;    
+        if (count($members) AND $state===0) $state = 1;    
     
         $smcFunc['db_query']('','
         UPDATE {db_prefix}tasks
@@ -1134,6 +1158,8 @@ function super_edit()
     else redirectexit('action=delegator;sa=vt&task_id='.$id_task);
     
 }
+
+
 
 
 is_not_guest();

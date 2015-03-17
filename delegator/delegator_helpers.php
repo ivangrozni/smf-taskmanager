@@ -140,7 +140,6 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
      **************************************** */
 
     global $smcFunc;
-
     if ($what == "None") {
 
         $query = '
@@ -199,9 +198,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
 
     else {return "Wrng input";  }
              
-    
     $request = $smcFunc['db_query']('', $query , $values );
-
     $tasks = array();
     while ($row = $smcFunc['db_fetch_assoc']($request))
         $tasks[] = $row;
@@ -242,10 +239,14 @@ function ret_num($status, $what, $value){
 
 
 // status bi lahko bil argument in glede na to vrnil deadline...
-// NE DELA PRAV!!!
-function show_task_list() {
-
+// @todo function show_task_list($finished=false) {
+function show_task_list($status) {
+    if ($status === "unfinished") $status = 0;
+    elseif ($status === "finished") $status = 2;
+    //else $status = $status;
+    
     global $txt, $scripturl;
+    //ena moznost je, da preverim stanje tu v funkciji, druga pa, da ga dam kot argument...
 
     $columns = array(
         'name' => array(		// TASK
@@ -293,14 +294,20 @@ function show_task_list() {
             ),
         ),
 
-        'deadline' => array(      //ROK - "%j" vrne ven vrednost zaporedne stevilke dneva v letu - EVO TUKI GIZMO!
+        'deadline' => array(     
             'header' => array(
                 'value' => $txt['delegator_deadline'],
             ),
             'data' => array(
-                'function' => function($row) {
-                    $deadline = $row['deadline'];
-                    return "<span class=\"relative-time\">$deadline</span>";
+                'function' => function($row) use ($status) { 
+                    if ($status < 2) {
+                        $deadline = $row['deadline'];
+                        if (date('Y-m-d') > $deadline) return "<font color=\"red\"><span class=\"relative-time\">$deadline</span></font>";
+                        else return "<span class=\"relative-time\">$deadline</span>";
+                    }
+                    else {
+                        return $row['deadline'];
+                    }
                 },
             ),
             //'style' => 'width: 20%; text-align: center;',
@@ -316,8 +323,8 @@ function show_task_list() {
                 'value' => $txt['delegator_priority'],
             ),
             'data' => array(
-                    'function' => getPriorityIcon,
-                    'style' => 'width: 10%; text-align: center;',
+                'function' => getPriorityIcon,
+                'style' => 'width: 10%; text-align: center;',
             ),
             'sort' =>  array(
                 'default' => 'priority',
@@ -390,5 +397,35 @@ function generateMemberSuggest ($input, $container, $param) {
         // ]]></script>';
 }
 
+function count_states($states, $what, $value){
+    //dobi tabelo stanj in jo dopolni...
+    // @todo Naslednji korak k temu, da iz Delegator.template odstranimo queryje
+    global $smcFunc, $txt, $scripturl, $context;
+
+    if ($what==="Worker" ){
+        // Workers don't have state 0
+        $query = 'SELECT COUNT(id) FROM {db_prefix}workers
+            WHERE id_member={int:id_member} AND status = {int:status}';
+        $values = function ($status) use ($value) {return array ('id_member' => $value, 'status' => $status);};
+    }
+    elseif ($what==="None"){
+        $query = 'SELECT COUNT(id) FROM {db_prefix}tasks
+            WHERE  state = {int:state}';
+        $values = function ($status) {return array ('state' => $status);};
+    }
+    elseif ($what==="Project"){
+        $query = 'SELECT COUNT(id) FROM {db_prefix}tasks
+            WHERE  state = {int:state} AND id_proj = {int:id_proj}';
+        $values = function ($status) use ($value) {return array ('state' => $status, 'id_proj' => $value);};
+    }
+    foreach($states as $status => $count){
+        $request = $smcFunc['db_query']('', $query, $values($status));
+        $row = $smcFunc['db_fetch_assoc']($request);
+        $states[$status] = $row['COUNT(id)'];
+        $smcFunc['db_free_result']($request);
+        
+    }
+    return $states;
+}
 
 ?>
