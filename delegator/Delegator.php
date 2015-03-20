@@ -34,8 +34,6 @@ if (!defined('SMF'))
 
 include 'delegator_helpers.php';
 
-
-
 //Tu se zacne originalni To-Do list mod
 function Delegator()
 {
@@ -610,7 +608,7 @@ function view_worker()
                     return (ret_num(0, "Worker", $id_member) + ret_num(1, "Worker", $id_member) );
                 }
                 elseif ($status==="finished") {
-                    return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker", $id_member) + ret_num(4, "Project", $id_proj) );
+                    return (ret_num(2, "Worker", $id_member) + ret_num(3, "Worker", $id_member) + ret_num(4, "Worker", $id_member) );
                 }
                 else return ret_num($status, "Worker", $id_member);
 

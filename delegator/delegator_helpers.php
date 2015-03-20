@@ -143,7 +143,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
     if ($what == "None") {
 
         $query = '
-		SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date 
+		SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date, T2.end_date AS end_date
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
@@ -161,7 +161,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
 
     elseif ($what == "Project") {
        $query = '
-           SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date
+           SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date, , T1.end_date AS end_date
 		   FROM {db_prefix}tasks T1
 		   LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		   LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
@@ -178,7 +178,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
     }
 
     elseif ($what == "Worker"){
-        $query = 'SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date
+        $query = 'SELECT T1.id_task AS id_task,T2.name AS task_name, T3.name AS project_name, T2.deadline AS deadline, T2.priority AS priority, T2.state AS state, T4.real_name AS author, T2.id_proj AS id_proj, T2.id_author AS id_author, T2.creation_date, T2.end_date AS end_date
         FROM {db_prefix}workers T1
         LEFT JOIN {db_prefix}tasks T2 ON T1.id_task = T2.id
         LEFT JOIN {db_prefix}projects T3 ON T2.id_proj = T3.id
@@ -240,6 +240,7 @@ function ret_num($status, $what, $value){
 
 // status bi lahko bil argument in glede na to vrnil deadline...
 // @todo function show_task_list($finished=false) {
+// @todo lahko bi se napisalo funkcijo, ki dobi argumente 'name', 'header', 'data'...
 function show_task_list($status) {
     if ($status === "unfinished") $status = 0;
     elseif ($status === "finished") $status = 2;
@@ -293,10 +294,13 @@ function show_task_list($status) {
                 'reverse' => 'author DESC',
             ),
         ),
-
+        ////////////////////////////////        
         'deadline' => array(     
             'header' => array(
-                'value' => $txt['delegator_deadline'],
+                'value' => function () use ($status, $txt){
+                    if ($status < 2) return $txt['delegator_deadline'];
+                    else return $txt['delegator_end_date'];
+                },
             ),
             'data' => array(
                 'function' => function($row) use ($status) { 
@@ -306,7 +310,7 @@ function show_task_list($status) {
                         else return "<span class=\"relative-time\">$deadline</span>";
                     }
                     else {
-                        return $row['deadline'];
+                        return $row['end_date'];
                     }
                 },
             ),
@@ -317,6 +321,7 @@ function show_task_list($status) {
                 'reverse' => 'deadline DESC',
             ),
         ),
+        //////////////////////////////////////
              // spet undefined index priority je v errolog-u
         'priority' => array(      //POMEMBNOST
             'header' => array(

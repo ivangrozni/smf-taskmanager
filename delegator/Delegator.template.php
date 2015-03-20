@@ -497,8 +497,8 @@ function template_view_worker()
          echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$states[$status2].'</br>';
 
     }
-    echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.'status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.'status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br>';
+    echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
+    echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br>';
 
     
 
