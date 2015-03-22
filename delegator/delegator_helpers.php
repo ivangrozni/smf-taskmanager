@@ -143,7 +143,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
     if ($what == "None") {
 
         $query = '
-		SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date, T2.end_date AS end_date
+		SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date, T1.end_date AS end_date
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
@@ -152,7 +152,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
 		LIMIT {int:start}, {int:per_page}';
 
         $values = array (
-            'state' => $status,
+            'state'     => $status,
             'sort'      => $sort,
             'start'     => $start,
             'per_page'  => $items_per_page,);
@@ -161,7 +161,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
 
     elseif ($what == "Project") {
        $query = '
-           SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date, , T1.end_date AS end_date
+           SELECT T1.id AS id_task, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.id_proj AS id_proj, T1.id_author AS id_author, T1.creation_date, T1.end_date AS end_date
 		   FROM {db_prefix}tasks T1
 		   LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		   LEFT JOIN {db_prefix}members T3 on T1.id_author = T3.id_member
@@ -189,7 +189,7 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
 
     $values = array(
             'id_member' => $value,
-            'status' => $status,
+            'status'    => $status,
             'sort'      => $sort,
             'start'     => $start,
             'per_page'  => $items_per_page,
@@ -294,12 +294,13 @@ function show_task_list($status) {
                 'reverse' => 'author DESC',
             ),
         ),
-        ////////////////////////////////        
-        'deadline' => array(     
+        //////////////////////////////// Ali bi lahko tukaj if stavek uturil?
+        /////////////////////////////// Mislim, da ne, ker sem v arrayu...
+        /*'deadline' => array(     
             'header' => array(
                 'value' => function () use ($status, $txt){
                     if ($status < 2) return $txt['delegator_deadline'];
-                    else return $txt['delegator_end_date'];
+                    else return $txt['delegator_task_end_date'];
                 },
             ),
             'data' => array(
@@ -312,6 +313,38 @@ function show_task_list($status) {
                     else {
                         return $row['end_date'];
                     }
+                },
+                ),
+            //'style' => 'width: 20%; text-align: center;',
+
+            'sort' =>  array(
+                'default' => 'deadline',
+                'reverse' => 'deadline DESC',
+
+                //'default' => function () use ($status){
+                //    if ($status < 2) return 'deadline';
+                //    else return 'end_date';
+                //},
+                //'reverse' => function () use ($status){
+                //    if ($status < 2) return 'deadline DESC';
+                //    else return 'end_date DESC';
+                //    }
+            ),
+        ),*/
+        'deadline' => array(     
+            'header' => array(
+                'value' => $txt['delegator_deadline'],
+            ),
+            'data' => array(
+                'function' => function($row) use ($status)  { 
+                    $deadline = $row['deadline'];
+                    if (date('Y-m-d') > $deadline and $status < 2) return "<font color=\"red\"><span class=\"relative-time\">$deadline</span></font>";
+                    elseif ($status > 1){
+                        if ($row['end_date'] > $deadline) return "<font color=\"red\">$deadline</font>";
+                        else return $deadline;
+                        
+                    }
+                    else return "<span class=\"relative-time\">$deadline</span>";
                 },
             ),
             //'style' => 'width: 20%; text-align: center;',
@@ -370,8 +403,32 @@ function show_task_list($status) {
         ),
     );
 
+    /* Hotel sem zamenjat deadline z end_date, pa query potem noce vec delat...
+    if ($status > 1){
+        $end_date = array (
+            'header' => array(
+                'value' => $txt['delegator_task_end_date'],
+            ),
+            'data' => array(
+                'function' => function($row) {
+                    if ($row['end_date'] > $row['deadline']) return '<font color=\"red\">'.$row['end_date'].'</font>';
+                    return $row['end_date']; },
+                //'style' => 'width: 20%; text-align: center;',
+            ),
+            'sort' =>  array(
+                'default' => 'end_date',
+                'reverse' => 'end_date DESC',
+            ),
+        );
+        // sedaj moram pa to zamenjat...
+        //$columns['end_date'] = $end_date;
+        //unset($columns['deadline']);
+        }*/
+    
+
     return $columns;
 }
+
 
 /**************************************************
  * Vnesi javascript za autocomplete               *
