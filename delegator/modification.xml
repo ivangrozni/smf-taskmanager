@@ -42,7 +42,7 @@ Drop down menu: @Jaka - kaj rabimo?
 			<add><![CDATA['delegator' => array(
 				'title' => function_exists('delegator_placeholder') ? delegator_placeholder() :  'DELEGATOR TODAY PLACEHOLDER',
 				'href' => $scripturl . '?action=delegator',
-				'show' =>  $context['allow_memberlist'], // @TODO: proper permission
+				'show' =>  $context['allow_delegator_view'], // @TODO: proper permission
 				'sub_buttons' => array(
 					'add' => array(
 						'title' => $txt['delegator_task_add'],
