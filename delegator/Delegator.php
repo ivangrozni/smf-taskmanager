@@ -128,6 +128,7 @@ function Delegator()
             }
             table.delegator-sidebar td {
                 border-right: 1.5px solid #CCC;
+                padding: 2px 4px;
             }
             table.delegator-sidebar td:last-child {
                 border-right: none;
