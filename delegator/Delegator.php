@@ -92,11 +92,11 @@ function Delegator()
     // CSS, javascript!
     $context['html_headers'] .= '
         <link rel="stylesheet" type="text/css" href="Themes/default/css/pikaday.css" />
-        <script src="Themes/default/scripts/moment.min.js" type="text/javascript"></script>
-        <script src="Themes/default/scripts/jquery-1.9.0.min.js" type="text/javascript"></script>
-        <script src="Themes/default/scripts/pikaday.js" type="text/javascript"></script>
-        <script src="Themes/default/scripts/pikaday.jquery.js" type="text/javascript"></script>
-        <script src="Themes/default/scripts/delegator.js" type="text/javascript"></script>
+        <script src="Themes/default/scripts/moment.min.js" charset="UTF-8" type="text/javascript"></script>
+        <script src="Themes/default/scripts/jquery-1.9.0.min.js" charset="UTF-8" type="text/javascript"></script>
+        <script src="Themes/default/scripts/pikaday.js" charset="UTF-8" type="text/javascript"></script>
+        <script src="Themes/default/scripts/pikaday.jquery.js" charset="UTF-8" type="text/javascript"></script>
+        <script src="Themes/default/scripts/delegator.js" charset="UTF-8" type="text/javascript"></script>
         <style type="text/css">
             dl.delegator_et
             {
@@ -125,6 +125,13 @@ function Delegator()
             {
                 text-align: center;
                 padding: 1em 0;
+            }
+            table.delegator-sidebar td {
+                border-right: 1.5px solid #CCC;
+                padding: 2px 4px;
+            }
+            table.delegator-sidebar td:last-child {
+                border-right: none;
             }
         </style>';
     $subActions[$sub_action]();
