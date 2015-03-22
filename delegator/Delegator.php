@@ -69,7 +69,8 @@ function Delegator()
         'view_projects' => 'view_projects',   // seznam vseh projektov
         'view_log'      => 'view_log',   // seznam vseh projektov
         'se'            => 'se',
-        'super_edit'    => 'super_edit'
+        'super_edit'    => 'super_edit',
+        'del_log'       => 'del_log',
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -1067,12 +1068,17 @@ function del_log()
 {
     global $smcFunc, $context;
 
-    //checkSession('get');
+
+    isAllowedTo('delegator_super_edit');
+
+    checkSession('get');
 
     $smcFunc['db_query']('', '
-        DELETE * FROM {db_prefix}delegator_log',
+       TRUNCATE {db_prefix}delegator_log
+        ',
         array());
-    //        TRUNCATE {db_prefix}delegator_log
+    //  DELETE * FROM {db_prefix}delegator_log       
+    zapisiLog(-2, -2, 'del_log');
     redirectexit('action=delegator');
 }
 

@@ -36,7 +36,7 @@ function template_main()
         echo '<a href="'.$scipturl.'?action=delegator;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp;'.$states[$status2].'</br>';
     }
     echo '<hr><a href="'.$scipturl.'?action=delegator;status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0]+$states[1]).'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br>';
+    echo '<a href="'.$scipturl.'?action=delegator;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
     
     template_show_list('list_tasks');
 }
@@ -362,7 +362,9 @@ function template_vt() // id bi bil kar dober argument
             ';
         if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
             // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
-                                                                             if(isMemberCoordinator($task_id) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=se;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+         // FORA - zakaj pri canceled tasks manjka super_edit???
+        //print_r(isMemberCoordinator($row['id_proj'])); print_r($row['state']);
+        if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=se;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         echo '
 			</div>
 			<span class="botslice"><span></span></span>
@@ -462,7 +464,7 @@ function template_view_proj()
 
     }
     echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0] + $states[1]).'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br>';
+    echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
     
     template_show_list('list_tasks_of_proj');
@@ -498,7 +500,7 @@ function template_view_worker()
 
     }
     echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br>';
+    echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
     
 
@@ -532,7 +534,7 @@ function template_my_tasks()
 
     }
     echo '<hr><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br>';
+    echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
     
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 }
@@ -556,15 +558,18 @@ function template_view_log()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
-    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_log'] .' </h2>';
-    //print_r ("template se nalozi");
-
     $session_var = $context['session_var'];
 	$session_id = $context['session_id'];
+    
+    template_button_strip(array(array('text' => 'delegator_del_log', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=del_log;'.$session_var. '='. $session_id, 'active'=> true)), 'right');
+
+    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_log'] .' </h2><hr>';
+    //print_r ("template se nalozi");
 
     //echo '<a href="index.php?action=delegator;sa=del_log;'. $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_del_log'] . '</a>';
     
-    //template_button_strip(array(array('text' => 'delegator_del_log', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=del_log;'.$session_var. '='. $session_id, 'active'=> true)), 'right');
+    
+    
     
     template_show_list('log'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 }

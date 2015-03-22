@@ -62,7 +62,7 @@ function isMemberWorker($id_task){
     return FALSE;
 }
 
-function isMemberCoordinator( $id_proj){
+function isMemberCoordinator($id_proj){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
     global $context, $smcFunc, $scripturl;

@@ -16,9 +16,11 @@
 		<operation>
 			<search position="replace"><![CDATA['karma_edit' => array(false, 'general', 'moderate_general'),]]></search>
 			<add><![CDATA[
-            'karma_edit' => array(false, 'general', 'moderate_general'),
-			'view_todo' => array(false, 'general', 'view_todolist'),
-			'add_new_todo' => array(false, 'general', 'add_new_todolist'),]]></add>
+			'karma_edit' => array(false, 'general', 'moderate_general'),
+			'delegator_view' => array(false, 'general', 'delegator_view'),
+			'delegator_add_task' => array(false, 'general', 'delegator_add_task'),
+			'delegator_super_edit' => array(false, 'general', 'delegator_super_edit'),
+			]]></add>
 		</operation>
 	</file>
 	<!-- zakomentirano do sem -->
@@ -26,8 +28,9 @@
 	  <!-- zakomentirano -->
 	    <operation>
 			<search position="replace"><![CDATA[	$context['allow_memberlist'] = allowedTo('view_mlist');]]></search>
-			<add><![CDATA[	$context['allow_memberlist'] = allowedTo('view_mlist');
-            $context['allow_view_todolist'] = allowedTo('view_todo');]]></add>
+			<add><![CDATA[	
+			$context['allow_memberlist'] = allowedTo('view_mlist');
+			$context['allow_delegator_view'] = allowedTo('delegator_view');]]></add>
 		</operation>
 	<!-- zakomentirano do sem -->
 		<operation>
@@ -37,39 +40,39 @@ Drop down menu: @Jaka - kaj rabimo?
 -->
 
 			<add><![CDATA['delegator' => array(
-				'title' => function_exists('get_today_todos') ? get_today_todos() :  'DELEGATOR TODAY PLACEHOLDER',
+				'title' => function_exists('delegator_placeholder') ? delegator_placeholder() :  'DELEGATOR TODAY PLACEHOLDER',
 				'href' => $scripturl . '?action=delegator',
 				'show' =>  $context['allow_memberlist'], // @TODO: proper permission
 				'sub_buttons' => array(
 					'add' => array(
 						'title' => $txt['delegator_task_add'],
 						'href' => $scripturl . '?action=delegator;sa=add',
-						'show' => allowedTo('add_new_todo'),	// @TODO: proper permission
+						'show' => allowedTo('delegator_add_task'),	// @TODO: proper permission
 						'is_last' => true,
 					),
 
                                         'add_proj' => array(
                                             'title' => $txt['delegator_add_proj'],
                                             'href' => $scripturl . '?action=delegator;sa=proj',
-                                            'show' => allowedTo('add_new_todo'),
+                                            'show' => allowedTo('delegator_add_task'),
                                             'is_last' => true,
                                         ),
                                         'my_tasks' => array(
                                             'title' => $txt['delegator_my_tasks'],
                                             'href' => $scripturl . '?action=delegator;sa=my_tasks',
-                                            'show' => allowedTo('add_new_todo'),
+                                            'show' => allowedTo('delegator_view'),
                                             'is_last' => true,
                                         ),
                                         'view_projects' => array(
                                             'title' => $txt['delegator_projects'],
                                             'href' => $scripturl . '?action=delegator;sa=view_projects',
-                                            'show' => allowedTo('add_new_todo'),
+                                            'show' => allowedTo('delegator_view'),
                                             'is_last' => true,
                                         ),
 					'view_log' => array(
                                             'title' => $txt['delegator_view_log'],
                                             'href' => $scripturl . '?action=delegator;sa=view_log',
-                                            'show' => allowedTo('add_new_todo'),
+                                            'show' => allowedTo('delegator_view'),
                                             'is_last' => true,
                                         ),
 
@@ -79,11 +82,12 @@ Drop down menu: @Jaka - kaj rabimo?
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[?>]]></search>
-			<add><![CDATA[function get_today_todos()
+			<add><![CDATA[function delegator_placeholder()
 {
 	global $txt, $smcFunc;
 
-	/*$month = date('n');
+	/*
+	$month = date('n');
 	$day = date('j');
 
 	$request = $smcFunc['db_query']('', '
@@ -103,8 +107,8 @@ Drop down menu: @Jaka - kaj rabimo?
 	list($todays_todos) = $smcFunc['db_fetch_row']($request);
 	$smcFunc['db_free_result']($request);
 
-	return $txt['delegator'] . ' [<strong>' . $todays_todos . '</strong>]';*/
-
+	return $txt['delegator'] . ' [<strong>' . $todays_todos . '</strong>]';*
+	 */
 	return 'Delegator: <strong>Spread communism</strong>';
 }
 ?>]]></add>
@@ -121,6 +125,10 @@ $txt['delegator_empty'] = !$context['user']['is_admin'] ? 'To-Do List is empty!'
 $txt['delegator_del'] = 'Delete';
 $txt['delegator_subject'] = 'Subject';
 $txt['delegator_due_time'] = 'Due date';
+//Permissions
+//$txt['delegator_view'] = 'Can View Delegator';
+//$txt['delegator_add_task'] = 'Delegator Basic Editing';
+//$txt['delegator_super_edit'] = 'Delegator Total Control';
 
 $txt['delegator_due_year'] = 'Due year';
 $txt['delegator_due_month'] = 'Due month';
@@ -184,6 +192,15 @@ $txt['delegator_log_empty'] = 'Log is empty.';
 $txt['delegator_action_date'] = 'Date and Time';
 $txt['delegator_member_name'] = 'Member';
 $txt['delegator_action'] = 'Action';
+
+$txt['permissionname_delegator_view'] = 'Can View Delegator';
+$txt['permissionhelp_delegator_view'] = 'Can View Delegator';
+$txt['permissionname_delegator_add_task'] = 'Delegator Basic Editing';
+$txt['permissionhelp_delegator_add_task'] = 'Delegator Basic Editing';
+$txt['permissionname_delegator_super_edit'] = 'Delegator Total Control';
+$txt['permissionhelp_delegator_super_edit'] = 'Delegator Total Control';
+
+
 // Permissions
 $txt['permissionname_view_todo'] = 'View To-Do List';
 $txt['permissionhelp_view_todo'] = 'This permission allows users to view To-Do List.';
