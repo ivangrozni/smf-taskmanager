@@ -57,13 +57,13 @@ function show(){
 
     echo '</br><a href="', $scripturl, '?action=delegator;sa=my_tasks">', $txt['delegator_my_tasks'], '</a>: &nbsp;', $count_my ;
 
-    echo '<hr><table>';
+    echo '<hr><table class="delegator-sidebar">';
     while ($row = $smcFunc['db_fetch_assoc']($request)){
         echo '<tr><td><a href="', $scripturl ,'?action=delegator;sa=vt;task_id=', $row['id_task'] ,'"> ',$row['task_name'],'</a></td>
           <td><a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'"> ',$row['project_name'],'</a></td>
           <td>';
         if ($today > $row['deadline']) echo '<font color="red">' .$row['deadline'].'</font></td>';
-        else echo $row['deadline'].'</td>';
+        else echo '<span class="relative-time">' . $row['deadline'] . '</span></td>';
         //echo '<td>'.$row['priority'].'</td></tr>';
         echo  '<td>'. getPriorityIcon2($row) . '</td></tr>';
 }
