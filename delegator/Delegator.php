@@ -265,7 +265,7 @@ function add_task()
 
     zapisiLog($id_proj, $row['id_task'], 'add_task');
     
-    redirectexit('action=delegator;sa=vt&task_id='.$row['id_task']);
+    redirectexit('action=delegator;sa=view_proj&id_proj='.$id_proj);
 }
 
 // analogija funkciji add()

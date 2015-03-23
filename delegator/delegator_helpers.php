@@ -387,16 +387,23 @@ function show_task_list($status) {
                 'value' => $txt['delegator_actions'],
             ),
             'data' => array(
-                'function' => function($row) {
+                'function' => function($row) use ($status) {
                     global $context, $settings, $scripturl;
-
+                    if ($status < 2){
                     return '
                         <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                             <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
                         </a>
                         <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                             <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
+                        </a>';}
+                    else {
+                        return '
+                        <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=se;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
                         </a>';
+
+                    }
                     },
                     'style' => 'width: 10%; text-align: center;',
             ),
