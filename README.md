@@ -1,85 +1,105 @@
-Taskmanager app za iskrin forum
+* DELEGATOR
+** ENG
+*** General Info
+   Delegator is continued work from To Do list created by grafitus - slava mu. It is very simple project management app. 
+**** Curent version
+     Delegator: spread communism 0.99
+**** Functionality
+    Basic functionality of delegator is to create simple Tasks that other members of forum can see and claim. Members can also be delegated to Tasks.
+    Tasks are connected into Projects.
 
-http://wiki.studentska-iskra.org/index.php?title=TaskManagerApp
+    Delegator also has many different views (and sortings) of tasks. You can select all tasks, tasks of specific project or specific members.
+    Then you can select them depending on state (unfinished: unclaimed, claimed; finished: suddesful, unsuccesful, canceled).
 
-______________________________________________________________
+    This basic options gives helps you organize and coordinate (political) actions.
 
-DONE:
- - zasnova baze (tm_new.txt)
- - zasnova querry-jev (tm_new.txt)
+*** ChangeLog
+**** version 0.99
+    Delegator gives basic functionality of simple project managment app. Current version is a mode for Simple Machines Forum (http://www.simplemachines.org/)
+but it is intended to become a standalone app with SMF mode implementation. 
+*** Authors
+   Iskra - delovni odbor za tehnologijo (Iskra is a radical-left student organisation from Slovenia). Members of Technology Work Commitee of Iskra.
+   http://studentska-iskra.org/
+   
+*** Install
+**** SMF forum
+   Download latest stable version from github (https://github.com/ivangrozni/smf-taskmanager).
+   Create .zip file of delegator map and upload then install it to your SMF forum.
+*** License
+   This program is free software; you may redistribute it and/or modify it under 
+   the terms of the provided license as published by Simple Machines LLC.          
+                                                                                 
+   This program is distributed in the hope that it is and will be useful, but  
+   WITHOUT ANY WARRANTIES; without even any implied warranty of MERCHANTABILITY    
+   or FITNESS FOR A PARTICULAR PURPOSE.                                            
+                                                                                 
+   See the "license.txt" file for details of the Simple Machines license.          
+   The latest version can always be found at http://www.simplemachines.org. 
+*** BUGS and TODOS
+**** version 1.0
+    - Delete/Edit Project
+    - html anchoring (optional)
+    - BBcode in description
+    - cleaned up git repo
 
-TO DO:
- - Ustvari bazo in jo populiraj (3 tabele - Tasks, Projects, Members)
- - Preveri Querry-je
- - Popravi Querry-je
- - Vgradi Querry-je v PHP funkcije
- - Uvozi PHP funkcije v smf-mod
+**** version 2.0
+    - code cleanup (it complies with SMF standards)
+    - statistical grafical elements (timelines, effectivity graphs...)
+    - new form of Tasks (Tasks with duration)
+    - notifications of coordinators
 
-______________________________________________________________
+**** version 3.0
+    - standalone version (GUI)
+    - SMF implementation mod
 
+** SLO
+*** Splošne informacije
+    Delegator je sloni na To Do list modu za SMF forum, ki ga je ustvaril grafitus - slava mu. Je zelo preprost program za projektno vodenje.
+**** Trenutna verzija
+     Delegator: spread communism 0.99
+**** Funkcionalnost
+     Osnovna funkcija Delegatorja je ustvarjanje preprostih zadolžitev. Uporabniki foruma lahko po zadolžitvah brskajo, jih sprejemajo in zaključujejo.
+     Zadolžitve so povezane v Projekte.
 
-DONE:
-   - baza je ustvarjena in populirana
+     Delegator sestoji iz precej različnih pogledov. Gleda se lahko vse zadolžitve, zadolžitve posameznega projekta, ali zadolžitve posameznega uporabnika.
+     Naprej lahko zadolžitve razdeliš glede na stanje.
 
-TO DO:
-   - natunat bazo (AUTO_INCREMENT... http://www.mysqltutorial.org/mysql-sequence/)
-   - poiskati querry-je za posamezne prikaze baze
-   - vgraditi querry-je v php
-   - vgraditi php v samo strukturo smf foruma
+     Ta funkcionalnost pomaga organizirati in koordinirati (politične) akcije.
+     
+*** Seznam Sprememb
+**** verzija 0.99
+     Delegator: spread communism 0.99 ima osnovno funkcionalnost preprostega programa za projektno vodenje. Trenutna verzija je vtičnik za
+     Simple Machines Forum (http://www.simplemachines.org/), a namerava se ga razviti do te mere, da bo samostojna aplikacija z možnostjo
+     implementacije na dotični forum.
+*** Avtorji
+    Iskra - delovni odbor za tehnologijo
+    Iskra (http://studentska-iskra.org)
+    Delovni odbor za tehnologijo (http://iskra.kreten.si)
+*** Namestitev
+**** SMF forum
+     Končno verzijo potegnite z githuba (https://github.com/ivangrozni/smf-taskmanager).
+     Ustvarite .zip datoteko iz mape delegator in jo nato naložite ter namestite na vaš SMF forum.
+*** Licenca
+    Ta program je prosta programska oprema; lahko se ga deli in/ali ureja v skladu s pogoji,
+    ki jih določa Simple Machines LL.
 
-NOV NACRT:
-Nasim potrebam se prilagodi mod TO-DO LIST (nahaja se v mapi to-do).
-Naloga je zahtevnejsa kot se zdi - treba je znat strukturo smf mod-ov, zato pa ne obstaja dokumentacije na netu - skoraj nic.
+    Ta program se distribuira v upanjum, da je in bo uporabe, a brez kakršnihkoli garancij.
 
-Studiranje strukture se nahaja v datoteki taskmanager/scratch.txt.
+    Vsi pogoji uporabe se nahajajo v "license.txt" dokumentu, katerega zadnjo verzijo lahko
+    najdete na http://www.simplemachines.org
+*** Hrošči in Izbolšave
+**** verzija 1.0
+     - Izpriši/Uredi Projekt
+     - html anchoring (ne nujno)
+     - BB koda v opisu projekta in zadolžitve
+     - pospravi git odložišče
 
-Predlagam, da se instalira testni forum, na katerem bomo lahko testirali app.
-
-Spet lahko ustanovimo torke zvecer - najmanj 4h - da se projekt spelje do konca. Pavsalna ocena je 150 ur skupnega programiranja vseh programerjev.
-
-===Verzija 1.0 taskmanager:===
-
-BAZA - urejena kronolosko 
-<table>
- <tr> <td> id_todo     </td> <td> INT(10) PRIM auto_incr      </td> <td> </td> </tr>
- <tr> <td>id_todo_sec  </td> <td> INT(10)                     </td> <td>  default = 0 poveca se s st izvrsevalcev </td> </tr>
- <tr> <td>id_autor     </td> <td>INT(10)                      </td> <td>  avtor naloge </td> </tr>
- <tr> <td>task         </td> <td>CHAR(50)                     </td> <td>  ime naloge</td> </tr>
- <tr> <td>project      </td> <td>CHAR(50)                     </td> <td>  h kateremu projektu pase</td> </tr>
- <tr> <td>description  </td> <td>CHAR(250)                    </td> <td>  opis naloge</td> </tr>
- <tr> <td>start_date   </td> <td>DATE                         </td> <td>  kdaj je treba nalogo zaceti izvrsevati</td> </tr>
- <tr> <td>duedate      </td> <td>DATE                         </td> <td>  rok </td></tr>
- <tr> <td>priority     </td> <td>TINYINT(2)                   </td> <td>  0 - low, 1 - normal, 2 - high </td></tr>
-
- <tr> <td>is_did       </td> <td>TINYINT(2)                   </td> <td>  stanje: 0prazno,1vteku,2zakljuceno,3preklic</td> </tr>
- <tr> <td>id_member    </td> <td>INT(10)                      </td> <td>  izvrsevalec naloge </td></tr>
-
- <tr> <td>end_date     </td> <td>DATE                         </td> <td>  datum zakljucka naloge</td> </tr>
- <tr> <td>end_comment  </td> <td>CHAR(250)                    </td> <td>  komentar ob zakljucku naloge</td> </tr>
-</table>
-AKCIJE
-
- add_task
- accept
- task_finished
-
-VIEWS
- empty_tasks
- emptyAndInProgres_tasks
- finished_tasks
- timeline
-
-
-Verzija 2.0
- - dobi tage k taskom
-
-DONE
-
- - datebase.php  - ustvarjena je baza
-
-TO DO
-  
- - package-info.xml
- - modification.xml
- - TaskList.php      (akcije)
- - TaskList.template.php   (views)
+**** verzija 2.0
+     - pospravi kodo, da bo ustrezala SMF standardom
+     - statistični grafični elementi (časovnica, grafi efektivnosti ...)
+     - nova oblika Zadolžitve (Zadolžitev s trajanjem)
+     - opozorila za koordinatorje
+       
+**** verzija 3.0
+     - samostojen program (s svojim grafičnim vmesnikom)
+     - vtičnik za SMF forum

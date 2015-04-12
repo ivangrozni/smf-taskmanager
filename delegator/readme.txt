@@ -26,6 +26,8 @@ but it is intended to become a standalone app with SMF mode implementation.
 **** SMF forum
    Download latest stable version from github (https://github.com/ivangrozni/smf-taskmanager).
    Create .zip file of delegator map and upload then install it to your SMF forum.
+
+   You should also copy super_edit.gif picture into your img/buttons folder of your SMF forum.
 *** License
    This program is free software; you may redistribute it and/or modify it under 
    the terms of the provided license as published by Simple Machines LLC.          
@@ -80,6 +82,8 @@ but it is intended to become a standalone app with SMF mode implementation.
 **** SMF forum
      Končno verzijo potegnite z githuba (https://github.com/ivangrozni/smf-taskmanager).
      Ustvarite .zip datoteko iz mape delegator in jo nato naložite ter namestite na vaš SMF forum.
+
+     Sliko super_edit.gif prekopirajte v mapo img/buttons vašega SMF foruma
 *** Licenca
     Ta program je prosta programska oprema; lahko se ga deli in/ali ureja v skladu s pogoji,
     ki jih določa Simple Machines LL.

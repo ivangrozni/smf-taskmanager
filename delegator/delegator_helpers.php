@@ -389,18 +389,30 @@ function show_task_list($status) {
             'data' => array(
                 'function' => function($row) use ($status) {
                     global $context, $settings, $scripturl;
-                    if ($status < 2){
+                    if ($status < 2 ){
+                        // ali pa ce bi to totalno skrajsal...
+                        if (isMemberCoordinator($row['id_proj'])===TRUE){
+                            return '
+                       <a title="Super Edit task" href="'. $scripturl. '?action=delegator;sa=se;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/super_edit.gif" alt="Edit task" />
+                        </a>
+                        <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
+                        </a>
+';
+                        }
+                        else {
                     return '
                         <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=et;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                             <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
                         </a>
                         <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                             <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
-                        </a>';}
+                        </a>';}}
                     else {
                         return '
-                        <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=se;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
-                            <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
+                        <a title="Super Edit task" href="'. $scripturl. '?action=delegator;sa=se;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <img src="'. $settings['images_url']. '/buttons/super_edit.gif" alt="Edit task" />
                         </a>';
 
                     }
