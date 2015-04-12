@@ -1,46 +1,106 @@
-[size=3][b][color=maroon]Delegator[/color][/b][/size] by Iskra
-[b]Description:[/b] You can use this to tell people what to do
+* DELEGATOR
+  
+** ENG
+*** General Info
+   Delegator is continued work from To Do list created by grafitus - slava mu. It is very simple project management app. 
+**** Curent version
+     Delegator: spread communism 0.99
+**** Functionality
+    Basic functionality of delegator is to create simple Tasks that other members of forum can see and claim. Members can also be delegated to Tasks.
+    Tasks are connected into Projects.
 
-[b]Version 0.1:[/b]
-2014 11 09 
-Odkrita huda napaka na forum_kopija, na katerem naj bi testirali delegator.
-Zato so bila testiranja neuspesna. Krivec je Jaka Perovsek. Pozabil je pobrisat Cache file.
+    Delegator also has many different views (and sortings) of tasks. You can select all tasks, tasks of specific project or specific members.
+    Then you can select them depending on state (unfinished: unclaimed, claimed; finished: suddesful, unsuccesful, canceled).
 
-2015 02 21
-Torej, dobil sem novo idejo. Vsaj projektu bi lahko dali zraven še topic_id, v katerem bi potekala debata o tem projektu... Kjer bi bil pregled nad zadolžitvami projekta...
+    This basic options gives helps you organize and coordinate (political) actions.
 
-2015 03 01
-* add_task ne doda delegatov
-* najdalsa dolzina stringa za description je 50 znakov, ceprav je v database.php 250 - DELA
-* isMemberWorker se vedno bricka cel delegator - DELA (ne smes imeti enako imenovanih funkcij funkcij v Delegator.php in Delegator.template.php )
+*** ChangeLog
+**** version 0.99
+    Delegator gives basic functionality of simple project managment app. Current version is a mode for Simple Machines Forum (http://www.simplemachines.org/)
+but it is intended to become a standalone app with SMF mode implementation. 
+*** Authors
+   Iskra - delovni odbor za tehnologijo (Iskra is a radical-left student organisation from Slovenia). Members of Technology Work Commitee of Iskra.
+   http://studentska-iskra.org/
+   
+*** Install
+**** SMF forum
+   Download latest stable version from github (https://github.com/ivangrozni/smf-taskmanager).
+   Create .zip file of delegator map and upload then install it to your SMF forum.
+*** License
+   This program is free software; you may redistribute it and/or modify it under 
+   the terms of the provided license as published by Simple Machines LLC.          
+                                                                                 
+   This program is distributed in the hope that it is and will be useful, but  
+   WITHOUT ANY WARRANTIES; without even any implied warranty of MERCHANTABILITY    
+   or FITNESS FOR A PARTICULAR PURPOSE.                                            
+                                                                                 
+   See the "license.txt" file for details of the Simple Machines license.          
+   The latest version can always be found at http://www.simplemachines.org. 
+*** BUGS and TODOS
+**** version 1.0
+    - Delete/Edit Project
+    - html anchoring (optional)
+    - BBcode in description
+    - cleaned up git repo
 
-*end_task - DELA
-Kako ves, da je task v izvrsevanju - v tabeli workers je njegov id...
+**** version 2.0
+    - code cleanup (it complies with SMF standards)
+    - statistical grafical elements (timelines, effectivity graphs...)
+    - new form of Tasks (Tasks with duration)
+    - notifications of coordinators
 
-Lahko bi stvar malce preuredili in end_comment, end_date ter end_state dodali k tabeli workers
+**** version 3.0
+    - standalone version (GUI)
+    - SMF implementation mod
 
-Ena moznost je, da se da state v prikaz pod my_tasks -> tam zaenkrat se prikaze vse taske, ne glede na state.
+** SLO
+*** Splošne informacije
+    Delegator je sloni na To Do list modu za SMF forum, ki ga je ustvaril grafitus - slava mu. Je zelo preprost program za projektno vodenje.
+**** Trenutna verzija
+     Delegator: spread communism 0.99
+**** Funkcionalnost
+     Osnovna funkcija Delegatorja je ustvarjanje preprostih zadolžitev. Uporabniki foruma lahko po zadolžitvah brskajo, jih sprejemajo in zaključujejo.
+     Zadolžitve so povezane v Projekte.
 
-Claim in Unclaim morata spremenit state. Kjerkoli pac ze...
+     Delegator sestoji iz precej različnih pogledov. Gleda se lahko vse zadolžitve, zadolžitve posameznega projekta, ali zadolžitve posameznega uporabnika.
+     Naprej lahko zadolžitve razdeliš glede na stanje.
 
-To, kako se bodo urejala stanja je treba resno natuhtat.
------------------------------------------------------------
+     Ta funkcionalnost pomaga organizirati in koordinirati (politične) akcije.
+     
+*** Seznam Sprememb
+**** verzija 0.99
+     Delegator: spread communism 0.99 ima osnovno funkcionalnost preprostega programa za projektno vodenje. Trenutna verzija je vtičnik za
+     Simple Machines Forum (http://www.simplemachines.org/), a namerava se ga razviti do te mere, da bo samostojna aplikacija z možnostjo
+     implementacije na dotični forum.
+*** Avtorji
+    Iskra - delovni odbor za tehnologijo
+    Iskra (http://studentska-iskra.org)
+    Delovni odbor za tehnologijo (http://iskra.kreten.si)
+*** Namestitev
+**** SMF forum
+     Končno verzijo potegnite z githuba (https://github.com/ivangrozni/smf-taskmanager).
+     Ustvarite .zip datoteko iz mape delegator in jo nato naložite ter namestite na vaš SMF forum.
+*** Licenca
+    Ta program je prosta programska oprema; lahko se ga deli in/ali ureja v skladu s pogoji,
+    ki jih določa Simple Machines LL.
 
-DONE:
-edit_task
-view_projects
-view_worker
-isMemberWorker
-tabela logov, kjer se vse vidi, kdo je kaj delal
+    Ta program se distribuira v upanjum, da je in bo uporabe, a brez kakršnihkoli garancij.
 
-TO DO:
-claim/unclaim updejtata tabelo tasks state => 1
-my_tasks (gumbek za myfinished tasks)
-end_task (koordinator, naj bi zakljucil nalogo)
-php_sidebar
-hrosci in to do je se v projektu Delegator 1.0
+    Vsi pogoji uporabe se nahajajo v "license.txt" dokumentu, katerega zadnjo verzijo lahko
+    najdete na http://www.simplemachines.org
+*** Hrošči in Izbolšave
+**** verzija 1.0
+     - Izpriši/Uredi Projekt
+     - html anchoring (ne nujno)
+     - BB koda v opisu projekta in zadolžitve
+     - pospravi git odložišče
 
-FUTURE
-edit_proj, del_proj
-
-Dalo bi se naredit funkcijo, ki dobi kot argument string, ki je query za bazo podatkov, in vrne fetch results... Tako ne bi rabili tistih anonimnih funkcij skoz...
+**** verzija 2.0
+     - pospravi kodo, da bo ustrezala SMF standardom
+     - statistični grafični elementi (časovnica, grafi efektivnosti ...)
+     - nova oblika Zadolžitve (Zadolžitev s trajanjem)
+     - opozorila za koordinatorje
+       
+**** verzija 3.0
+     - samostojen program (s svojim grafičnim vmesnikom)
+     - vtičnik za SMF forum

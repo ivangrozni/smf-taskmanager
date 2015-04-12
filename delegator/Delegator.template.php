@@ -964,7 +964,7 @@ function template_se()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=edit_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
+		<form action="', $scripturl, '?action=delegator;sa=super_edit" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
