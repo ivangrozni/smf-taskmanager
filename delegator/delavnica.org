@@ -21,8 +21,10 @@
 
 *** Seznam SMF funkcij
     [[http://dev.simplemachines.org/smcfunctions.php][SMF Funkcije]]
+
     Primer klica:
     ~$smcFunc['arugment'](parameter odvisen od arugmenta)~
+
     Argumenti za poizvedbe v bazo:
     - ~db_query~ (SQL poizvedba) - poizvedba v bazo ~SELECT~, ~SELECT COUNT()~, ~INSERT~, ~UPDATE~, ~DELETE~
       primer: 
@@ -33,7 +35,30 @@
             WHERE id = {int:id_task}', array('id_task' => $id_task) );
       #+END_SRC
     - ~db_insert~ (SQL poizvedba)
-    - ~db_fetch_assoc~ ()
-    - ~db_free_results~ (narediš kar tako)
+    - ~db_fetch_assoc~ (~$request~)
+      primer:
+      #+NAME: db_fetch_assoc
+      #+BEGIN_SRC php 
+     $row = $smcFunc['db_fetch_assoc']($request);
+      #+END_SRC
+    - ~db_free_results~ (~$request~) - narediš kar tako, da sprostiš nek spomin, al kaj
+    - ~html_specialchars~ - (~string~) zaščita pred SQL injekcijami
+    - ~html_trim~ - (~string~) zaščita pred SQL injekcijami
 
+    Ostale funckije:
+     - ~checkSession()~ - preveri, če je uporabnik pravi
 
+*** Struktura Moda
+
+    datoteke:
+    - ~package-info.xml~
+    - ~modification.xml~
+    - ~database.php~
+    - ~Delegator.php~
+    - ~Delegator.template.php~
+    - ~delegator_helpers.php~    
+    - ~delegator.js~
+    - ~moment.min.js~
+    - ~pikaday.css~    
+    - ~pikaday.jquery.js~
+    - ~pikaday.js~    

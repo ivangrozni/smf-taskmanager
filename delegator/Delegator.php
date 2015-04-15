@@ -934,10 +934,10 @@ function view_log()
         'get_items' => array(
             // FUNKCIJE
 
-            'function' => create_function('$start, $items_per_page, $sort ', '
+            'function' => function($start, $items_per_page, $sort) {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
+				$request = $smcFunc['db_query']('', '
                                         SELECT T1.action_date, T1.id_member, T1.id_task, T1.id_proj, T1.action, T2.real_name AS member, T3.name AS project_name, T4.name AS task_name
 
                                         FROM {db_prefix}delegator_log T1
@@ -945,41 +945,40 @@ function view_log()
                                         LEFT JOIN {db_prefix}projects T3 ON T1.id_proj = T3.id
                                         LEFT JOIN {db_prefix}tasks T4 ON T1.id_task = T4.id
                                         ORDER BY {raw:sort}
-					LIMIT {int:start}, {int:per_page}\',
+					LIMIT {int:start}, {int:per_page}',
 					array(
-						\'sort\' => $sort,
-						\'start\' => $start,
-						\'per_page\' => $items_per_page,
+						'sort' => $sort,
+						'start' => $start,
+						'per_page' => $items_per_page,
 					)
 				);
 
 				$logs = array();
-				while ($row = $smcFunc[\'db_fetch_assoc\']($request))
+				while ($row = $smcFunc['db_fetch_assoc']($request))
 					$logs[] = $row;
-				$smcFunc[\'db_free_result\']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $logs;                                    //funkcija vrne taske
-                                '),
+            },
             'params' => array(
                 'id_member' => $context['user']['id'], //tudi ne rabimo
                  ),
         ),
 
         'get_count' => array(							//tudi tu je posodobljen query
-            'function' => create_function('', '
+            'function' => function() {
 				global $smcFunc;
 
-				$request = $smcFunc[\'db_query\'](\'\', \'
-
+				$request = $smcFunc['db_query']('', '
 					SELECT COUNT(*)
-					FROM {db_prefix}delegator_log \',
+					FROM {db_prefix}delegator_log ',
                     array()
 				);
-				list($total_logs) = $smcFunc[\'db_fetch_row\']($request);
-				$smcFunc[\'db_free_result\']($request);
+				list($total_logs) = $smcFunc['db_fetch_row']($request);
+				$smcFunc['db_free_result']($request);
 
 				return $total_logs;
-			'),
+			},
         ),
         'no_items_label' => $txt['delegator_log_empty'],
         'columns' => array(
