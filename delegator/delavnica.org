@@ -1,3 +1,14 @@
 * Delegator delavnico
+** php osnove
+    - if stavki (control structures)  
+    - include
+
 ** Seznam php funkcij
+ - die();
+ 
 ** Seznam SMF funkcij
+
+
+
+
+
