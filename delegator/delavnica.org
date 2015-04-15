@@ -9,28 +9,37 @@
     - ; konec stavkov - klic_funkcije();
 *** Podatkovne strukture
 **** Skalarni tip (spremenljvika z eno vrednostjo)
-     - #+BEGIN_SRC php
-       $spremenljivka = "vrednost";
-       #+END_SRC
-     - #+BEGIN_SRC php
-       print_r($spremenljivka); // izpiše "vrednost"
-       #+END_SRC
+     #+BEGIN_SRC php
+     $spremenljivka = "vrednost";
+     #+END_SRC
+
+     #+BEGIN_SRC php
+     print_r($spremenljivka); // izpiše "vrednost"
+     #+END_SRC
 ***** Tipi skalarjev
       - Besedilo (string)
+
         'Dobeseden tekst', "Tekst s spremenljivko: $stevilo"
       - Število (integer) - celo število
+
         0, 42, -123 ...
       - Decimalno število (float)
+
         0.5, -12.952 ...
       - Binarna vrednost (boolean)
+
         true / false
       - Ničelna vrednost
+
         null
       - V skalar lahko tudi shranimo funkcijo
-        #+BEGIN_SRC php $opravilo = function() {
+
+        #+BEGIN_SRC php
+        $opravilo = function() {
             izvedi;
         }
-        $opravilo(); #+END_SRC
+        $opravilo();
+        #+END_SRC
 **** Konstante
      - nespremenljive
      - define("IMEKONSTANTE", vrednost);
