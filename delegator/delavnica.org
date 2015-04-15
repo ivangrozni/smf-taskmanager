@@ -1,8 +1,108 @@
 #+TITLE: Handout za Delegator delavnico
 * Delegator delavnica
-** php osnove
-    - if stavki (control structures)  
-    - include
+* Delegator delavnica
+** PHP osnove
+*** Splošno
+    - dokaj C-jevska sintaksa (sicer enostavnejša)
+    - .php datoteko začnemo z <?php tagom
+    - { } za definicije blokov (funkcij, teles kontrolnih struktur...)
+    - ; konec stavkov - klic_funkcije();
+*** Podatkovne strukture
+**** Skalarni tip (spremenljvika z eno vrednostjo)
+     - #+BEGIN_SRC $spremenljivka = "vrednost"; #+END_SRC
+     - #+BEGIN_SRC print_r($spremenljivka); // izpiše "vrednost" #+END_SRC
+***** Tipi skalarjev
+      - Besedilo (string)
+        'Dobeseden tekst', "Tekst s spremenljivko: $stevilo"
+      - Število (integer) - celo število
+        0, 42, -123 ...
+      - Decimalno število (float)
+        0.5, -12.952 ...
+      - Binarna vrednost (boolean)
+        true / false
+      - Ničelna vrednost
+        null
+      - V skalar lahko tudi shranimo funkcijo
+        #+BEGIN_SRC php $opravilo = function() {
+            izvedi;
+        }
+        $opravilo(); #+END_SRC
+**** Konstante
+     - nespremenljive
+     - define("IMEKONSTANTE", vrednost);
+**** Polje (array)
+    - Vsebuje zaporeden seznam vrednosti kateregakoli tipa (kot pri skalarjih)
+    - Dostop do elementov z zaporednim številom, začenši z 0
+    - $polje = [1, "dva", 3];
+       $polje[1] vsebuje 1
+       $polje[2] vsebuje "dva"
+**** Asociativno polje (associative array)
+    - Seznam vrednosti, indeksiran z vrednostmi kateregakoli tipa
+    - $asociativno_polje = [
+            "kljuc" => "vrednost!",
+            1001 => true
+      ];
+      $asociativno_polje["kljuc"] vsebuje "vrednost!"
+      $asociativno_polje[1001] vsebuje true
+    - koda; // Enovrstični komentar
+    - /*
+            večvrstični
+            komentar
+      */
+    - include "imedatoteke.php";
+      Vključi kodo (požene) iz datoteke v trenuten program
+*** Kontrolne strukture
+**** If stavki
+    - if (pogoj) posledica else drugaposledica;
+    - if (pogoj) {
+            posledica;
+      } elseif (drugpogoj) {
+            drugaposledica;
+      } else {
+            nekajtretjega;
+      }
+    - if (pogoj):
+            razne;
+            stvari;
+      else:
+            drugo;
+      endif;
+**** While zanke
+    - while (pogoj) {
+            ponavljaj;
+      }
+    - do {
+            ponavljaj;
+      } while (pogoj);
+    - while (pogoj):
+            ponavljaj;
+      endwhile;
+**** For zanke
+    - for ($i = 0; $i < 3; $i++) {
+            ponovi;     // Ponovi 3x
+      }
+    - $stevec = [1, 2, 3, 4];
+      foreach ($stevec as $stevilo) {
+            print_r("$stevilo!\n");
+      }
+    - $polje = [
+            "kljuc" => "vrednost",
+            "drugo" => "tretje"
+      ];
+      foreach ($polje as $kljuc => $vrednost) {
+            print_r("vrednost " . $kljuc . ": " . $vrednost . "\n");
+      }
+*** Funkcije
+    - function imeFunkcije ($argument, &$referencniArgument) {
+            telo_funkcije;
+            $vrednost = "primer";
+            return $vrednost;
+      }
+    - function sestej ($prvo, $drugo) {
+            return $prvo + $drugo + 2;
+      }
+      sestej(2, 3); // Vrne 7
+>>>>>>> WIP php stuff za delavnico
 
 ** Seznam php funkcij
  - die();
