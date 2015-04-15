@@ -1,0 +1,3 @@
+* Delegator delavnico
+** Seznam php funkcij
+** Seznam SMF funkcij
