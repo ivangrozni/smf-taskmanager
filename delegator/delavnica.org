@@ -3,15 +3,26 @@
 ** PHP osnove
 *** Splošno
     - dokaj C-jevska sintaksa (sicer enostavnejša)
-    - .php datoteko začnemo s src_php{<?php} tagom
-    - src_php{\{ \}} za definicije blokov (funkcij, teles kontrolnih struktur...)
-    - src_php{;} konec stavkov - src_php{klic_funkcije();}
+    - .php datoteko začnemo s <?php tagom, opcionalno zaključimo z ?>
+
+      #+BEGIN_SRC php
+      <?php
+            program;
+            in_to;
+      ?>
+      #+END_SRC
+
+    - { } za definicije blokov (funkcij, teles kontrolnih struktur...)
+    - ; konec stavkov
+      
+      #+BEGIN_SRC php
+      klic_funkcije();
+      #+END_SRC
 *** Podatkovne strukture
 **** Skalarni tip (spremenljvika z eno vrednostjo)
      #+BEGIN_SRC php
      $spremenljivka = "vrednost";
      #+END_SRC
-
      #+BEGIN_SRC php
      print_r($spremenljivka); // izpiše "vrednost"
      #+END_SRC
