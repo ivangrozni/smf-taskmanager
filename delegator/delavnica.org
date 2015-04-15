@@ -9,6 +9,8 @@
 
 ** SMF
 *** Spremenljivke
+    [[http://wiki.simplemachines.org/smf/Global_variables][SMF variable]]
+
     - ~$context~ (items for template)
     - ~$txt~ (prevodi)
     - ~$scripturl~
@@ -17,9 +19,25 @@
     - ~$smcFunc~ (Funkcije)
 
 
-** Seznam SMF funkcij
-
-
-
+*** Seznam SMF funkcij
+    [[http://dev.simplemachines.org/smcfunctions.php][SMF Funkcije]]
+    Primer klica:
+    ~$smcFunc['arugment'](parameter odvisen od arugmenta)~
+    Argumenti za poizvedbe v bazo:
+    - ~db_query~ (SQL poizvedba) - poizvedba v bazo ~SELECT~, ~SELECT COUNT()~, ~INSERT~, ~UPDATE~, ~DELETE~
+      primer: 
+    ~$result = $smcFunc['db_query']('', '
+    SELECT poster_time
+    FROM {db_prefix}messages
+    WHERE id_msg = {int:id_msg}
+    LIMIT 1',
+    array(
+    'id_msg' => $user_settings['id_msg_last_visit'],
+    )
+    );
+    ))~
+    - ~db_insert~ (SQL poizvedba)
+    - ~db_fetch_assoc~ ()
+    - ~db_free_results~ (narediš kar tako)
 
 
