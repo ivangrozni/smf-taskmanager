@@ -52,6 +52,8 @@ but it is intended to become a standalone app with SMF mode implementation.
     - standalone version (GUI)
     - SMF implementation mod
 
+*** Conflicts
+     - Member suggest doesn't work when the Simple Portal Advanced Unread extension mod (version 1.4). To fix it, you have to edit Sources/PortalUnread.php and comment out line 117, "window.onload=regenerateUnreadPosters". What exactly this does is not known yet.
 ** SLO
 *** Splošne informacije
     Delegator je sloni na To Do list modu za SMF forum, ki ga je ustvaril grafitus - slava mu. Je zelo preprost program za projektno vodenje.
@@ -103,3 +105,5 @@ but it is intended to become a standalone app with SMF mode implementation.
 **** verzija 3.0
      - samostojen program (s svojim grafičnim vmesnikom)
      - vtičnik za SMF forum
+*** Konflikti
+     - Member suggest ne deluje, če je nameščen Simple Portal Advanced Unread extension (verzija 1.4). Suggest se popravi tako, da se v Sources/PortalUnread.php fajlu zakomentira vrstico 117, "window.onload=regenerateUnreadPosters". Nevem pa, kaj se izgubi ko zakomentiraš to zadevo.
