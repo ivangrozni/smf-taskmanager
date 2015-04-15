@@ -1,5 +1,5 @@
-#+TITLE Templeate Delegator delavnica
-* Delegator delavnico
+#+TITLE: Handout za Delegator delavnico
+* Delegator delavnica
 ** php osnove
     - if stavki (control structures)  
     - include
@@ -9,12 +9,12 @@
 
 ** SMF
 *** Spremenljivke
-    - ```$context``` (items for template)
-    - ```$txt``` (prevodi)
-    - ```$scripturl```
-    - ```$settings``` (global theme settings)
-    - ```$sourcedir``` (absolute path to Sources directory)
-    - ```$smcFunc``` (Funkcije)
+    - ~$context~ (items for template)
+    - ~$txt~ (prevodi)
+    - ~$scripturl~
+    - ~$settings~ (global theme settings)
+    - ~$sourcedir~ (absolute path to Sources directory)
+    - ~$smcFunc~ (Funkcije)
 
 
 ** Seznam SMF funkcij
