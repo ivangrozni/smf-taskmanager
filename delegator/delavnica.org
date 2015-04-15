@@ -1,12 +1,11 @@
 #+TITLE: Handout za Delegator delavnico
 * Delegator delavnica
-* Delegator delavnica
 ** PHP osnove
 *** Splošno
     - dokaj C-jevska sintaksa (sicer enostavnejša)
-    - .php datoteko začnemo z <?php tagom
-    - { } za definicije blokov (funkcij, teles kontrolnih struktur...)
-    - ; konec stavkov - klic_funkcije();
+    - .php datoteko začnemo s src_php{<?php} tagom
+    - src_php{\{ \}} za definicije blokov (funkcij, teles kontrolnih struktur...)
+    - src_php{;} konec stavkov - src_php{klic_funkcije();}
 *** Podatkovne strukture
 **** Skalarni tip (spremenljvika z eno vrednostjo)
      #+BEGIN_SRC php
