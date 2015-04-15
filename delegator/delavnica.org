@@ -1,3 +1,4 @@
+#+TITLE Templeate Delegator delavnica
 * Delegator delavnico
 ** php osnove
     - if stavki (control structures)  
@@ -5,7 +6,17 @@
 
 ** Seznam php funkcij
  - die();
- 
+
+** SMF
+*** Spremenljivke
+    - ```$context``` (items for template)
+    - ```$txt``` (prevodi)
+    - ```$scripturl```
+    - ```$settings``` (global theme settings)
+    - ```$sourcedir``` (absolute path to Sources directory)
+    - ```$smcFunc``` (Funkcije)
+
+
 ** Seznam SMF funkcij
 
 
