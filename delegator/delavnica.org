@@ -1,4 +1,6 @@
 #+TITLE: Handout za Delegator delavnico
+#+OPTIONS: toc: 3
+
 * Delegator delavnica
 ** PHP osnove
 *** Splošno
@@ -251,3 +253,9 @@
     - ~pikaday.css~    
     - ~pikaday.jquery.js~
     - ~pikaday.js~    
+
+**** Povezave
+     [[http://www.simplemachines.org/community/index.php?topic=299670.0][modification.xml]]
+     [[http://www.simplemachines.org/community/index.php?topic=299669.0][package-info.xml]] 
+     [[http://wiki.simplemachines.org/smf/Coding_Guidelines][Smernice programiranja]]
+     [[http://wiki.simplemachines.org/smf/Customization_approval_guidelines][Smernice za kostumizacijo]]
