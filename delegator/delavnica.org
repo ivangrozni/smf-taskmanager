@@ -1,5 +1,5 @@
 #+TITLE: Handout za Delegator delavnico
-#+OPTIONS: toc: 3
+#+OPTIONS: toc:3
 
 * Delegator delavnica
 ** PHP osnove
