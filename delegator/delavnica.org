@@ -5,6 +5,7 @@
 * git
 
 Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med drugim je tudi izjemno orodje za sodelovanje.
+[[https://www.atlassian.com/git/][git tutorial]]
 
 ** Začetni ukazi
    - ~git init~ :: ustvari nov git repository (git arhiv)
@@ -39,10 +40,11 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      + ~git remote rm <ime_povezave>~ :: izbriše povezavo
      + ~git remote rename <staro_ime> <novo_ime>~ :: preimenuje povezavo
    - ~git fetch~ :: uvozi zgodovino commitov /(ne znam)/
+*** Porivanje in vlečenje
    - ~git pull <remote>~ :: združi vodilne spremembe iz oddaljenega arhiva v lokalni/delovni arhiv
      + ~git pull --rebase~ :: združi spremembe iz oddaljenega arhiva glede na čas commitov 
    - ~git push <remote> <ime_veje>~ :: prenos lokalnih sprememb na oddaljen arhiv
-#+begin_src ditaa :file dita-seqboxes.png
+#+begin_src ditaa :file dita-seqboxes1.png
              +-----------+
              | cBLU      |
              | Origin/m  |
@@ -60,7 +62,8 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
                                                       | m         |
                                                       +-----------+
 #+end_src
-#+begin_src ditaa :file dita-seqboxes.png
+
+#+begin_src ditaa :file dita-seqboxes2.png
                                                     +-----------+
                                                     | cBLU      |
                                                     | Origin/m  |
@@ -78,6 +81,32 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
                                                       | m         |
                                                       +-----------+
 #+end_src
+
+*** Veje
+    So neodvisne razvojne linije projekta. Novi komiti so shranjeni v zgodovino trenutne veje. 
+    - ~git branch~ :: ukaz lahko ustvari, prikaže, preimenuje in izbriše veje. Za preskakovanje med vejami se uporablja ~git checkout~.
+      + ~git branch~ :: prikaže vse veje v arhivu
+      + ~git branch <ime_veje>~ :: ustvari novo vejo, a se ne premakne v njo
+      + ~git branch -d <ime_veje>~ :: izbriše vejo
+      + ~git branch - <ime_veje>~ :: preimenuje trenutno vejo
+    Veje so sestavni del gitovega razvojnega procesa. Spremembe na projektu se najprej naredi v stranskih vejah. Ko je koda v stranski
+    veji stabilna, se jo lahko združi (merge-a) v glavno vejo. 
+    - ~git checkout <ime_veje>~ :: odpre že obstoječo vejo (prej je morala biti ustvarjena z ~git branc~)
+    - ~git checkout -b <ime_nove_veje>~ :: združi z ukazom za ustvarjanje nove veje
+**** Združevanje (merge)
+     Je način, kako nazaj združimo razdeljeno zgodovino. Vse spremembe se zapišejo v trenutno/izbrano vejo.
+     - ~git merge <ime_veje>~ :: spremembe izbrane veje se zapišejo v trenutno vejo
+     Če se v združevanih vejah niso urejale iste stvari, potem ne pride do konfliktov in veji se združita hitro. Ako pa so se spreminjale
+     iste stvari v združevanih vejah, dobimo spore, ki jih je potrebno razrešiti. Dobimo *tro-vejno združevanje*, saj se za združevanje 
+     uporabljajo trije komiti - vodilna komita iz vsake veje in njunega skupnega prednika.
+*** Delovni proces
+    1. koliniraš ali povlečeš projekt
+    2. ustvariš novo vejo (zamisliš si neko funkcijo oz nek dodatek za k projektu)
+    3. razvijaš novo vejo, dodajaš komite in potiskaš kodo v oddaljen arhiv
+    4. ko si s kodo zadovoljen jo združiš z glavno vejo (pull request)
+    5. spet povlečeš projekt, ustvariš novo vejo, itn.
+
+    [[https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow][workflow tutorial]]
 
 * PHP osnove
 ** Splošno
@@ -287,8 +316,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
     - ~$settings~ (globalne nastavitve teme)
     - ~$sourcedir~ (absolutna pot do mape Sources)
     - ~$smcFunc~ (Funkcije)
-
-
+      
 ** Seznam SMF funkcij
 
     [[http://dev.simplemachines.org/smcfunctions.php][SMF Funkcije]]
