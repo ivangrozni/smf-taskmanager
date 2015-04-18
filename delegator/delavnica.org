@@ -4,11 +4,80 @@
 * Uvod
 * git
 
-Git je sistem za nadzor nad verzijami programa. In seveda še mnogo več. Med drugim je tudi izjemno orodje za sodelovanje.
+Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med drugim je tudi izjemno orodje za sodelovanje.
 
-Osnovni ukazi:
- - ~git init~ 
+** Začetni ukazi
+   - ~git init~ :: ustvari nov git repository (git arhiv)
+   - ~git clone <repo>~ :: kopira obstoječ git arhiv
+   - ~git config~ :: podatki uporabnika
+ 
+*** Shranjevanje
+   - ~git add <datoteke>~ :: dodajanje datotek, ki bodo vključene v naslednji commit (spremembo)
+   - ~git commit <datoteke>~ :: zapiše izbrane spremembe v zgodovino projekta - ta zgodovina je shranjena lokalno
 
+*** Pregledovanje arhiva
+   - ~git status~ :: prikaže stanje v delovni mapi in spremembe v njej
+   - ~git log~ :: prikaže zgodovino projekta
+   - ~git checkout~ :: 3 načini uporabe
+     + ~git checkout <ime_veje>~ :: pojdi v vejo
+     + ~git checkout <commit> <ime_datoteke>~ :: poglej prejšno verzije datoteke
+     + ~git checkout <commit~ :: Posodobi vse datoteke, da ustrezajo izbranemu komitu
+
+*** Razveljavljanje sprememb /(ne znam)/
+   - ~git checkout~ 
+   - ~git revert~ 
+   - ~git reset~ 
+   - ~git clean~ 
+   - ~git commit --amend~ 
+   - ~git rebase~ 
+
+** Sodelovanje
+   - ~git remote~ :: ukaz za ustvarjanje, ogled in brisanje povezov do drugih arhivov
+     + ~git remote -v~ :: prikaže povezave do drugih arhivov
+     + ~git remote add <ime_povezave> <url>~ :: ustvari povezavo do oddaljenega arhiva
+          Url je lahko ~http~ ali ~ssh~ povezava. Slednja ima prednost lažjega zapisovnja, al kaj.
+     + ~git remote rm <ime_povezave>~ :: izbriše povezavo
+     + ~git remote rename <staro_ime> <novo_ime>~ :: preimenuje povezavo
+   - ~git fetch~ :: uvozi zgodovino commitov /(ne znam)/
+   - ~git pull <remote>~ :: združi vodilne spremembe iz oddaljenega arhiva v lokalni/delovni arhiv
+     + ~git pull --rebase~ :: združi spremembe iz oddaljenega arhiva glede na čas commitov 
+   - ~git push <remote> <ime_veje>~ :: prenos lokalnih sprememb na oddaljen arhiv
+#+begin_src ditaa :file dita-seqboxes.png
+             +-----------+
+             | cBLU      |
+             | Origin/m  |
+             +-----------+
+                  | 
+                  | 
+/-------\     /---+---\     /-------\    /-------\     /-------\
+|       |     |       |     |       |    |       |     |       |
+| v1    +-----| v2    +-----| v3    +----| v4    +-----| v5    | 
+\-------/     \-------/     \-------/    \-------/     \---+---/
+                                                           |
+                                                           |
+                                                      +----+------+
+                                                      | cBLU      |
+                                                      | m         |
+                                                      +-----------+
+#+end_src
+#+begin_src ditaa :file dita-seqboxes.png
+                                                    +-----------+
+                                                    | cBLU      |
+                                                    | Origin/m  |
+                                                    +------+----+
+                                                           |
+                                                           |
+/-------\     /---+---\     /-------\    /-------\     /---+---\
+|       |     |       |     |       |    |       |     |       |
+| v1    +-----| v2    +-----| v3    +----| v4    +-----| v5    | 
+\-------/     \-------/     \-------/    \-------/     \---+---/
+                                                           |
+                                                           |
+                                                      +----+------+
+                                                      | cBLU      |
+                                                      | m         |
+                                                      +-----------+
+#+end_src
 
 * PHP osnove
 ** Splošno
