@@ -140,6 +140,9 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
     - include "imedatoteke.php";
 
       Include vključi (požene) kodo iz poljubne datoteke
+
+    - Konfiguracija v php.ini
+    - Obstaja zelo veliko modulov
 ** Podatkovne strukture
 *** Skalarni tip (spremenljvika z eno vrednostjo)
 
@@ -203,20 +206,128 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
 
       #+BEGIN_SRC php
       $polje = [1, "dva", 3];
+      $polje = array(1, "dva", 3);
       echo($polje[1]); // 1
       echo($polje[2]); // "dva"
       #+END_SRC
-**** Asociativno polje (associative array)
-    - Seznam vrednosti, indeksiran z vrednostmi kateregakoli tipa
+*** Asociativno polje (associative array)
+     - Seznam vrednosti, indeksiran z vrednostmi kateregakoli tipa
 
+     #+BEGIN_SRC php
+     $asociativno_polje = array(
+           "kljuc" => "vrednost!",
+           1001 => true
+     );
+     $asociativno_polje = [
+           "kljuc" => "vrednost!",
+           1001 => true
+     ];
+     echo($asociativno_polje["kljuc"]); // "vrednost!"
+     echo($asociativno_polje[1001]); // true
+     #+END_SRC
+
+*** Posebne spremenljivke
+    - $_GET
+
+      Vsebuje asociativno polje parametrov, podanih preko naslova.
+
+      Primer:http://stran.domena.si/skripta.php?stran=1&objekt=streha
       #+BEGIN_SRC php
-      $asociativno_polje = [
-            "kljuc" => "vrednost!",
-            1001 => true
-      ];
-      echo($asociativno_polje["kljuc"]); // "vrednost!"
-      echo($asociativno_polje[1001]); // true
+      [
+          "stran" => "1",
+          "objekt" => "streha"
+      ]
       #+END_SRC
+
+    - $_POST
+
+      Vsebuje POST podatke, ki se pošljejo kadar oddamo obrazec (form), pri
+      nalaganju datotek itd.
+
+    - $_SERVER
+
+      Seznam raznih podatkov o strežniku
+
+    - $_REQUEST
+
+      Seznam podatkov oddanega obrazca (najdemo jih tudi v POST, ampak so tam
+      lahko še kakšni drugi)
+
+    - $_SESSION
+
+      Vsebuje seznam vrednosti seje (session), ki služi ohranjanju istih
+      podatkov posameznega uporabnika, med večimi zahtevki
+      
+    - $_ENV
+
+      Okoljske spremenljivke sistema (če je omogočeno v konfiguraciji)
+      
+    - $_COOKIE
+
+      Podatki piškotka uporabnika. Piškotki so malo podobni seji, vendar se
+      njihovi podatki ne hranji na strežniku, temveč v brskalniku uporabnika
+      samega
+
+    - $_FILES
+
+      Asociativno polje, ki vsebuje datoteke, naložene s POST zahtevkom
+
+** Operatorji
+*** Aritmetični
+    #+BEGIN_SRC php
+    1 + 3  // 8
+    1 - 1  // 0
+    2 * 5  // 10
+    8 / 4  // 2
+    10 % 4 // 2
+    2**3   // 8
+    #+END_SRC
+
+*** Določitveni
+    #+BEGIN_SRC php
+    $blah = "tekst";
+    $st += 1;
+    $test -= 4;
+    $num *= 2;
+    $N /= 3;
+    $veliko %= 5;
+    "eno" . " in " . " drugo" // "eno in drugo"
+    $tekst = "Pozdravljen";
+    $tekst .+ ", svet!"; // "Pozdravljen, svet!"
+    #+END_SRC
+     
+*** Primerjalni
+    #+BEGIN_SRC php
+    1 == 2         // false
+    null == 0      // true
+    false == null  // true
+    4 != 4         // false
+    8 != "test"    // true
+    2 <> 7         // true
+
+    0 === null     // false
+    null !== false // true
+
+    6 < 7          // true
+    9 > 27         // false
+
+    3 >= 1         // false
+    7 >= 5 + 2     // true
+    #+END_SRC
+
+*** Logiški
+    #+BEGIN_SRC php
+    1 && 0          // false
+    false and false // true
+
+    1 || 0          // true
+    false or 0      // false
+
+    true xor true   // false
+    0 xor true      // true
+
+    !true           // false
+    #+END_SRC
 
 ** Kontrolne strukture
 *** If stavki
@@ -286,6 +397,22 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      }
      #+END_SRC
 
+*** Switch stavek
+    - Podoben if / elseif / else, ampak nekoliko berljivejši
+
+    #+BEGIN_SRC php
+    switch ($spremenljivka) {
+        case 1:
+            narediNekaj();
+            break;
+        case "drugo":
+            drug_primer();
+            break;
+        default:
+            privzeto();
+    }
+    #+END_SRC
+
 ** Funkcije
      #+BEGIN_SRC php
      function imeFunkcije ($argument, &$referencniArgument) {
@@ -296,14 +423,63 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      #+END_SRC
 
      #+BEGIN_SRC php
-     function sestej ($prvo, $drugo) {
+     function sestej ($prvo, $drugo, $neobvezno = 0) {
          return $prvo + $drugo + 2;
      }
-     sestej(2, 3); // Vrne 7
+     sestej(2, 3);    // Vrne 7
+     sestej(2, 3, 5); // Vrne 12
      #+END_SRC
 
-** Seznam php funkcij
- - die();
+** Seznam primerov raznih PHP funkcij
+ - [[http://php.net/manual/en/function.substr.php][Povezava do seznama
+   funkcij]]
+
+ - implode($veznik, $polje)
+
+   Združi elemente polja z znakom $veznik
+
+   #+BEGIN_SRC php
+   $polje = ["Janez", "Marija", "Ana", "Zdravko"];
+   echo(implode(", ", $polje));   // "Janez, Marija, Ana, Zdravko"
+   #+END_SRC
+
+ - explode($locilo, $niz[, $meja])
+
+   Razstavi niz znakov v polje elementov, ki so med seboj ločeni z
+   znakom/znaki $locilo. Število elementov lahko po želji omejimo z $meja
+
+   #+BEGIN_SRC php
+   $niz = "Kadar spimo|Lep dan|tretje";
+   echo(explode("|", $niz, 2));   // ["Kadar spimo", "Lep dan|tretje"]
+   #+END_SRC
+
+ - strpos($niz, $iskano[, $zamik])
+
+   Poišče prvo pojavitev znaka/niza $iskano v znakovnem nizu $niz, lahko pa
+   tudi podamo zanim, po katerem začne iskati.
+
+ - strtoupper($niz)
+
+   Spremeni niz v velike črke
+
+ - strtolower($niz)
+
+   Spremeni niz v male črke
+
+ - count($spremenljivka)
+
+   Vrne dolžino za vrednost $spremenljivka. Če gre za niz, vrne število
+   znakov, pri polju pa število elementov
+
+ - substr($niz, $zacetek[, $dolzina])
+
+   Vrne podniz zankovnega niza $niz, od položaja $zacetek do konca, če pa
+   podamo $dolzina, pa le toliko znakov
+
+ - die([$sporocilo]);
+
+   Končaj izvajanje programa, kjer je to klicano. Lahko podamo tudi
+   sporočilo, ki se izpiše pred izhodom
 
 * SMF
 ** Spremenljivke
