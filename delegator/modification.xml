@@ -52,7 +52,7 @@ Drop down menu: @Jaka - kaj rabimo?
 					),
 
                                         'add_proj' => array(
-                                            'title' => $txt['delegator_add_proj'],
+                                            'title' => $txt['delegator_project_add'],
                                             'href' => $scripturl . '?action=delegator;sa=proj',
                                             'show' => allowedTo('delegator_add_task'),
                                             'is_last' => true,

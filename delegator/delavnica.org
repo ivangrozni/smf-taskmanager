@@ -119,7 +119,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      #+END_SRC
 
      #+BEGIN_SRC php
-     print_r($spremenljivka); // izpiše "vrednost"
+     echo($spremenljivka); // "vrednost"
      #+END_SRC
 
 **** Tipi skalarjev
@@ -166,6 +166,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
 
        #+BEGIN_SRC php
        define("IMEKONSTANTE", vrednost);
+       echo(IMEKONSTANTE); // vrednost
        #+END_SRC
 *** Polje (array)
     - Vsebuje zaporeden seznam vrednosti kateregakoli tipa (kot pri skalarjih)
@@ -173,8 +174,8 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
 
       #+BEGIN_SRC php
       $polje = [1, "dva", 3];
-      $polje[1] vsebuje 1
-      $polje[2] vsebuje "dva"
+      echo($polje[1]); // 1
+      echo($polje[2]); // "dva"
       #+END_SRC
 **** Asociativno polje (associative array)
     - Seznam vrednosti, indeksiran z vrednostmi kateregakoli tipa
@@ -184,8 +185,8 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
             "kljuc" => "vrednost!",
             1001 => true
       ];
-      $asociativno_polje["kljuc"]; // "vrednost!"
-      $asociativno_polje[1001]; // true
+      echo($asociativno_polje["kljuc"]); // "vrednost!"
+      echo($asociativno_polje[1001]); // true
       #+END_SRC
 
 ** Kontrolne strukture
@@ -242,7 +243,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      #+BEGIN_SRC php
      $stevec = [1, 2, 3, 4];
      foreach ($stevec as $stevilo) {
-         print_r("$stevilo!\n");
+         echo("$stevilo!\n");
      }
      #+END_SRC
 
@@ -252,7 +253,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
          "drugo" => "tretje"
      ];
      foreach ($polje as $kljuc => $vrednost) {
-         print_r("vrednost " . $kljuc . ": " . $vrednost . "\n");
+         echo("vrednost " . $kljuc . ": " . $vrednost . "\n");
      }
      #+END_SRC
 
