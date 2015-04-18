@@ -1,9 +1,17 @@
 #+TITLE: Handout za Delegator delavnico
-#+OPTIONS: toc:3
+#+OPTIONS: toc :3
 
-* Delegator delavnica
-** PHP osnove
-*** Splošno
+* Uvod
+* git
+
+Git je sistem za nadzor nad verzijami programa. In seveda še mnogo več. Med drugim je tudi izjemno orodje za sodelovanje.
+
+Osnovni ukazi:
+ - ~git init~ 
+
+
+* PHP osnove
+** Splošno
     - dokaj C-jevska sintaksa (sicer enostavnejša)
     - .php datoteko začnemo s <?php tagom, opcionalno zaključimo z ?>
 
@@ -34,8 +42,8 @@
     - include "imedatoteke.php";
 
       Include vključi (požene) kodo iz poljubne datoteke
-*** Podatkovne strukture
-**** Skalarni tip (spremenljvika z eno vrednostjo)
+** Podatkovne strukture
+*** Skalarni tip (spremenljvika z eno vrednostjo)
 
      #+BEGIN_SRC php
      $spremenljivka = "vrednost";
@@ -45,7 +53,7 @@
      print_r($spremenljivka); // izpiše "vrednost"
      #+END_SRC
 
-***** Tipi skalarjev
+**** Tipi skalarjev
       - Besedilo (string)
 
         #+BEGIN_SRC php
@@ -84,13 +92,13 @@
         }
         $opravilo();
         #+END_SRC
-**** Konstante
+*** Konstante
      - nespremenljive
 
        #+BEGIN_SRC php
        define("IMEKONSTANTE", vrednost);
        #+END_SRC
-**** Polje (array)
+*** Polje (array)
     - Vsebuje zaporeden seznam vrednosti kateregakoli tipa (kot pri skalarjih)
     - Dostop do elementov z zaporednim številom, začenši z 0
 
@@ -111,8 +119,8 @@
       $asociativno_polje[1001]; // true
       #+END_SRC
 
-*** Kontrolne strukture
-**** If stavki
+** Kontrolne strukture
+*** If stavki
      #+BEGIN_SRC php
      if (pogoj) posledica else drugaposledica;
      #+END_SRC
@@ -136,7 +144,7 @@
      endif;
      #+END_SRC
 
-**** While zanke
+*** While zanke
      #+BEGIN_SRC php
      while (pogoj) {
          ponavljaj;
@@ -155,7 +163,7 @@
      endwhile;
      #+END_SRC
 
-**** For zanke
+*** For zanke
      #+BEGIN_SRC php
      for ($i = 0; $i < 3; $i++) {
          ponovi;     // Ponovi 3x
@@ -179,7 +187,7 @@
      }
      #+END_SRC
 
-*** Funkcije
+** Funkcije
      #+BEGIN_SRC php
      function imeFunkcije ($argument, &$referencniArgument) {
          telo_funkcije;
@@ -198,19 +206,21 @@
 ** Seznam php funkcij
  - die();
 
-** SMF
-*** Spremenljivke
+* SMF
+** Spremenljivke
+
     [[http://wiki.simplemachines.org/smf/Global_variables][SMF variable]]
 
-    - ~$context~ (items for template)
+    - ~$context~ (predmeti/spremenljivke za v predlogo)
     - ~$txt~ (prevodi)
     - ~$scripturl~
-    - ~$settings~ (global theme settings)
-    - ~$sourcedir~ (absolute path to Sources directory)
+    - ~$settings~ (globalne nastavitve teme)
+    - ~$sourcedir~ (absolutna pot do mape Sources)
     - ~$smcFunc~ (Funkcije)
 
 
-*** Seznam SMF funkcij
+** Seznam SMF funkcij
+
     [[http://dev.simplemachines.org/smcfunctions.php][SMF Funkcije]]
 
     Primer klica:
@@ -239,7 +249,7 @@
     Ostale funckije:
      - ~checkSession()~ - preveri, če je uporabnik pravi
 
-*** Struktura Moda
+** Struktura Moda
 
     datoteke:
     - ~package-info.xml~
@@ -254,8 +264,8 @@
     - ~pikaday.jquery.js~
     - ~pikaday.js~    
 
-**** Povezave
-     [[http://www.simplemachines.org/community/index.php?topic=299670.0][modification.xml]]
-     [[http://www.simplemachines.org/community/index.php?topic=299669.0][package-info.xml]] 
-     [[http://wiki.simplemachines.org/smf/Coding_Guidelines][Smernice programiranja]]
-     [[http://wiki.simplemachines.org/smf/Customization_approval_guidelines][Smernice za kostumizacijo]]
+*** Povezave
+     - [[http://www.simplemachines.org/community/index.php?topic=299670.0][modification.xml]]
+     - [[http://www.simplemachines.org/community/index.php?topic=299669.0][package-info.xml]] 
+     - [[http://wiki.simplemachines.org/smf/Coding_Guidelines][Smernice programiranja]]
+     - [[http://wiki.simplemachines.org/smf/Customization_approval_guidelines][Smernice za kostumizacijo]]
