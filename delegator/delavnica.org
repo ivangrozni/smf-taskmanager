@@ -395,10 +395,11 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
 *** Pregledovanje arhiva
    - ~git status~ :: prikaže stanje v delovni mapi in spremembe v njej
    - ~git log~ :: prikaže zgodovino projekta
+
    - ~git checkout~ :: 3 načini uporabe
      + ~git checkout <ime_veje>~ :: pojdi v vejo
      + ~git checkout <commit> <ime_datoteke>~ :: poglej prejšno verzije datoteke
-     + ~git checkout <commit~ :: Posodobi vse datoteke, da ustrezajo izbranemu komitu
+     + ~git checkout <commit>~ :: Posodobi vse datoteke, da ustrezajo izbranemu komitu
 
 #+begin_src ditaa :file dita-seqboxes0.png
 /-------\     /-------\     /-------\    /-------\     /-------\          /-------\
@@ -416,7 +417,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
    - ~git rebase~ 
 
 ** Sodelovanje
-   Za skupno delo na projektu je potrebno dodati povezavo do oddaljenjega arhiva. Ta lahko poteka preko HTTP(S)
+   Za skupno delo na projektu je potrebno dodati povezavo do oddaljenjega arhiva (remote). Ta lahko poteka preko HTTP(S)
    protokola ali ssh.
    - ~git remote~ :: ukaz za ustvarjanje, ogled in brisanje povezov do drugih arhivov
      + ~git remote -v~ :: prikaže povezave do drugih arhivov
@@ -428,7 +429,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
 *** Porivanje in vlečenje
    - ~git pull <remote>~ :: združi vodilne spremembe iz oddaljenega arhiva v lokalni/delovni arhiv
      + ~git pull --rebase~ :: združi spremembe iz oddaljenega arhiva glede na čas commitov 
-   - ~git push <remote> <ime_veje>~ :: prenos lokalnih sprememb na oddaljen arhiv
+   - ~git push <ime_povezave> <ime_veje>~ :: prenos lokalnih sprememb na oddaljen arhiv
 #+begin_src ditaa :file dita-seqboxes1.png
              +-----------+
              | cBLU      |
@@ -473,7 +474,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
       + ~git branch~ :: prikaže vse veje v arhivu
       + ~git branch <ime_veje>~ :: ustvari novo vejo, a se ne premakne v njo
       + ~git branch -d <ime_veje>~ :: izbriše vejo
-      + ~git branch - <ime_veje>~ :: preimenuje trenutno vejo
+      + ~git branch -m <novo_ime_veje>~ :: preimenuje trenutno vejo
     Veje so sestavni del gitovega razvojnega procesa. Spremembe na projektu se najprej naredi v stranskih vejah. Ko je koda v stranski
     veji stabilna, se jo lahko združi (merge-a) v glavno vejo. 
     - ~git checkout <ime_veje>~ :: odpre že obstoječo vejo (prej je morala biti ustvarjena z ~git branc~)
@@ -500,6 +501,7 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
                         \-------/    \-------/
 
 #+end_src
+
 *** Delovni proces
     1. koliniraš ali povlečeš projekt
     2. ustvariš novo vejo (zamisliš si neko funkcijo oz nek dodatek za k projektu)
@@ -508,6 +510,11 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
     5. spet povlečeš projekt, ustvariš novo vejo, itn.
 
     [[https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow][workflow tutorial]]
+
+
+** Naloge
+   - kloniraj projekt
+   - 
 
 * SMF
 ** Spremenljivke
