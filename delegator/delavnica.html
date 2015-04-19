@@ -1,0 +1,1219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Handout za Delegator delavnico</title>
+<!-- 2015-04-19 Sun 14:34 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="len" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Handout za Delegator delavnico</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Uvod</a></li>
+<li><a href="#sec-2">2. PHP osnove</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Splošno</a></li>
+<li><a href="#sec-2-2">2.2. Podatkovne strukture</a>
+<ul>
+<li><a href="#sec-2-2-1">2.2.1. Skalarni tip (spremenljvika z eno vrednostjo)</a></li>
+<li><a href="#sec-2-2-2">2.2.2. Konstante</a></li>
+<li><a href="#sec-2-2-3">2.2.3. Polje (array)</a></li>
+<li><a href="#sec-2-2-4">2.2.4. Asociativno polje (associative array)</a></li>
+<li><a href="#sec-2-2-5">2.2.5. Posebne spremenljivke</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-3">2.3. Operatorji</a>
+<ul>
+<li><a href="#sec-2-3-1">2.3.1. Aritmetični</a></li>
+<li><a href="#sec-2-3-2">2.3.2. Določitveni</a></li>
+<li><a href="#sec-2-3-3">2.3.3. Primerjalni</a></li>
+<li><a href="#sec-2-3-4">2.3.4. Logiški</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-4">2.4. Kontrolne strukture</a>
+<ul>
+<li><a href="#sec-2-4-1">2.4.1. If stavki</a></li>
+<li><a href="#sec-2-4-2">2.4.2. While zanke</a></li>
+<li><a href="#sec-2-4-3">2.4.3. For zanke</a></li>
+<li><a href="#sec-2-4-4">2.4.4. Switch stavek</a></li>
+</ul>
+</li>
+<li><a href="#sec-2-5">2.5. Funkcije</a></li>
+<li><a href="#sec-2-6">2.6. Seznam primerov raznih PHP funkcij</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. git</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Začetni ukazi</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. Shranjevanje</a></li>
+<li><a href="#sec-3-1-2">3.1.2. Pregledovanje arhiva</a></li>
+<li><a href="#sec-3-1-3">3.1.3. Razveljavljanje sprememb <i>(ne znam)</i></a></li>
+</ul>
+</li>
+<li><a href="#sec-3-2">3.2. Sodelovanje</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. Porivanje in vlečenje</a></li>
+<li><a href="#sec-3-2-2">3.2.2. Veje</a></li>
+<li><a href="#sec-3-2-3">3.2.3. Delovni proces</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-4">4. SMF</a>
+<ul>
+<li><a href="#sec-4-1">4.1. Spremenljivke</a></li>
+<li><a href="#sec-4-2">4.2. Seznam SMF funkcij</a></li>
+<li><a href="#sec-4-3">4.3. Struktura Moda</a>
+<ul>
+<li><a href="#sec-4-3-1">4.3.1. Povezave</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Uvod</h2>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> PHP osnove</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Splošno</h3>
+<div class="outline-text-3" id="text-2-1">
+<ul class="org-ul">
+<li>dokaj C-jevska sintaksa (sicer enostavnejša)
+</li>
+<li>.php datoteko začnemo s &lt;?php tagom, opcionalno zaključimo z ?&gt;
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #919191;">&lt;?php</span>
+      program;
+      in_to;
+<span style="color: #919191;">?&gt;</span>
+</pre>
+</div>
+</li>
+
+<li>{ } za definicije blokov (funkcij, teles kontrolnih struktur&#x2026;)
+</li>
+<li>; konec stavkov
+
+<div class="org-src-container">
+
+<pre class="src src-php">klic_funkcije();
+</pre>
+</div>
+</li>
+
+<li>Komentarji
+
+<div class="org-src-container">
+
+<pre class="src src-php">koda; <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">Enovrsti&#269;ni komentar</span>
+<span style="color: #8e908c; font-style: italic;">/*</span>
+<span style="color: #8B8989; font-style: italic;">    ve&#269;vrsti&#269;ni</span>
+<span style="color: #8B8989; font-style: italic;">    komentar</span>
+<span style="color: #8B8989; font-style: italic;">*/</span>
+</pre>
+</div>
+</li>
+
+<li>include "imedatoteke.php";
+
+<p>
+Include vključi (požene) kodo iz poljubne datoteke
+</p>
+</li>
+
+<li>Konfiguracija v php.ini
+</li>
+<li>Obstaja zelo veliko modulov
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Podatkovne strukture</h3>
+<div class="outline-text-3" id="text-2-2">
+</div><div id="outline-container-sec-2-2-1" class="outline-4">
+<h4 id="sec-2-2-1"><span class="section-number-4">2.2.1</span> Skalarni tip (spremenljvika z eno vrednostjo)</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">spremenljivka</span> = <span style="color: #61CE3C;">"vrednost"</span>;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">echo</span>(<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">spremenljivka</span>); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">"vrednost"</span>
+</pre>
+</div>
+</div>
+
+<ol class="org-ol"><li><a id="sec-2-2-1-1" name="sec-2-2-1-1"></a>Tipi skalarjev<br  /><div class="outline-text-5" id="text-2-2-1-1">
+<ul class="org-ul">
+<li>Besedilo (string)
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #61CE3C;">'Dobeseden tekst'</span>, <span style="color: #61CE3C;">"Tekst s spremenljivko: </span><span style="color: #D8FA3C;">$stevilo</span><span style="color: #61CE3C;">"</span>
+</pre>
+</div>
+</li>
+
+<li>Število (integer) - celo število
+
+<div class="org-src-container">
+
+<pre class="src src-php">0, 42, -123 ...
+</pre>
+</div>
+</li>
+
+<li>Decimalno število (float)
+
+<div class="org-src-container">
+
+<pre class="src src-php">0.5, -12.952 ...
+</pre>
+</div>
+</li>
+
+<li>Binarna vrednost (boolean)
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #4c83ff;">true</span> / <span style="color: #4c83ff;">false</span>
+</pre>
+</div>
+</li>
+
+<li>Ničelna vrednost
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #4c83ff;">null</span>
+</pre>
+</div>
+</li>
+
+<li>V skalar lahko tudi shranimo funkcijo
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">opravilo</span> = <span style="color: #FBDE2D;">function</span>() {
+    izvedi;
+}
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">opravilo</span>();
+</pre>
+</div>
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-2-2-2" class="outline-4">
+<h4 id="sec-2-2-2"><span class="section-number-4">2.2.2</span> Konstante</h4>
+<div class="outline-text-4" id="text-2-2-2">
+<ul class="org-ul">
+<li>nespremenljive
+
+<div class="org-src-container">
+
+<pre class="src src-php">define(<span style="color: #61CE3C;">"IMEKONSTANTE"</span>, vrednost);
+<span style="color: #FBDE2D;">echo</span>(<span style="color: #4c83ff;">IMEKONSTANTE</span>); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">vrednost</span>
+</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2-2-3" class="outline-4">
+<h4 id="sec-2-2-3"><span class="section-number-4">2.2.3</span> Polje (array)</h4>
+<div class="outline-text-4" id="text-2-2-3">
+<ul class="org-ul">
+<li>Vsebuje zaporeden seznam vrednosti kateregakoli tipa (kot pri skalarjih)
+</li>
+<li>Dostop do elementov z zaporednim številom, začenši z 0
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span> = [1, <span style="color: #61CE3C;">"dva"</span>, 3];
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span> = <span style="color: #FBDE2D;">array</span>(1, <span style="color: #61CE3C;">"dva"</span>, 3);
+<span style="color: #FBDE2D;">echo</span>(<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span>[1]); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">1</span>
+<span style="color: #FBDE2D;">echo</span>(<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span>[2]); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">"dva"</span>
+</pre>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2-2-4" class="outline-4">
+<h4 id="sec-2-2-4"><span class="section-number-4">2.2.4</span> Asociativno polje (associative array)</h4>
+<div class="outline-text-4" id="text-2-2-4">
+<ul class="org-ul">
+<li>Seznam vrednosti, indeksiran z vrednostmi kateregakoli tipa
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">asociativno_polje</span> = <span style="color: #FBDE2D;">array</span>(
+      <span style="color: #61CE3C;">"kljuc"</span> =&gt; <span style="color: #61CE3C;">"vrednost!"</span>,
+      1001 =&gt; <span style="color: #4c83ff;">true</span>
+);
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">asociativno_polje</span> = [
+      <span style="color: #61CE3C;">"kljuc"</span> =&gt; <span style="color: #61CE3C;">"vrednost!"</span>,
+      1001 =&gt; <span style="color: #4c83ff;">true</span>
+];
+<span style="color: #FBDE2D;">echo</span>(<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">asociativno_polje</span>[<span style="color: #61CE3C;">"kljuc"</span>]); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">"vrednost!"</span>
+<span style="color: #FBDE2D;">echo</span>(<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">asociativno_polje</span>[1001]); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2-5" class="outline-4">
+<h4 id="sec-2-2-5"><span class="section-number-4">2.2.5</span> Posebne spremenljivke</h4>
+<div class="outline-text-4" id="text-2-2-5">
+<ul class="org-ul">
+<li>$<sub>GET</sub>
+
+<p>
+Vsebuje asociativno polje parametrov, podanih preko naslova.
+</p>
+
+<p>
+Primer:<a href="http://stran.domena.si/skripta.php?stran=1&objekt=streha">http://stran.domena.si/skripta.php?stran=1&objekt=streha</a>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-php">[
+    <span style="color: #61CE3C;">"stran"</span> =&gt; <span style="color: #61CE3C;">"1"</span>,
+    <span style="color: #61CE3C;">"objekt"</span> =&gt; <span style="color: #61CE3C;">"streha"</span>
+]
+</pre>
+</div>
+</li>
+
+<li>$<sub>POST</sub>
+
+<p>
+Vsebuje POST podatke, ki se pošljejo kadar oddamo obrazec (form), pri
+nalaganju datotek itd.
+</p>
+</li>
+
+<li>$<sub>SERVER</sub>
+
+<p>
+Seznam raznih podatkov o strežniku
+</p>
+</li>
+
+<li>$<sub>REQUEST</sub>
+
+<p>
+Seznam podatkov oddanega obrazca (najdemo jih tudi v POST, ampak so tam
+lahko še kakšni drugi)
+</p>
+</li>
+
+<li>$<sub>SESSION</sub>
+
+<p>
+Vsebuje seznam vrednosti seje (session), ki služi ohranjanju istih
+podatkov posameznega uporabnika, med večimi zahtevki
+</p>
+</li>
+
+<li>$<sub>ENV</sub>
+
+<p>
+Okoljske spremenljivke sistema (če je omogočeno v konfiguraciji)
+</p>
+</li>
+
+<li>$<sub>COOKIE</sub>
+
+<p>
+Podatki piškotka uporabnika. Piškotki so malo podobni seji, vendar se
+njihovi podatki ne hranji na strežniku, temveč v brskalniku uporabnika
+samega
+</p>
+</li>
+
+<li>$<sub>FILES</sub>
+
+<p>
+Asociativno polje, ki vsebuje datoteke, naložene s POST zahtevkom
+</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Operatorji</h3>
+<div class="outline-text-3" id="text-2-3">
+</div><div id="outline-container-sec-2-3-1" class="outline-4">
+<h4 id="sec-2-3-1"><span class="section-number-4">2.3.1</span> Aritmetični</h4>
+<div class="outline-text-4" id="text-2-3-1">
+<div class="org-src-container">
+
+<pre class="src src-php">1 + 3  <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">8</span>
+1 - 1  <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">0</span>
+2 * 5  <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">10</span>
+8 / 4  <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">2</span>
+10 % 4 <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">2</span>
+2**3   <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">8</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-2" class="outline-4">
+<h4 id="sec-2-3-2"><span class="section-number-4">2.3.2</span> Določitveni</h4>
+<div class="outline-text-4" id="text-2-3-2">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">blah</span> = <span style="color: #61CE3C;">"tekst"</span>;
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">st</span> += 1;
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">test</span> -= 4;
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">num</span> *= 2;
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">N</span> /= 3;
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">veliko</span> %= 5;
+<span style="color: #61CE3C;">"eno"</span> . <span style="color: #61CE3C;">" in "</span> . <span style="color: #61CE3C;">" drugo"</span> <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">"eno in drugo"</span>
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">tekst</span> = <span style="color: #61CE3C;">"Pozdravljen"</span>;
+<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">tekst</span> .+ <span style="color: #61CE3C;">", svet!"</span>; <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">"Pozdravljen, svet!"</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-3" class="outline-4">
+<h4 id="sec-2-3-3"><span class="section-number-4">2.3.3</span> Primerjalni</h4>
+<div class="outline-text-4" id="text-2-3-3">
+<div class="org-src-container">
+
+<pre class="src src-php">1 == 2         <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+<span style="color: #4c83ff;">null</span> == 0      <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+<span style="color: #4c83ff;">false</span> == <span style="color: #4c83ff;">null</span>  <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+4 != 4         <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+8 != <span style="color: #61CE3C;">"test"</span>    <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+2 &lt;&gt; 7         <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+
+0 === <span style="color: #4c83ff;">null</span>     <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+<span style="color: #4c83ff;">null</span> !== <span style="color: #4c83ff;">false</span> <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+
+6 &lt; 7          <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+9 &gt; 27         <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+
+3 &gt;= 1         <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+7 &gt;= 5 + 2     <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-3-4" class="outline-4">
+<h4 id="sec-2-3-4"><span class="section-number-4">2.3.4</span> Logiški</h4>
+<div class="outline-text-4" id="text-2-3-4">
+<div class="org-src-container">
+
+<pre class="src src-php">1 &amp;&amp; 0          <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+<span style="color: #4c83ff;">false</span> <span style="color: #FBDE2D;">and</span> <span style="color: #4c83ff;">false</span> <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+
+1 || 0          <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+<span style="color: #4c83ff;">false</span> <span style="color: #FBDE2D;">or</span> 0      <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+
+<span style="color: #4c83ff;">true</span> <span style="color: #FBDE2D;">xor</span> <span style="color: #4c83ff;">true</span>   <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+0 <span style="color: #FBDE2D;">xor</span> <span style="color: #4c83ff;">true</span>      <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">true</span>
+
+<span style="color: #4271ae;">!</span><span style="color: #4c83ff;">true</span>           <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">false</span>
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4" class="outline-3">
+<h3 id="sec-2-4"><span class="section-number-3">2.4</span> Kontrolne strukture</h3>
+<div class="outline-text-3" id="text-2-4">
+</div><div id="outline-container-sec-2-4-1" class="outline-4">
+<h4 id="sec-2-4-1"><span class="section-number-4">2.4.1</span> If stavki</h4>
+<div class="outline-text-4" id="text-2-4-1">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">if</span> (pogoj) posledica <span style="color: #FBDE2D;">else</span> drugaposledica;
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">if</span> (pogoj) {
+    posledica;
+} <span style="color: #FBDE2D;">elseif</span> (drugpogoj) {
+    drugaposledica;
+} <span style="color: #FBDE2D;">else</span> {
+    nekajtretjega;
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">if</span> (pogoj):
+    razne;
+    stvari;
+<span style="color: #FBDE2D;">else</span>:
+    drugo;
+<span style="color: #FBDE2D;">endif</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-2" class="outline-4">
+<h4 id="sec-2-4-2"><span class="section-number-4">2.4.2</span> While zanke</h4>
+<div class="outline-text-4" id="text-2-4-2">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">while</span> (pogoj) {
+    ponavljaj;
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">do</span> {
+    ponavljaj;
+} <span style="color: #FBDE2D;">while</span> (pogoj);
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">while</span> (pogoj):
+    ponavljaj;
+<span style="color: #FBDE2D;">endwhile</span>;
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-3" class="outline-4">
+<h4 id="sec-2-4-3"><span class="section-number-4">2.4.3</span> For zanke</h4>
+<div class="outline-text-4" id="text-2-4-3">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">for</span> (<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">i</span> = 0; <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">i</span> &lt; 3; <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">i</span>++) {
+    ponovi;     <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">Ponovi 3x</span>
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">stevec</span> = [1, 2, 3, 4];
+<span style="color: #FBDE2D;">foreach</span> (<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">stevec</span> <span style="color: #FBDE2D;">as</span> <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">stevilo</span>) {
+    <span style="color: #FBDE2D;">echo</span>(<span style="color: #61CE3C;">"</span><span style="color: #D8FA3C;">$stevilo</span><span style="color: #61CE3C;">!\n"</span>);
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span> = [
+    <span style="color: #61CE3C;">"kljuc"</span> =&gt; <span style="color: #61CE3C;">"vrednost"</span>,
+    <span style="color: #61CE3C;">"drugo"</span> =&gt; <span style="color: #61CE3C;">"tretje"</span>
+];
+<span style="color: #FBDE2D;">foreach</span> (<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span> <span style="color: #FBDE2D;">as</span> <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">kljuc</span> =&gt; <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">vrednost</span>) {
+    <span style="color: #FBDE2D;">echo</span>(<span style="color: #61CE3C;">"vrednost "</span> . <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">kljuc</span> . <span style="color: #61CE3C;">": "</span> . <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">vrednost</span> . <span style="color: #61CE3C;">"\n"</span>);
+}
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-4-4" class="outline-4">
+<h4 id="sec-2-4-4"><span class="section-number-4">2.4.4</span> Switch stavek</h4>
+<div class="outline-text-4" id="text-2-4-4">
+<ul class="org-ul">
+<li>Podoben if / elseif / else, ampak nekoliko berljivejši
+</li>
+</ul>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">switch</span> (<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">spremenljivka</span>) {
+    <span style="color: #FBDE2D;">case</span> 1:
+        narediNekaj();
+        <span style="color: #FBDE2D;">break</span>;
+    <span style="color: #FBDE2D;">case</span> <span style="color: #61CE3C;">"drugo"</span>:
+        drug_primer();
+        <span style="color: #FBDE2D;">break</span>;
+    <span style="color: #FBDE2D;">default</span>:
+        privzeto();
+}
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-5" class="outline-3">
+<h3 id="sec-2-5"><span class="section-number-3">2.5</span> Funkcije</h3>
+<div class="outline-text-3" id="text-2-5">
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">function</span> <span style="color: #ff1493;">imeFunkcije</span> (<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">argument</span>, &amp;<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">referencniArgument</span>) {
+    telo_funkcije;
+    <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">vrednost</span> = <span style="color: #61CE3C;">"primer"</span>;
+    <span style="color: #FBDE2D;">return</span> <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">vrednost</span>;
+}
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #FBDE2D;">function</span> <span style="color: #ff1493;">sestej</span> (<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">prvo</span>, <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">drugo</span>, <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">neobvezno</span> = 0) {
+    <span style="color: #FBDE2D;">return</span> <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">prvo</span> + <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">drugo</span> + 2;
+}
+sestej(2, 3);    <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">Vrne 7</span>
+sestej(2, 3, 5); <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">Vrne 12</span>
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2-6" class="outline-3">
+<h3 id="sec-2-6"><span class="section-number-3">2.6</span> Seznam primerov raznih PHP funkcij</h3>
+<div class="outline-text-3" id="text-2-6">
+<ul class="org-ul">
+<li><a href="http://php.net/manual/en/function.substr.php">Povezava do seznama
+funkcij</a>
+</li>
+
+<li>implode($veznik, $polje)
+
+<p>
+Združi elemente polja z znakom $veznik
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span> = [<span style="color: #61CE3C;">"Janez"</span>, <span style="color: #61CE3C;">"Marija"</span>, <span style="color: #61CE3C;">"Ana"</span>, <span style="color: #61CE3C;">"Zdravko"</span>];
+<span style="color: #FBDE2D;">echo</span>(implode(<span style="color: #61CE3C;">", "</span>, <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">polje</span>));   <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">"Janez, Marija, Ana, Zdravko"</span>
+</pre>
+</div>
+</li>
+
+<li>explode($locilo, $niz[, $meja])
+
+<p>
+Razstavi niz znakov v polje elementov, ki so med seboj ločeni z
+znakom/znaki $locilo. Število elementov lahko po želji omejimo z $meja
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-php"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">niz</span> = <span style="color: #61CE3C;">"Kadar spimo|Lep dan|tretje"</span>;
+<span style="color: #FBDE2D;">echo</span>(explode(<span style="color: #61CE3C;">"|"</span>, <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">niz</span>, 2));   <span style="color: #8e908c; font-style: italic;">// </span><span style="color: #8B8989; font-style: italic;">["Kadar spimo", "Lep dan|tretje"]</span>
+</pre>
+</div>
+</li>
+
+<li>strpos($niz, $iskano[, $zamik])
+
+<p>
+Poišče prvo pojavitev znaka/niza $iskano v znakovnem nizu $niz, lahko pa
+tudi podamo zanim, po katerem začne iskati.
+</p>
+</li>
+
+<li>strtoupper($niz)
+
+<p>
+Spremeni niz v velike črke
+</p>
+</li>
+
+<li>strtolower($niz)
+
+<p>
+Spremeni niz v male črke
+</p>
+</li>
+
+<li>count($spremenljivka)
+
+<p>
+Vrne dolžino za vrednost $spremenljivka. Če gre za niz, vrne število
+znakov, pri polju pa število elementov
+</p>
+</li>
+
+<li>substr($niz, $zacetek[, $dolzina])
+
+<p>
+Vrne podniz zankovnega niza $niz, od položaja $zacetek do konca, če pa
+podamo $dolzina, pa le toliko znakov
+</p>
+</li>
+
+<li>die([$sporocilo]);
+
+<p>
+Končaj izvajanje programa, kjer je to klicano. Lahko podamo tudi
+sporočilo, ki se izpiše pred izhodom
+</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> git</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med drugim je tudi izjemno orodje za sodelovanje.
+</p>
+
+<ul class="org-ul">
+<li><a href="https://www.atlassian.com/git/">git tutorial</a>
+</li>
+
+<li><a href="http://git-scm.com/download/guis">GUIclients</a>
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Začetni ukazi</h3>
+<div class="outline-text-3" id="text-3-1">
+<dl class="org-dl">
+<dt> <code>git init</code> </dt><dd>ustvari nov git repository (git arhiv)
+</dd>
+<dt> <code>git clone &lt;repo&gt;</code> </dt><dd>kopira obstoječ git arhiv
+</dd>
+<dt> <code>git config</code> </dt><dd>podatki uporabnika
+</dd>
+</dl>
+</div>
+
+<div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Shranjevanje</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<dl class="org-dl">
+<dt> <code>git add &lt;datoteke&gt;</code> </dt><dd>dodajanje datotek, ki bodo vključene v naslednji commit (spremembo)
+</dd>
+<dt> <code>git commit &lt;datoteke&gt;</code> </dt><dd>zapiše izbrane spremembe v zgodovino projekta - ta zgodovina je shranjena lokalno
+</dd>
+</dl>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Pregledovanje arhiva</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<dl class="org-dl">
+<dt> <code>git status</code> </dt><dd>prikaže stanje v delovni mapi in spremembe v njej
+</dd>
+<dt> <code>git log</code> </dt><dd>prikaže zgodovino projekta
+</dd>
+<dt> <code>git checkout</code> </dt><dd>3 načini uporabe
+<dl class="org-dl">
+<dt> <code>git checkout &lt;ime_veje&gt;</code> </dt><dd>pojdi v vejo
+</dd>
+<dt> <code>git checkout &lt;commit&gt; &lt;ime_datoteke&gt;</code> </dt><dd>poglej prejšno verzije datoteke
+</dd>
+<dt> <code>git checkout &lt;commit</code> </dt><dd>Posodobi vse datoteke, da ustrezajo izbranemu komitu
+</dd>
+</dl>
+</dd>
+</dl>
+
+<div class="org-src-container">
+
+<pre class="src src-ditaa">/-------\     /-------\     /-------\    /-------\     /-------\          /-------\
+|       |     |       |     |       |    |       |     |       |          |       |
+| v1    +-----+ v2    +-----+ v3    +----+ v4    +-----+ v5    +----------+ v6    | 
+\-------/     \-------/     \-------/    \-------/     \-------/          \-------/
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> Razveljavljanje sprememb <i>(ne znam)</i></h4>
+<div class="outline-text-4" id="text-3-1-3">
+<ul class="org-ul">
+<li><code>git checkout</code> 
+</li>
+<li><code>git revert</code> 
+</li>
+<li><code>git reset</code> 
+</li>
+<li><code>git clean</code> 
+</li>
+<li><code>git commit --amend</code> 
+</li>
+<li><code>git rebase</code> 
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Sodelovanje</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Za skupno delo na projektu je potrebno dodati povezavo do oddaljenjega arhiva. Ta lahko poteka preko HTTP(S)
+protokola ali ssh.
+</p>
+<dl class="org-dl">
+<dt> <code>git remote</code> </dt><dd>ukaz za ustvarjanje, ogled in brisanje povezov do drugih arhivov
+<dl class="org-dl">
+<dt> <code>git remote -v</code> </dt><dd>prikaže povezave do drugih arhivov
+</dd>
+<dt> <code>git remote add &lt;ime_povezave&gt; &lt;url&gt;</code> </dt><dd>ustvari povezavo do oddaljenega arhiva
+Url je lahko <code>http</code> ali <code>ssh</code> povezava. Slednja ima prednost lažjega zapisovnja, al kaj.
+</dd>
+<dt> <code>git remote rm &lt;ime_povezave&gt;</code> </dt><dd>izbriše povezavo
+</dd>
+<dt> <code>git remote rename &lt;staro_ime&gt; &lt;novo_ime&gt;</code> </dt><dd>preimenuje povezavo
+</dd>
+</dl>
+</dd>
+<dt> <code>git fetch</code> </dt><dd>uvozi zgodovino commitov <i>(ne znam)</i>
+</dd>
+</dl>
+</div>
+<div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> Porivanje in vlečenje</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<dl class="org-dl">
+<dt> <code>git pull &lt;remote&gt;</code> </dt><dd>združi vodilne spremembe iz oddaljenega arhiva v lokalni/delovni arhiv
+<dl class="org-dl">
+<dt> <code>git pull --rebase</code> </dt><dd>združi spremembe iz oddaljenega arhiva glede na čas commitov 
+</dd>
+</dl>
+</dd>
+<dt> <code>git push &lt;remote&gt; &lt;ime_veje&gt;</code> </dt><dd>prenos lokalnih sprememb na oddaljen arhiv
+</dd>
+</dl>
+<div class="org-src-container">
+
+<pre class="src src-ditaa">             +-----------+
+             | cBLU      |
+             | Origin/m  |
+             +----+------+
+                  | 
+                  | 
+/-------\     /---+---\     /-------\    /-------\     /-------\
+|       |     |       |     |       |    |       |     |       |
+| v1    +-----+ v2    +-----+ v3    +----+ v4    +-----+ v5    | 
+\-------/     \-------/     \-------/    \-------/     \---+---/
+                                                           |
+                                                           |
+                                                      +----+------+
+                                                      | cBLU      |
+                                                      | m         |
+                                                      +-----------+
+</pre>
+</div>
+
+<div class="org-src-container">
+
+<pre class="src src-ditaa">                                                    +-----------+
+                                                    | cBLU      |
+                                                    | Origin/m  |
+                                                    +------+----+
+                                                           |
+                                                           |
+/-------\     /---+---\     /-------\    /-------\     /---+---\     
+|       |     |       |     |       |    |       |     |       |
+| v1    +-----+ v2    +-----+ v3    +----+ v4    +-----+ v5    |
+\-------/     \-------/     \-------/    \-------/     \---+---/
+                                                           |
+                                                           |
+                                                      +----+------+
+                                                      | cBLU      |
+                                                      | m         |
+                                                      +-----------+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Veje</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+So neodvisne razvojne linije projekta. Novi komiti so shranjeni v zgodovino trenutne veje. 
+</p>
+<dl class="org-dl">
+<dt> <code>git branch</code> </dt><dd>ukaz lahko ustvari, prikaže, preimenuje in izbriše veje. Za preskakovanje med vejami se uporablja <code>git checkout</code>.
+<dl class="org-dl">
+<dt> <code>git branch</code> </dt><dd>prikaže vse veje v arhivu
+</dd>
+<dt> <code>git branch &lt;ime_veje&gt;</code> </dt><dd>ustvari novo vejo, a se ne premakne v njo
+</dd>
+<dt> <code>git branch -d &lt;ime_veje&gt;</code> </dt><dd>izbriše vejo
+</dd>
+<dt> <code>git branch - &lt;ime_veje&gt;</code> </dt><dd>preimenuje trenutno vejo
+</dd>
+</dl>
+</dd>
+</dl>
+<p>
+Veje so sestavni del gitovega razvojnega procesa. Spremembe na projektu se najprej naredi v stranskih vejah. Ko je koda v stranski
+veji stabilna, se jo lahko združi (merge-a) v glavno vejo. 
+</p>
+<dl class="org-dl">
+<dt> <code>git checkout &lt;ime_veje&gt;</code> </dt><dd>odpre že obstoječo vejo (prej je morala biti ustvarjena z <code>git branc</code>)
+</dd>
+<dt> <code>git checkout -b &lt;ime_nove_veje&gt;</code> </dt><dd>združi z ukazom za ustvarjanje nove veje
+</dd>
+</dl>
+</div>
+<ol class="org-ol"><li><a id="sec-3-2-2-1" name="sec-3-2-2-1"></a>Združevanje (merge)<br  /><div class="outline-text-5" id="text-3-2-2-1">
+<p>
+Je način, kako nazaj združimo razdeljeno zgodovino. Vse spremembe se zapišejo v trenutno/izbrano vejo.
+</p>
+<dl class="org-dl">
+<dt> <code>git merge &lt;ime_veje&gt;</code> </dt><dd>spremembe izbrane veje se zapišejo v trenutno vejo
+</dd>
+</dl>
+<p>
+Če se v združevanih vejah niso urejale iste stvari, potem ne pride do konfliktov in veji se združita hitro. Ako pa so se spreminjale
+iste stvari v združevanih vejah, dobimo spore, ki jih je potrebno razrešiti. Dobimo <b>tro-vejno združevanje</b>, saj se za združevanje 
+uporabljajo trije komiti - vodilna komita iz vsake veje in njunega skupnega prednika.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-ditaa">/-------\     /-------\     /-------\    /-------\     /-------\          /-------\
+|       |     |       |     |       |    |       |     |       |          |       |
+| v1    +-----+ v2    +--+--+ v3    +----+ v4    +-----+ v5    +------+---+ v6    | 
+\-------/     \-------/  |  \-------/    \-------/     \-------/      /   \-------/
+                         \                                           /
+                          \                                         /
+                           \                                       /
+                            |                                     /
+                        /---+---\    /-------\                   /
+                        |       |    |       |                  /
+                        | newF1 +----+ newF2 +------------------+
+                        \-------/    \-------/
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> Delovni proces</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<ol class="org-ol">
+<li>koliniraš ali povlečeš projekt
+</li>
+<li>ustvariš novo vejo (zamisliš si neko funkcijo oz nek dodatek za k projektu)
+</li>
+<li>razvijaš novo vejo, dodajaš komite in potiskaš kodo v oddaljen arhiv
+</li>
+<li>ko si s kodo zadovoljen jo združiš z glavno vejo (pull request)
+</li>
+<li>spet povlečeš projekt, ustvariš novo vejo, itn.
+</li>
+</ol>
+
+<p>
+<a href="https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow">workflow tutorial</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> SMF</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Spremenljivke</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+<a href="http://wiki.simplemachines.org/smf/Global_variables">SMF variable</a>
+</p>
+
+<ul class="org-ul">
+<li><code>$context</code> (predmeti/spremenljivke za v predlogo)
+</li>
+<li><code>$txt</code> (prevodi)
+</li>
+<li><code>$scripturl</code>
+</li>
+<li><code>$settings</code> (globalne nastavitve teme)
+</li>
+<li><code>$sourcedir</code> (absolutna pot do mape Sources)
+</li>
+<li><code>$smcFunc</code> (Funkcije)
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Seznam SMF funkcij</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+<a href="http://dev.simplemachines.org/smcfunctions.php">SMF Funkcije</a>
+</p>
+
+<p>
+Primer klica:
+<code>$smcFunc['arugment'](parameter odvisen od arugmenta)</code>
+</p>
+
+<p>
+Argumenti za poizvedbe v bazo:
+</p>
+<ul class="org-ul">
+<li><code>db_query</code> (SQL poizvedba) - poizvedba v bazo <code>SELECT</code>, <code>SELECT COUNT()</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>
+      primer: 
+<div class="org-src-container">
+
+<pre class="src src-php" id="db_query"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">request</span> = <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">smcFunc</span>[<span style="color: #61CE3C;">'db_query'</span>](<span style="color: #61CE3C;">''</span>, <span style="color: #61CE3C;">'</span>
+<span style="color: #61CE3C;">       SELECT id_proj FROM {db_prefix}tasks</span>
+<span style="color: #61CE3C;">       WHERE id = {int:id_task}'</span>, <span style="color: #FBDE2D;">array</span>(<span style="color: #61CE3C;">'id_task'</span> =&gt; <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">id_task</span>) );
+</pre>
+</div>
+</li>
+<li><code>db_insert</code> (SQL poizvedba)
+</li>
+<li><code>db_fetch_assoc</code> (<code>$request</code>)
+primer:
+<div class="org-src-container">
+
+<pre class="src src-php" id="db_fetch_assoc"><span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">row</span> = <span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">smcFunc</span>[<span style="color: #61CE3C;">'db_fetch_assoc'</span>](<span style="color: #d3d3d3; background-color: #000000;">$</span><span style="color: #D8FA3C;">request</span>);
+</pre>
+</div>
+</li>
+<li><code>db_free_results</code> (<code>$request</code>) - narediš kar tako, da sprostiš nek spomin, al kaj
+</li>
+<li><code>html_specialchars</code> - (<code>string</code>) zaščita pred SQL injekcijami
+</li>
+<li><code>html_trim</code> - (<code>string</code>) zaščita pred SQL injekcijami
+</li>
+</ul>
+
+<p>
+Ostale funckije:
+</p>
+<ul class="org-ul">
+<li><code>checkSession()</code> - preveri, če je uporabnik pravi
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3"><span class="section-number-3">4.3</span> Struktura Moda</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+datoteke:
+</p>
+<ul class="org-ul">
+<li><code>package-info.xml</code>
+</li>
+<li><code>modification.xml</code>
+</li>
+<li><code>database.php</code>
+</li>
+<li><code>Delegator.php</code>
+</li>
+<li><code>Delegator.template.php</code>
+</li>
+<li><code>delegator_helpers.php</code>    
+</li>
+<li><code>delegator.js</code>
+</li>
+<li><code>moment.min.js</code>
+</li>
+<li><code>pikaday.css</code>    
+</li>
+<li><code>pikaday.jquery.js</code>
+</li>
+<li><code>pikaday.js</code>    
+</li>
+</ul>
+</div>
+
+<div id="outline-container-sec-4-3-1" class="outline-4">
+<h4 id="sec-4-3-1"><span class="section-number-4">4.3.1</span> Povezave</h4>
+<div class="outline-text-4" id="text-4-3-1">
+<ul class="org-ul">
+<li><a href="http://www.simplemachines.org/community/index.php?topic=299670.0">modification.xml</a>
+</li>
+<li><a href="http://www.simplemachines.org/community/index.php?topic=299669.0">package-info.xml</a> 
+</li>
+<li><a href="http://wiki.simplemachines.org/smf/Coding_Guidelines">Smernice programiranja</a>
+</li>
+<li><a href="http://wiki.simplemachines.org/smf/Customization_approval_guidelines">Smernice za kostumizacijo</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: len</p>
+<p class="date">Created: 2015-04-19 Sun 14:34</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.4.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

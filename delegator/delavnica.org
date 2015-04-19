@@ -378,7 +378,10 @@
 * git
 
 Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med drugim je tudi izjemno orodje za sodelovanje.
-[[https://www.atlassian.com/git/][git tutorial]]
+
+ - [[https://www.atlassian.com/git/][git tutorial]]
+
+ - [[http://git-scm.com/download/guis][GUIclients]]
 
 ** Začetni ukazi
    - ~git init~ :: ustvari nov git repository (git arhiv)
@@ -386,9 +389,9 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
    - ~git config~ :: podatki uporabnika
  
 *** Shranjevanje
-   - ~git add <datoteke>~ :: dodajanje datotek, ki bodo vključene v naslednji commit (spremembo)
-   - ~git commit <datoteke>~ :: zapiše izbrane spremembe v zgodovino projekta - ta zgodovina je shranjena lokalno
-
+   - ~git add <datoteke>~ :: dodajanje datotek, ki bodo vključene v naslednji commit (verzija)
+   - ~git commit -m "<komentar>"~ :: zapiše izbrane spremembe v zgodovino projekta - ta zgodovina je shranjena lokalno
+        
 *** Pregledovanje arhiva
    - ~git status~ :: prikaže stanje v delovni mapi in spremembe v njej
    - ~git log~ :: prikaže zgodovino projekta
@@ -396,6 +399,13 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      + ~git checkout <ime_veje>~ :: pojdi v vejo
      + ~git checkout <commit> <ime_datoteke>~ :: poglej prejšno verzije datoteke
      + ~git checkout <commit~ :: Posodobi vse datoteke, da ustrezajo izbranemu komitu
+
+#+begin_src ditaa :file dita-seqboxes0.png
+/-------\     /-------\     /-------\    /-------\     /-------\          /-------\
+|       |     |       |     |       |    |       |     |       |          |       |
+| v1    +-----+ v2    +-----+ v3    +----+ v4    +-----+ v5    +----------+ v6    | 
+\-------/     \-------/     \-------/    \-------/     \-------/          \-------/
+#+end_src
 
 *** Razveljavljanje sprememb /(ne znam)/
    - ~git checkout~ 
@@ -406,6 +416,8 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
    - ~git rebase~ 
 
 ** Sodelovanje
+   Za skupno delo na projektu je potrebno dodati povezavo do oddaljenjega arhiva. Ta lahko poteka preko HTTP(S)
+   protokola ali ssh.
    - ~git remote~ :: ukaz za ustvarjanje, ogled in brisanje povezov do drugih arhivov
      + ~git remote -v~ :: prikaže povezave do drugih arhivov
      + ~git remote add <ime_povezave> <url>~ :: ustvari povezavo do oddaljenega arhiva
@@ -421,12 +433,12 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
              +-----------+
              | cBLU      |
              | Origin/m  |
-             +-----------+
+             +----+------+
                   | 
                   | 
 /-------\     /---+---\     /-------\    /-------\     /-------\
 |       |     |       |     |       |    |       |     |       |
-| v1    +-----| v2    +-----| v3    +----| v4    +-----| v5    | 
+| v1    +-----+ v2    +-----+ v3    +----+ v4    +-----+ v5    | 
 \-------/     \-------/     \-------/    \-------/     \---+---/
                                                            |
                                                            |
@@ -443,9 +455,9 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
                                                     +------+----+
                                                            |
                                                            |
-/-------\     /---+---\     /-------\    /-------\     /---+---\
+/-------\     /---+---\     /-------\    /-------\     /---+---\     
 |       |     |       |     |       |    |       |     |       |
-| v1    +-----| v2    +-----| v3    +----| v4    +-----| v5    | 
+| v1    +-----+ v2    +-----+ v3    +----+ v4    +-----+ v5    |
 \-------/     \-------/     \-------/    \-------/     \---+---/
                                                            |
                                                            |
@@ -472,6 +484,22 @@ Git je sistem za nadzor nad verzijami projekta. In seveda še mnogo več. Med dr
      Če se v združevanih vejah niso urejale iste stvari, potem ne pride do konfliktov in veji se združita hitro. Ako pa so se spreminjale
      iste stvari v združevanih vejah, dobimo spore, ki jih je potrebno razrešiti. Dobimo *tro-vejno združevanje*, saj se za združevanje 
      uporabljajo trije komiti - vodilna komita iz vsake veje in njunega skupnega prednika.
+
+#+begin_src ditaa :file dita-seqboxes3.png
+/-------\     /-------\     /-------\    /-------\     /-------\          /-------\
+|       |     |       |     |       |    |       |     |       |          |       |
+| v1    +-----+ v2    +--+--+ v3    +----+ v4    +-----+ v5    +------+---+ v6    | 
+\-------/     \-------/  |  \-------/    \-------/     \-------/      /   \-------/
+                         \                                           /
+                          \                                         /
+                           \                                       /
+                            |                                     /
+                        /---+---\    /-------\                   /
+                        |       |    |       |                  /
+                        | newF1 +----+ newF2 +------------------+
+                        \-------/    \-------/
+
+#+end_src
 *** Delovni proces
     1. koliniraš ali povlečeš projekt
     2. ustvariš novo vejo (zamisliš si neko funkcijo oz nek dodatek za k projektu)
