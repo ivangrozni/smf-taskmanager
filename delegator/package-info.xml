@@ -18,6 +18,7 @@
 		<require-file name="pikaday.jquery.js" destination="$themedir/scripts" />
 		<require-file name="pikaday.css" destination="$themedir/css" />
 		<require-file name="jquery-1.9.0.min.js" destination="$themedir/scripts" />
+        <require-file name="super_edit.gif" destination="$themedir/images/buttons" />
 		<database>database.php</database>
 		<redirect url="$scripturl?action=delegator" timeout="3000">redirect.txt</redirect>
 	</install>
@@ -34,5 +35,6 @@
 		<remove-file name="$themedir/scripts/pikaday.jquery.js" />
 		<remove-file name="$themedir/scripts/pikaday.css" />
         <remove-file name="$themedir/scripts/jquery-1.9.0.min.js" />
+        <remove-file name="$themedir/images/buttons/super_edit.gif" />
 	</uninstall>
 </package-info>

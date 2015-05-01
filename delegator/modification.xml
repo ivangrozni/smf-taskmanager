@@ -12,7 +12,6 @@
 	</file>
 	<!-- zakomentirano -->
 	<file name="$sourcedir/ManagePermissions.php">
-
 		<operation>
 			<search position="replace"><![CDATA['karma_edit' => array(false, 'general', 'moderate_general'),]]></search>
 			<add><![CDATA[
@@ -28,7 +27,7 @@
 	  <!-- zakomentirano -->
 	    <operation>
 			<search position="replace"><![CDATA[	$context['allow_memberlist'] = allowedTo('view_mlist');]]></search>
-			<add><![CDATA[	
+			<add><![CDATA[
 			$context['allow_memberlist'] = allowedTo('view_mlist');
 			$context['allow_delegator_view'] = allowedTo('delegator_view');]]></add>
 		</operation>
@@ -38,7 +37,6 @@
 <!--
 Drop down menu: @Jaka - kaj rabimo?
 -->
-
 			<add><![CDATA['delegator' => array(
 				'title' => function_exists('delegator_placeholder') ? delegator_placeholder() :  'DELEGATOR TODAY PLACEHOLDER',
 				'href' => $scripturl . '?action=delegator',
@@ -50,68 +48,43 @@ Drop down menu: @Jaka - kaj rabimo?
 						'show' => allowedTo('delegator_add_task'),	// @TODO: proper permission
 						'is_last' => true,
 					),
-
-                                        'add_proj' => array(
-                                            'title' => $txt['delegator_project_add'],
-                                            'href' => $scripturl . '?action=delegator;sa=proj',
-                                            'show' => allowedTo('delegator_add_task'),
-                                            'is_last' => true,
-                                        ),
-                                        'my_tasks' => array(
-                                            'title' => $txt['delegator_my_tasks'],
-                                            'href' => $scripturl . '?action=delegator;sa=my_tasks',
-                                            'show' => allowedTo('delegator_view'),
-                                            'is_last' => true,
-                                        ),
-                                        'view_projects' => array(
-                                            'title' => $txt['delegator_projects'],
-                                            'href' => $scripturl . '?action=delegator;sa=view_projects',
-                                            'show' => allowedTo('delegator_view'),
-                                            'is_last' => true,
-                                        ),
+                    'add_proj' => array(
+                        'title' => $txt['delegator_project_add'],
+                        'href' => $scripturl . '?action=delegator;sa=proj',
+                        'show' => allowedTo('delegator_add_task'),
+                        'is_last' => true,
+                    ),
+                    'my_tasks' => array(
+                        'title' => $txt['delegator_my_tasks'],
+                        'href' => $scripturl . '?action=delegator;sa=my_tasks',
+                        'show' => allowedTo('delegator_view'),
+                        'is_last' => true,
+                    ),
+                    'view_projects' => array(
+                        'title' => $txt['delegator_projects'],
+                        'href' => $scripturl . '?action=delegator;sa=view_projects',
+                        'show' => allowedTo('delegator_view'),
+                        'is_last' => true,
+                    ),
 					'view_log' => array(
-                                            'title' => $txt['delegator_view_log'],
-                                            'href' => $scripturl . '?action=delegator;sa=view_log',
-                                            'show' => allowedTo('delegator_view'),
-                                            'is_last' => true,
-                                        ),
-
+                        'title' => $txt['delegator_view_log'],
+                        'href' => $scripturl . '?action=delegator;sa=view_log',
+                        'show' => allowedTo('delegator_view'),
+                        'is_last' => true,
+                    ),
 				),
 			),
 'mlist' => array(]]></add>
 		</operation>
 		<operation>
-			<search position="replace"><![CDATA[?>]]></search>
+			<search position="replace"><![CDATA[function setupMenuContext()]]></search>
 			<add><![CDATA[function delegator_placeholder()
 {
 	global $txt, $smcFunc;
-
-	/*
-	$month = date('n');
-	$day = date('j');
-
-	$request = $smcFunc['db_query']('', '
-		SELECT COUNT(deadline)
-		FROM {db_prefix}to_dos
-		WHERE is_did = {int:is_did}
-			AND MONTH(deadline) = {int:month}
-			AND DAYOFMONTH(deadline) = {int:day}
-			AND YEAR(deadline) > {int:year}',
-		array(
-			'is_did' => 0,
-			'year' => 1,
-			'month' => $month,
-			'day' => $day,
-		)
-	);
-	list($todays_todos) = $smcFunc['db_fetch_row']($request);
-	$smcFunc['db_free_result']($request);
-
-	return $txt['delegator'] . ' [<strong>' . $todays_todos . '</strong>]';*
-	 */
 	return 'Delegator: <strong>Spread communism</strong>';
 }
-?>]]></add>
+
+function setupMenuContext()]]></add>
 		</operation>
 	</file>
 	<file name="$languagedir/Modifications.english.php">
