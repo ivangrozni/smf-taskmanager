@@ -26,9 +26,8 @@
 	<file name="$sourcedir/Subs.php">
 	  <!-- zakomentirano -->
 	    <operation>
-			<search position="replace"><![CDATA[	$context['allow_memberlist'] = allowedTo('view_mlist');]]></search>
-			<add><![CDATA[
-			$context['allow_memberlist'] = allowedTo('view_mlist');
+			<search position="replace"><![CDATA[$context['allow_memberlist'] = allowedTo('view_mlist');]]></search>
+			<add><![CDATA[$context['allow_memberlist'] = allowedTo('view_mlist');
 			$context['allow_delegator_view'] = allowedTo('delegator_view');]]></add>
 		</operation>
 	<!-- zakomentirano do sem -->
