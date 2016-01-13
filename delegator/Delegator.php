@@ -74,6 +74,7 @@ function Delegator()
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
+        // Tole sem dodal z zalinega racunalnika, prek ssh
     );
 
 	// Delegator v celoti je kot en modul. Razni viewi so "subactioni". Defaulten subaction je delegator. Ce
@@ -890,55 +891,8 @@ function end_task()
         
         $state = (int) $_POST['state'];
 
-		$request = $smcFunc['db_query']('', '
-            SELECT T2.real_name AS member, T2.email_address AS email, T3.name AS project_name, T4.name AS task_name, T4.description AS description
-            FROM {db_prefix}workers T1
-            LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
-            LEFT JOIN {db_prefix}tasks T4 ON T1.id_task = T4.id
-            LEFT JOIN {db_prefix}projects T3 ON T4.id_proj = T3.id
-            WHERE T1.id_task = {int:id_task}
-            ', array(
-                "id_task" => $id_task
-            )
-        );
-        $workerji = array();
-        $emaili = array();
-        $projekt = "";
-        $task = "";
-        $opis = "";
-        while ($row = $smcFunc['db_fetch_assoc']($request)) {
-            $workerji[] = $row["member"];
-            $emaili[] = $row["email"];
-            $projekt = $row["project_name"];
-            $task = $row["task_name"];
-            $opis = $row["description"];
-        }
-        $smcFunc['db_free_result']($request);
+        // @TODO Za posiljanje mailov bi bilo bolje spisat svojo funkcijo
 
-        $statusi = [
-            2 => "uspešno",
-            3 => "neuspešno",
-            4 => "preklicano"
-        ];
-        $status = $statusi[$state];
-        $subject = "Opravilo $task v projektu $projekt zaključeno ($status)";
-        
-        $body = "Pri projektu $projekt je bilo zaključeno opravilo $task, s stanjem \"$status\".\n";
-        $body .= "Opis:\n$opis\nOpravilo so zaključili: ";
-        $body .= implode(", ", $workerji) . ". Slava jim!\n";
-
-        var_dump($emaili);
-        var_dump($subject);
-        var_dump($body);
-		sendmail($emaili, $subject, $body, null, null, false, 5);
-        die();
-
-
-        // @TODO pošlji tudi koordinatorju (ne samo delavcem)
-
-
-        // @TODO Dodajmo proper email template za notifikacijo ob zaključitvi taska
-		//$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
 
         $smcFunc['db_query']('','
                   UPDATE {db_prefix}tasks

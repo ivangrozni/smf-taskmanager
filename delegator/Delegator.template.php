@@ -37,7 +37,7 @@ function template_main()
     }
     echo '<hr><a href="'.$scipturl.'?action=delegator;status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0]+$states[1]).'</br>';
     echo '<a href="'.$scipturl.'?action=delegator;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
-    
+
     template_show_list('list_tasks');
 }
 
