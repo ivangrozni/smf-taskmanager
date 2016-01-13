@@ -155,9 +155,9 @@ function delegator_main()                                      //glavna funkcija
     $list_options = array(
 
         'id'               => 'list_tasks',
-        'items_per_page'   => 30, 
-        'base_href'        => $scripturl . '?action=delegator;status='.$status,      
-        'default_sort_col' => 'deadline',                      
+        'items_per_page'   => 30,
+        'base_href'        => $scripturl . '?action=delegator;status='.$status,
+        'default_sort_col' => 'deadline',
         'get_items'        => array(
 
             'function' => function ($start, $items_per_page, $sort) use ($status) {
@@ -171,7 +171,7 @@ function delegator_main()                                      //glavna funkcija
                     $tasks3 = ret_tasks(3, "None", 1, $sort, $start, $items_per_page);
                     $tasks4 = ret_tasks(4, "None", 1, $sort, $start, $items_per_page);
                     return (array_merge($tasks2, $tasks3, $tasks4));
-                        
+
                     }
                 else {
                     return ret_tasks($status, "None", 1, $sort, $start, $items_per_page);
@@ -244,11 +244,11 @@ function add_task()
                           array('id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string', 'start_date' => 'string'),
                           array( $id_proj, $id_author, $name, $description, $deadline, $_POST['priority'], (count($members) ? 1 : 0 ), date("Y-m-d"), (count($members) ? date("Y-m-d") : "0001-01-01" ) ),
         array('id')
-    ); 
+    );
 
     // Dodaj delegirane memberje
-    // 
-    
+    //
+
     $request = $smcFunc['db_query']('', '
     SELECT T1.id AS id_task FROM {db_prefix}tasks T1
     ORDER BY T1.id DESC
@@ -265,7 +265,7 @@ function add_task()
     }
 
     zapisiLog($id_proj, $row['id_task'], 'add_task');
-    
+
     redirectexit('action=delegator;sa=view_proj&id_proj='.$id_proj);
 }
 
@@ -325,7 +325,7 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     $smcFunc['db_free_result']($request);
 
     zapisiLog($row['id_proj'], -1, 'add_proj');
-    
+
     redirectexit('action=delegator;sa=view_proj;id_proj='.$row['id_proj']); // redirect exit - logicno
 }
 
@@ -366,7 +366,7 @@ function view_proj()
     $id_proj = $_GET['id_proj'];
 
     $status = getStatus();
-    
+
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
@@ -389,7 +389,7 @@ function view_proj()
                     $tasks3 = ret_tasks(3, "Project", $id_proj, $sort, $start, $items_per_page);
                     $tasks4 = ret_tasks(4, "Project", $id_proj, $sort, $start, $items_per_page);
                     return (array_merge($tasks2, $tasks3, $tasks4));
-                        
+
                     }
                 else return ret_tasks($status, "Project", $id_proj, $sort, $start, $items_per_page);
             },
@@ -452,10 +452,10 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
 
 				$request = $smcFunc['db_query']('', '
                     SELECT T1.id AS id, T1.name AS project_name, T1.start AS start, T1.end AS end, T1.id_coord AS id_coord, T2.real_name AS coordinator
-                    FROM {db_prefix}projects T1  
-                    LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member 
-                    ORDER BY {raw:sort}     
-                    LIMIT {int:start}, {int:per_page}',    
+                    FROM {db_prefix}projects T1
+                    LEFT JOIN {db_prefix}members T2 ON T1.id_coord = T2.id_member
+                    ORDER BY {raw:sort}
+                    LIMIT {int:start}, {int:per_page}',
                     array(
 						'id_member' => $id_member,
 						'sort'      => $sort,
@@ -508,7 +508,7 @@ nadalje moramo query urediti tako, da bo se dodana tabela memberjov
                 ),
             ),
 
-	       'coordinator' => array(      
+	       'coordinator' => array(
                 'header' => array(
                     'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
                 ),
@@ -648,7 +648,7 @@ function my_tasks()
     $status = getStatus(true);
 
     $id_member = $context['user']['id'];
-    
+
 // tole lahko uporabimo za prikaz taskov, ampak si ne upam...
 // matra me $id_proj, ker ne vem, kako naj ga dobim sem notri...
     $list_options = array(
@@ -658,9 +658,9 @@ function my_tasks()
         'default_sort_col' => 'deadline',                      //razvrsis taske po roku
         'get_items' => array(
             // FUNKCIJE
-     
+
             'function' => function($start, $items_per_page, $sort ) use ($id_member, $status) {
-                
+
                 if ($status==="unfinished") {
                     $tasks0 = ret_tasks(0, "Worker", $id_member, $sort, $start, $items_per_page);
                     $tasks1 = ret_tasks(1, "Worker", $id_member, $sort, $start, $items_per_page);
@@ -734,7 +734,7 @@ function edit_task()
     $id_proj = $_POST['id_proj'];
 
     $members = $_POST["member_add"];
-    
+
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
@@ -762,7 +762,7 @@ function edit_task()
     }
 
     zapisiLog($id_proj, $id_task, 'edit_task');
-    
+
     redirectexit('action=delegator;sa=vt&task_id='.$id_task);
 }
 
@@ -776,7 +776,7 @@ function del_task()
     $id_task = (int) $_GET['task_id'];
 
     zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
-    
+
     $smcFunc['db_query']('', '
         DELETE FROM {db_prefix}tasks
         WHERE id = {int:id_task}',
@@ -792,7 +792,7 @@ function del_task()
             'id_task' => $id_task
         )
     );
-    
+
     redirectexit('action=delegator');
 }
 
@@ -863,7 +863,7 @@ function unclaim_task()
 // Funkcija ustreza et, add, najbrz tudi proj
 function en()
 {
-    
+
     // prebere podatke o tem tasku
     // odpre template z vpisanimi podatki
     // naredis UPDATE v bazi z novimi podatki -> funkcija edit_task
@@ -888,7 +888,7 @@ function end_task()
 
     if (isMemberWorker($id_task)){
         $end_comment = strtr($smcFunc['htmlspecialchars']($_POST['end_comment']), array("\r" => '', "\n" => '', "\t" => ''));
-        
+
         $state = (int) $_POST['state'];
 
         // @TODO Za posiljanje mailov bi bilo bolje spisat svojo funkcijo
@@ -913,7 +913,7 @@ function end_task()
     }
 
     redirectexit('action=delegator;sa=vt;task_id='.$id_task);
-    
+
 }
 
 function view_log()
@@ -988,11 +988,11 @@ function view_log()
         'no_items_label' => $txt['delegator_log_empty'],
         'columns' => array(
 
-            'action_date' => array(		
+            'action_date' => array(
                 'header' => array(
-                    'value' => $txt['delegator_action_date'],  
+                    'value' => $txt['delegator_action_date'],
                 ),
-                'data' => array( 
+                'data' => array(
                     'function' => create_function('$row',
                     'return $row[\'action_date\'];'
 					),
@@ -1018,8 +1018,8 @@ function view_log()
                     'reverse' => 'member DESC',
                 ),
             ),
-            
-            'action' => array(      
+
+            'action' => array(
                 'header' => array(
                     'value' => $txt['delegator_action'],      //dodano v modification.xml
                 ),
@@ -1034,7 +1034,7 @@ function view_log()
                 ),
             ),
 
-            'project' => array(   
+            'project' => array(
                 'header' => array(
                     'value' => $txt['delegator_project_name'],      //dodano v modification.xml
                 ),
@@ -1050,7 +1050,7 @@ function view_log()
                     'reverse' => 'project_name DESC',
                 ),
             ),
-            'task' => array( 
+            'task' => array(
                 'header' => array(
                     'value' => $txt['delegator_task_name'],      //dodano v modification.xml
                 ),
@@ -1064,7 +1064,7 @@ function view_log()
                     'default' => 'task_name',
                     'reverse' => 'task_name DESC',
                 ),
-            
+
             ),
         'style' => 'width: 10%; text-align: center;',
         ),
@@ -1088,7 +1088,7 @@ function del_log()
        TRUNCATE {db_prefix}delegator_log
         ',
         array());
-    //  DELETE * FROM {db_prefix}delegator_log       
+    //  DELETE * FROM {db_prefix}delegator_log
     zapisiLog(-2, -2, 'del_log');
     redirectexit('action=delegator');
 }
@@ -1105,7 +1105,7 @@ function se()
     // Super edit funkcija - koordinator lahko vrne projekt v nedokončano stanje
     // Tukaj notri bi moral bit requesti!!!
 
-    
+
     global $smcFunc, $scripturl, $context, $txt;
 
     $context['sub_template'] = 'se';
@@ -1124,13 +1124,13 @@ function super_edit()
     checkSession();
 
     if (isMemberCoordinator){
-    
+
         $id_author = $context['user']['id'];
         $id_task = (int) $_POST['id_task'];
         $id_proj = $_POST['id_proj'];
 
         $members = $_POST["member_add"];
-    
+
         $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
         $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
         $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
@@ -1144,8 +1144,8 @@ function super_edit()
 
     // Preveri, ce obstajajo workerji in je slucajno stanje nic
     // To ne gre...
-        if (count($members) AND $state===0) $state = 1;    
-    
+        if (count($members) AND $state===0) $state = 1;
+
         $smcFunc['db_query']('','
         UPDATE {db_prefix}tasks
         SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}, state={int:state}, start_date = {string:start_date}, end_date = {string:end_date}, end_comment = {string:end_comment}
@@ -1167,11 +1167,11 @@ function super_edit()
     }
 
         zapisiLog($id_proj, $id_task, 'super_edit');
-    
+
         redirectexit('action=delegator;sa=vt&task_id='.$id_task);
     }
     else redirectexit('action=delegator;sa=vt&task_id='.$id_task);
-    
+
 }
 
 

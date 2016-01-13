@@ -45,7 +45,7 @@ function isMemberWorker($id_task){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
     global $context, $smcFunc, $scripturl;
-    
+
     $id_member = $context['user']['id'];
 
     $request = $smcFunc['db_query']('', '
@@ -66,7 +66,7 @@ function isMemberCoordinator($id_proj){
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
     global $context, $smcFunc, $scripturl;
-    
+
     $id_member = $context['user']['id'];
 
     $request = $smcFunc['db_query']('', '
@@ -86,7 +86,7 @@ function numberOfWorkers($id_task){
     // Presteje Stevilo Workerjev
     // Trenutno se uporabi zgolj v unclaim, saj smo add_task in edit_task resili bolj elegantno...
     global $context, $smcFunc;
-    
+
     $request = $smcFunc['db_query']('', '
         SELECT COUNT(id) AS numworkers FROM {db_prefix}workers
         WHERE id_task = {int:id_task}', array('id_task' => $id_task));
@@ -119,11 +119,11 @@ function zapisiLog($id_proj, $id_task, $action){
         $smcFunc['db_free_result']($request);
         $id_proj = $row['id_proj'];
     }
-    
+
     $smcFunc['db_insert']('', '{db_prefix}delegator_log',
                           array('id_proj' => 'int', 'id_task' => 'int', 'action' => 'string', 'id_member' => 'int', 'action_date' => 'string' ),
                           array( $id_proj, $id_task, $action, $id_member, date('Y-m-d H-i-s') ),
-                          array() ); 
+                          array() );
     //  array( $id_proj, $id_task, $action, $id_member, date('Y-m-d') ),
 }
 
@@ -197,26 +197,26 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
     }
 
     else {return "Wrng input";  }
-             
+
     $request = $smcFunc['db_query']('', $query , $values );
     $tasks = array();
     while ($row = $smcFunc['db_fetch_assoc']($request))
         $tasks[] = $row;
     $smcFunc['db_free_result']($request);
-    
+
     return $tasks;                                    //funkcija vrne taske
-   
+
     }
 
 function ret_num($status, $what, $value){
     global $smcFunc;
 
     $query = 'SELECT COUNT(id) FROM {db_prefix}';
-    
+
     if ($what == "None") {
         $query = $query . 'tasks WHERE state={int:state}';
         $values = array ('state' => $status );
-        
+
     }
     elseif ($what == "Project") {
         $query = $query . 'tasks WHERE state = {int:state} AND id_proj = {int:id_proj}';
@@ -224,7 +224,7 @@ function ret_num($status, $what, $value){
                          'id_proj' => $value,);
     }
     elseif ($what == "Worker"){
-        $query = $query . 'workers 
+        $query = $query . 'workers
                     WHERE id_member={int:id_member} AND status = {int:status}';
         $values = array ('id_member' =>  $value,
                          'status' => $status,);
@@ -245,7 +245,7 @@ function show_task_list($status) {
     if ($status === "unfinished") $status = 0;
     elseif ($status === "finished") $status = 2;
     //else $status = $status;
-    
+
     global $txt, $scripturl;
     //ena moznost je, da preverim stanje tu v funkciji, druga pa, da ga dam kot argument...
 
@@ -296,7 +296,7 @@ function show_task_list($status) {
         ),
         //////////////////////////////// Ali bi lahko tukaj if stavek uturil?
         /////////////////////////////// Mislim, da ne, ker sem v arrayu...
-        /*'deadline' => array(     
+        /*'deadline' => array(
             'header' => array(
                 'value' => function () use ($status, $txt){
                     if ($status < 2) return $txt['delegator_deadline'];
@@ -304,7 +304,7 @@ function show_task_list($status) {
                 },
             ),
             'data' => array(
-                'function' => function($row) use ($status) { 
+                'function' => function($row) use ($status) {
                     if ($status < 2) {
                         $deadline = $row['deadline'];
                         if (date('Y-m-d') > $deadline) return "<font color=\"red\"><span class=\"relative-time\">$deadline</span></font>";
@@ -331,18 +331,18 @@ function show_task_list($status) {
                 //    }
             ),
         ),*/
-        'deadline' => array(     
+        'deadline' => array(
             'header' => array(
                 'value' => $txt['delegator_deadline'],
             ),
             'data' => array(
-                'function' => function($row) use ($status)  { 
+                'function' => function($row) use ($status)  {
                     $deadline = $row['deadline'];
                     if (date('Y-m-d') > $deadline and $status < 2) return "<font color=\"red\"><span class=\"relative-time\">$deadline</span></font>";
                     elseif ($status > 1){
                         if ($row['end_date'] > $deadline) return "<font color=\"red\">$deadline</font>";
                         else return $deadline;
-                        
+
                     }
                     else return "<span class=\"relative-time\">$deadline</span>";
                 },
@@ -443,7 +443,7 @@ function show_task_list($status) {
         //$columns['end_date'] = $end_date;
         //unset($columns['deadline']);
         }*/
-    
+
 
     return $columns;
 }
@@ -504,7 +504,7 @@ function count_states($states, $what, $value){
         $row = $smcFunc['db_fetch_assoc']($request);
         $states[$status] = $row['COUNT(id)'];
         $smcFunc['db_free_result']($request);
-        
+
     }
     return $states;
 }
@@ -543,16 +543,19 @@ function delegator_send_mail(){
         ];
         $status = $statusi[$state];
         $subject = "Opravilo $task v projektu $projekt zaključeno ($status)";
-        
+
         $body = "Pri projektu $projekt je bilo zaključeno opravilo $task, s stanjem \"$status\".\n";
         $body .= "Opis:\n$opis\nOpravilo so zaključili: ";
         $body .= implode(", ", $workerji) . ". Slava jim!\n";
 
+        // @TODO test? nevem ce dela to sploh.
+		sendmail($emaili, $subject, $body, null, null, false, 5);
+        /*
         var_dump($emaili);
         var_dump($subject);
         var_dump($body);
-		sendmail($emaili, $subject, $body, null, null, false, 5);
         die();
+        */
 
 
         // @TODO pošlji tudi koordinatorju (ne samo delavcem)
@@ -561,7 +564,7 @@ function delegator_send_mail(){
         // @TODO Dodajmo proper email template za notifikacijo ob zaključitvi taska
 		//$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
 
-    
+
 }
 
 ?>
