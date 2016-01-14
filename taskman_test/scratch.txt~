@@ -1,9 +1,0 @@
- ___________________________
-|                           |
-|  gledam modification.xml  |
-|___________________________|
-
-Pomemben tag: <file>
-              <operation>
-
-php funkcija: get_today_todos()

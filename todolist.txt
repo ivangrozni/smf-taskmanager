@@ -1,3 +1,0 @@
- - php funkcije
-   - header
-   - footer
