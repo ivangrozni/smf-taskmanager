@@ -24,22 +24,15 @@
 	</file>
 	<!-- zakomentirano do sem -->
 	<file name="$sourcedir/Subs.php">
-	  <!-- zakomentirano -->
-	    <operation>
-			<search position="replace"><![CDATA[$context['allow_memberlist'] = allowedTo('view_mlist');]]></search>
-			<add><![CDATA[$context['allow_memberlist'] = allowedTo('view_mlist');
-			$context['allow_delegator_view'] = allowedTo('delegator_view');]]></add>
-		</operation>
-	<!-- zakomentirano do sem -->
 		<operation>
-			<search position="replace"><![CDATA['mlist' => array(]]></search>
+			<search position="replace"><![CDATA['calendar' => array(]]></search>
 <!--
 Drop down menu: @Jaka - kaj rabimo?
 -->
 			<add><![CDATA['delegator' => array(
 				'title' => function_exists('delegator_placeholder') ? delegator_placeholder() :  'DELEGATOR TODAY PLACEHOLDER',
 				'href' => $scripturl . '?action=delegator',
-				'show' =>  $context['allow_delegator_view'], // @TODO: proper permission
+				'show' =>  allowedTo('delegator_view'), // @TODO: proper permission
 				'sub_buttons' => array(
 					'add' => array(
 						'title' => $txt['delegator_task_add'],
@@ -73,7 +66,7 @@ Drop down menu: @Jaka - kaj rabimo?
                     ),
 				),
 			),
-'mlist' => array(]]></add>
+			'calendar' => array(]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[function setupMenuContext()]]></search>
