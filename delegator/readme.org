@@ -62,7 +62,8 @@ but it is intended to become a standalone app with SMF mode implementation.
 
 ** SLO
 *** Splošne informacije
-    Delegator je sloni na To Do list modu za SMF forum, ki ga je ustvaril grafitus - slava mu. Je zelo preprost program za projektno vodenje.
+    Delegator je sloni na To Do list modu za SMF forum, ki ga je ustvaril
+    grafitus - slava mu. Je zelo preprost program za projektno vodenje.
 **** Trenutna verzija
      Delegator: spread communism 0.99
 **** Funkcionalnost
@@ -89,6 +90,12 @@ but it is intended to become a standalone app with SMF mode implementation.
      Ustvarite .zip datoteko iz mape delegator in jo nato naložite ter namestite na vaš SMF forum.
 
      Sliko super_edit.gif prekopirajte v mapo img/buttons vašega SMF foruma
+
+     To še ni vse.
+     Naredili smo tudi php blok, ki uporabniku prikazuje njegove taske in to.
+     Treba ga je dodati posebej.
+
+
 *** Licenca
     Ta program je prosta programska oprema; lahko se ga deli in/ali ureja v skladu s pogoji,
     ki jih določa Simple Machines LL.
