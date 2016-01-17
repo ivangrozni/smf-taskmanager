@@ -71,6 +71,8 @@ function Delegator()
         'se'            => 'se',
         'super_edit'    => 'super_edit',
         'del_log'       => 'del_log',
+        'edit_proj'     => 'edit_proj', // loads add-proj with preloaded fields
+        'del_proj'      => 'del_proj',
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
             // Spodnji komentarji so stara To-Do list mod koda
@@ -204,6 +206,11 @@ function delegator_main()                                      //glavna funkcija
     createList($list_options);
 }
 
+/**
+ * Add task button.
+ *
+  * @todo rename into task 
+ */
 function add()   //ni se prava funkcija za dodajanje - samo za gumb?
 {
     global $smcFunc, $scripturl, $context, $txt;
@@ -221,6 +228,11 @@ function add()   //ni se prava funkcija za dodajanje - samo za gumb?
 // Kaj se vpise v bazo, ko se ustvari task?
 //id, id_proj, id_author, name, description, creation_date, deadline, priority, state
 // MANJKA: description
+/**
+ * Function that actual adds new task.
+ *
+ *
+ */
 function add_task()
 {
     global $smcFunc, $context;
@@ -269,7 +281,9 @@ function add_task()
     redirectexit('action=delegator;sa=view_proj&id_proj='.$id_proj);
 }
 
-// analogija funkciji add()
+/**
+  * Function for add project initialization.
+  */
 function proj()
 {
     global $smcFunc, $scripturl, $context, $txt;
@@ -285,6 +299,9 @@ function proj()
 
 
 // add_project: id, id_coord, name, description, start, end
+/**
+  * Function that actually writes project into database.
+  */
 function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
 {
     global $smcFunc, $context;
@@ -333,7 +350,12 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
 ########################## view_task #############################
 ##################################################################
 
-// analogija funkciji add()
+/**
+ * Initializes view task.
+ *
+ * @todo rename into view_task.
+ * @todo remove database querries from template
+ */
 function vt()
 {
     global $smcFunc, $scripturl, $context, $txt;

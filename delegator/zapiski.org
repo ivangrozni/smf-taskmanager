@@ -1,0 +1,35 @@
+#+TITLE: zapiski o delegatorju
+#+SUBTITLE: random zapiski ob programiranju
+
+* 160113
+
+** DONE Ureditev delegatorja
+   CLOSED: [2016-01-17 Sun 19:00]
+   
+*** DONE github commit
+    CLOSED: [2016-01-17 Sun 19:00]
+    Najprej bomo vse commital. 
+
+*** DONE brisanje nepotrebnih stvari z gita
+    CLOSED: [2016-01-17 Sun 19:00]
+    Na gitu so kr eni SMF appi, ki so služili za osnovo in učenje.
+    Dajmo to stran.
+
+* 160117
+  
+** TODO Coding guidelines
+
+   Gremo kodo spravit v obliko, kakržno zahteva ljudi na SMFju.
+   [[http://wiki.simplemachines.org/smf/Coding_Guidelines][smf-coding-guidelines]]
+
+   - rename functions: ~add~ -> task, ~vt~ -> view-task, ~et~ -> edit-task
+   - remove database queries from template files
+
+** TODO Edit/delete project
+   V Delegator.php dodaj funkciji.
+
+
+   V Delegator.templates.php dodaj gumbke. K Project_view (gumbek edit-proj in del-proj).
+   Fora pa je, da naj jih vidi samo administrator.
+
+** TODO Commit v mod database
