@@ -1,0 +1,41 @@
+dl.delegator_et
+{
+    margin: 0;
+    clear: right;
+    overflow: auto;
+}
+
+dl.delegator_et dt
+{
+    float: left;
+    clear: both;
+    width: 30%;
+    margin: 0.5em 0 0 0;
+}
+
+dl.delegator_et label
+{
+    font-weight: bold;
+}
+
+dl.delegator_et dd
+{
+    float: left;
+    width: 69%;
+    margin: 0.5em 0 0 0;
+}
+
+#confirm_buttons
+{
+    text-align: center;
+    padding: 1em 0;
+}
+
+table.delegator-sidebar td {
+    border-right: 1.5px solid #CCC;
+    padding: 2px 4px;
+}
+
+table.delegator-sidebar td:last-child {
+    border-right: none;
+}

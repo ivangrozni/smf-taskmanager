@@ -32,7 +32,7 @@ if (!defined('SMF'))
  * Helper funkcije *
  ******************/
 
-include 'delegator_helpers.php';
+require_once 'delegator_helpers.php';
 
 //Tu se zacne originalni To-Do list mod
 function Delegator()
@@ -95,50 +95,13 @@ function Delegator()
     // CSS, javascript!
     $context['html_headers'] .= '
         <link rel="stylesheet" type="text/css" href="Themes/default/css/pikaday.css" />
+        <link rel="stylesheet" type="text/css" href="Themes/default/css/delegator.css" />
         <script src="Themes/default/scripts/moment.min.js" charset="UTF-8" type="text/javascript"></script>
         <script src="Themes/default/scripts/jquery-1.9.0.min.js" charset="UTF-8" type="text/javascript"></script>
         <script src="Themes/default/scripts/pikaday.js" charset="UTF-8" type="text/javascript"></script>
         <script src="Themes/default/scripts/pikaday.jquery.js" charset="UTF-8" type="text/javascript"></script>
-        <script src="Themes/default/scripts/delegator.js" charset="UTF-8" type="text/javascript"></script>
-        <style type="text/css">
-            dl.delegator_et
-            {
-                margin: 0;
-                clear: right;
-                overflow: auto;
-            }
-            dl.delegator_et dt
-            {
-                float: left;
-                clear: both;
-                width: 30%;
-                margin: 0.5em 0 0 0;
-            }
-            dl.delegator_et label
-            {
-                font-weight: bold;
-            }
-            dl.delegator_et dd
-            {
-                float: left;
-                width: 69%;
-                margin: 0.5em 0 0 0;
-            }
-            #confirm_buttons
-            {
-                text-align: center;
-                padding: 1em 0;
-            }
-            table.delegator-sidebar td {
-                border-right: 1.5px solid #CCC;
-                padding: 2px 4px;
-            }
-            table.delegator-sidebar td:last-child {
-                border-right: none;
-            }
-        </style>';
+        <script src="Themes/default/scripts/delegator.js" charset="UTF-8" type="text/javascript"></script>';
     $subActions[$sub_action]();
-
 }
 
 // Sixth, begin doing all the stuff that we want this action to display
@@ -152,16 +115,14 @@ function delegator_main()                                      //glavna funkcija
 
     //isAllowedTo('view_todo');                                // izkljuceni permissioni (za zdaj)
 
-    $status       =  getStatus(false);
+    $status =  getStatus(false);
     //print_r($status); print_r($status=="unfinished");
     $list_options = array(
-
         'id'               => 'list_tasks',
         'items_per_page'   => 30,
         'base_href'        => $scripturl . '?action=delegator;status='.$status,
         'default_sort_col' => 'deadline',
         'get_items'        => array(
-
             'function' => function ($start, $items_per_page, $sort) use ($status) {
                 if ($status==="unfinished") {
                     $tasks0 = ret_tasks(0, "None", 1, $sort, $start, $items_per_page);
@@ -173,7 +134,6 @@ function delegator_main()                                      //glavna funkcija
                     $tasks3 = ret_tasks(3, "None", 1, $sort, $start, $items_per_page);
                     $tasks4 = ret_tasks(4, "None", 1, $sort, $start, $items_per_page);
                     return (array_merge($tasks2, $tasks3, $tasks4));
-
                     }
                 else {
                     return ret_tasks($status, "None", 1, $sort, $start, $items_per_page);
@@ -181,9 +141,8 @@ function delegator_main()                                      //glavna funkcija
             },
             'params' => array(
                 'id_member' => $context['user']['id'],
-             ),
+            ),
         ),
-
         'get_count' => array(							//tudi tu je posodobljen query
             'function' => function() use ($status) {
                 if ($status==="unfinished") {
@@ -244,8 +203,10 @@ function add_task()
     $id_author = $context['user']['id'];
     $id_proj = $_POST['id_proj'];
 
-    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
-    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
+    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']),
+        array("\r" => '', "\n" => '', "\t" => ''));
+    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']),
+        array("\r" => '', "\n" => '', "\t" => ''));
     $deadline = $smcFunc['htmlspecialchars']($_POST['duedate']);
     $members = $_POST["member_add"];
 
@@ -253,8 +214,19 @@ function add_task()
         fatal_lang_error('delegator_empty_fields', false);
 
     $smcFunc['db_insert']('', '{db_prefix}tasks',
-                          array('id_proj' => 'int', 'id_author' => 'int', 'name' => 'string', 'description' => 'string', 'deadline' => 'date', 'priority' => 'int', 'state' => 'int', 'creation_date' => 'string', 'start_date' => 'string'),
-                          array( $id_proj, $id_author, $name, $description, $deadline, $_POST['priority'], (count($members) ? 1 : 0 ), date("Y-m-d"), (count($members) ? date("Y-m-d") : "0001-01-01" ) ),
+        array(
+            'id_proj' => 'int',
+            'id_author' => 'int',
+            'name' => 'string',
+            'description' => 'string',
+            'deadline' => 'date',
+            'priority' => 'int',
+            'state' => 'int',
+            'creation_date' => 'string',
+            'start_date' => 'string'),
+        array($id_proj, $id_author, $name, $description, $deadline,
+            $_POST['priority'], (count($members) ? 1 : 0 ), date("Y-m-d"),
+            (count($members) ? date("Y-m-d") : "0001-01-01")),
         array('id')
     );
 
@@ -262,23 +234,27 @@ function add_task()
     //
 
     $request = $smcFunc['db_query']('', '
-    SELECT T1.id AS id_task FROM {db_prefix}tasks T1
-    ORDER BY T1.id DESC
-    LIMIT 1', array() );
+        SELECT T1.id AS id_task FROM {db_prefix}tasks T1
+        ORDER BY T1.id DESC
+        LIMIT 1', array());
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
     foreach ($members as $member) {
         $smcFunc['db_insert']('', '{db_prefix}workers',
-                              array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
-                              array((int) $member, $row['id_task'], 1)
+            array(
+                'id_member' => 'int',
+                'id_task' => 'int',
+                'status' => 'int'
+            ),
+            array((int) $member, $row['id_task'], 1)
         );
     }
 
     zapisiLog($id_proj, $row['id_task'], 'add_task');
 
-    redirectexit('action=delegator;sa=view_proj&id_proj='.$id_proj);
+    redirectexit("action=delegator;sa=view_proj&id_proj=$id_proj");
 }
 
 /**
@@ -313,37 +289,44 @@ function add_proj() // mrbit bi moral imeti se eno funkcijo, v stilu add pri tas
     $id_coord = $context['user']['id'];
 
 
-    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
-    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
+    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']),
+        array("\r" => '', "\n" => '', "\t" => ''));
+    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']),
+        array("\r" => '', "\n" => '', "\t" => ''));
     $start = $smcFunc['htmlspecialchars']($_POST['start']);
     $end = $smcFunc['htmlspecialchars']($_POST['end']);
 
-    if ($smcFunc['htmltrim']($_POST['name']) === '' || $smcFunc['htmltrim']($_POST['end']) === '')
+    if ($smcFunc['htmltrim']($_POST['name']) === ''
+        || $smcFunc['htmltrim']($_POST['end']) === '') {
         fatal_lang_error('delegator_empty_fields', false);
+    }
 
-    $smcFunc['db_insert']('', '{db_prefix}projects',
-    array(
-        'id_coord' => 'int', 'name' => 'string', 'description' => 'string', 'start' => 'date', 'end' => 'date',
-    ),
-    array(
-        $id_coord, $name, $description, $start, $end,
-    ),
-    array('id')
+    $smcFunc['db_insert']('', '{db_prefix}projects', array(
+            'id_coord' => 'int',
+            'name' => 'string',
+            'description' => 'string',
+            'start' => 'date',
+            'end' => 'date'
+        ),
+        array(
+            $id_coord, $name, $description, $start, $end
+        ),
+        array('id')
     );
 
     // Redirect vrze na isti projekt...
     // Fora je, da moram pogledat, kateri id je dobil...
     $request = $smcFunc['db_query']('', '
-    SELECT T1.id AS id_proj FROM {db_prefix}projects T1
-    ORDER BY T1.id DESC
-    LIMIT 1', array() );
+        SELECT T1.id AS id_proj FROM {db_prefix}projects T1
+        ORDER BY T1.id DESC
+        LIMIT 1', array());
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
 
     zapisiLog($row['id_proj'], -1, 'add_proj');
 
-    redirectexit('action=delegator;sa=view_proj;id_proj='.$row['id_proj']); // redirect exit - logicno
+    redirectexit('action=delegator;sa=view_proj;id_proj=' . $row['id_proj']); // redirect exit - logicno
 }
 
 ##################################################################

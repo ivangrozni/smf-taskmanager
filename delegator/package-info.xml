@@ -13,6 +13,7 @@
 		<require-file name="delegator_helpers.php" destination="$sourcedir" />
 		<require-file name="Delegator.template.php" destination="$themedir" />
 		<require-file name="delegator.js" destination="$themedir/scripts" />
+		<require-file name="delegator.css" destination="$themedir/css" />
 		<require-file name="moment.min.js" destination="$themedir/scripts" />
 		<require-file name="pikaday.js" destination="$themedir/scripts" />
 		<require-file name="pikaday.jquery.js" destination="$themedir/scripts" />
@@ -30,10 +31,11 @@
 		<remove-file name="$sourcedir/delegator_helpers.php" />
 		<remove-file name="$themedir/Delegator.template.php" />
 		<remove-file name="$themedir/scripts/delegator.js" />
+		<remove-file name="$themedir/css/delegator.css" />
 		<remove-file name="$themedir/scripts/moment.min.js" />
 		<remove-file name="$themedir/scripts/pikaday.js" />
 		<remove-file name="$themedir/scripts/pikaday.jquery.js" />
-		<remove-file name="$themedir/scripts/pikaday.css" />
+		<remove-file name="$themedir/css/pikaday.css" />
         <remove-file name="$themedir/scripts/jquery-1.9.0.min.js" />
         <remove-file name="$themedir/images/buttons/super_edit.gif" />
 	</uninstall>

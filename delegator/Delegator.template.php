@@ -6,7 +6,7 @@
 
 // Sestavi seznam prioritet (izbor)
 
-include "/../../Sources/delegator_helpers.php";
+require_once "/../../Sources/delegator_helpers.php";
 // Tukaj znajo biti se tezave...
 
 // @todo se bo v helper dalo, ampak bi sel rad spat zdaj :)
@@ -21,22 +21,40 @@ function template_main()
 
 	//if (allowedTo('add_new_todo'))
     echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
-    template_button_strip(array(array('text' => 'delegator_task_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=add', 'active'=> true)), 'right');
-    template_button_strip(array(array('text' => 'delegator_project_add', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=proj', 'active'=> true)), 'right');
 
-    
+    // Task add button
+    template_button_strip(array(
+        array(
+            'text' => 'delegator_task_add',
+            'image' => 'to_do_add.gif',
+            'lang' => true,
+            'url' => $scripturl . '?action=delegator;sa=add',
+            'active'=> true
+        )
+    ), 'right');
+
+    // Project add button
+    template_button_strip(array(
+        array(
+            'text' => 'delegator_project_add',
+            'image' => 'to_do_add.gif',
+            'lang' => true,
+            'url' => $scripturl . '?action=delegator;sa=proj',
+            'active'=> true
+        )
+    ), 'right');
+
     $status = getStatus();
-    
-    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_state_'.$status ].' &nbsp;'.$txt['delegator_tasks'].'</h2> <hr>';
-    
+    echo '<h2 style="font-size:1.5em" >' . $txt["delegator_state_$status"] . '&nbsp;' . $txt['delegator_tasks'] . '</h2> <hr>';
+
     // Prestejem taske v posameznih stanjih :)
-    $states = count_states(array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0), "None", 1);
+    $states = count_states(array(0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0), "None", 1);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
-        echo '<a href="'.$scipturl.'?action=delegator;status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp;'.$states[$status2].'</br>';
+        echo "<a href=\"$scipturl?action=delegator;status=$status2\">" . $txt["delegator_state_$status2"] . '</a>:&nbsp;' . $states[$status2] . '</br>';
     }
-    echo '<hr><a href="'.$scipturl.'?action=delegator;status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0]+$states[1]).'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
+    echo "<hr><a href=\"$scipturl?action=delegator;status=unfinished\">" . $txt['delegator_state_unfinished'] . '</a>:&nbsp;' . ($states[0] + $states[1]) . '</br>';
+    echo "<a href=\"$scipturl?action=delegator;status=finished\">" . $txt['delegator_state_finished'] . '</a>:&nbsp;' . ($states[2] + $states[3] + $states[4]) . '</br><hr>';
 
     template_show_list('list_tasks');
 }
@@ -44,17 +62,17 @@ function template_main()
 function template_add()
 {
 	global $scripturl, $context, $txt;
-        // id_author, name, description, creation_date, deadline, priority, state
+    // id_author, name, description, creation_date, deadline, priority, state
 
-        // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
-        global $smcFunc;
+    // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
+    global $smcFunc;
 
-        $id_proj=(isset($_GET['id_proj']) ? $_GET['id_proj'] : FALSE ) ;
+    $id_proj=(isset($_GET['id_proj']) ? $_GET['id_proj'] : FALSE ) ;
 
-        $request = $smcFunc['db_query']('', '
-                 SELECT id, name
-                 FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
-        // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
+    $request = $smcFunc['db_query']('', '
+             SELECT id, name
+             FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
+    // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
 
 	echo '
 	<div id="container">
@@ -112,7 +130,7 @@ function template_add()
                                 } else {
                                     echo '<option value="'.$row['id'].'" > '.$row['name'].'</option> ';
                                 }
-                            
+
 					        }
 					    $smcFunc['db_free_result']($request);
         				echo '
@@ -357,7 +375,7 @@ function template_vt() // id bi bil kar dober argument
 			echo '</dl> <br />';
                  if( $row['state'] < 2) echo $claimButton, '&nbsp;
                 <a href="index.php?action=delegator;sa=et;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> 
+                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
                <!-- <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';sesc=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> -->
             ';
         if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
@@ -389,7 +407,7 @@ function template_view_proj()
     $id_proj = (int) $_GET['id_proj'];
 
     $status = getStatus();
-    
+
     $request = $smcFunc['db_query']('', '
         SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
 		FROM {db_prefix}projects T1
@@ -466,7 +484,7 @@ function template_view_proj()
     echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0] + $states[1]).'</br>';
     echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
-    
+
     template_show_list('list_tasks_of_proj');
 }
 
@@ -502,7 +520,7 @@ function template_view_worker()
     echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
     echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
-    
+
 
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 
@@ -526,7 +544,7 @@ function template_my_tasks()
     $smcFunc['db_free_result']($request);
 
     echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</br>'.$txt['delegator_state_'.$status].'</h2> <hr>';
-    
+
     $states = count_states(array (1 => 0, 2 => 0, 3 => 0, 4 => 0), "Worker", $id_member);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
@@ -535,7 +553,7 @@ function template_my_tasks()
     }
     echo '<hr><a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
     echo '<a href="'.$scipturl.'?action=delegator;sa=my_tasks;status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
-    
+
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 }
 
@@ -560,17 +578,17 @@ function template_view_log()
 
     $session_var = $context['session_var'];
 	$session_id = $context['session_id'];
-    
+
     template_button_strip(array(array('text' => 'delegator_del_log', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=del_log;'.$session_var. '='. $session_id, 'active'=> true)), 'right');
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_log'] .' </h2><hr>';
     //print_r ("template se nalozi");
 
     //echo '<a href="index.php?action=delegator;sa=del_log;'. $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_del_log'] . '</a>';
-    
-    
-    
-    
+
+
+
+
     template_show_list('log'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 }
 
@@ -712,7 +730,7 @@ function template_en()
 
 	//$session_var = $context['session_var'];
 	//$session_id = $context['session_id'];
-        
+
        // rabim samo id_task-a, ki se zakljucuje
 
     $id_task = (int) $_GET['task_id'];
@@ -1034,7 +1052,7 @@ function template_se()
                         for ($i = 0; $i <= 5; $i++){
                             if ($row['state'] == $i) echo '<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> ';
                             else echo '<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ';
-                            
+
                         }
 
 
