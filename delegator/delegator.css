@@ -1,11 +1,11 @@
-dl.delegator_et
+dl.delegator_edit_task
 {
     margin: 0;
     clear: right;
     overflow: auto;
 }
 
-dl.delegator_et dt
+dl.delegator_edit_task dt
 {
     float: left;
     clear: both;
@@ -13,12 +13,12 @@ dl.delegator_et dt
     margin: 0.5em 0 0 0;
 }
 
-dl.delegator_et label
+dl.delegator_edit_task label
 {
     font-weight: bold;
 }
 
-dl.delegator_et dd
+dl.delegator_edit_task dd
 {
     float: left;
     width: 69%;
@@ -38,4 +38,8 @@ table.delegator-sidebar td {
 
 table.delegator-sidebar td:last-child {
     border-right: none;
+}
+
+span.overdue {
+    color: red;
 }

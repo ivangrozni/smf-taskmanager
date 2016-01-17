@@ -20,7 +20,7 @@ function getPriorityIcon2($row) {
 }
 
 function show(){
-    
+
     global $smcFunc, $context, $txt, $scipturl;
 
     $id_member = $context['user']['id'];
@@ -59,10 +59,10 @@ function show(){
 
     echo '<hr><table class="delegator-sidebar">';
     while ($row = $smcFunc['db_fetch_assoc']($request)){
-        echo '<tr><td><a href="', $scripturl ,'?action=delegator;sa=vt;task_id=', $row['id_task'] ,'"> ',$row['task_name'],'</a></td>
-          <td><a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'"> ',$row['project_name'],'</a></td>
+        echo '<tr><td><a href="', $scripturl ,'?action=delegator;sa=view_task;task_id=', $row['id_task'] ,'"> ',$row['task_name'],'</a></td>
+          <td><a href="', $scripturl ,'?action=delegator;sa=view_project;id_proj=', $row['id_proj'] ,'"> ',$row['project_name'],'</a></td>
           <td>';
-        if ($today > $row['deadline']) echo '<font color="red">' .$row['deadline'].'</font></td>';
+        if ($today > $row['deadline']) echo '<span class="overdue">' .$row['deadline'].'</span></td>';
         else echo '<span class="relative-time">' . $row['deadline'] . '</span></td>';
         //echo '<td>'.$row['priority'].'</td></tr>';
         echo  '<td>'. getPriorityIcon2($row) . '</td></tr>';

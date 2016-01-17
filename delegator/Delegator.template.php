@@ -1,12 +1,16 @@
 <?php
 
+// First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. Sledeci vrstici sta dodani, da kdo ne sheka (SMF uporablja v vseh fajlih, mod ni uporabljal).
+if (!defined('SMF'))
+    die('Hack Attempt...');
+
 /*******************
  * Helper funkcije *
  ******************/
 
 // Sestavi seznam prioritet (izbor)
 
-require_once "/../../Sources/delegator_helpers.php";
+require_once "$sourcedir/delegator_helpers.php";
 // Tukaj znajo biti se tezave...
 
 // @todo se bo v helper dalo, ampak bi sel rad spat zdaj :)
@@ -23,29 +27,27 @@ function template_main()
     echo 'sss, sss, kids! hey, kids!<br> wanna build communism?';
 
     // Task add button
-    template_button_strip(array(
-        array(
-            'text' => 'delegator_task_add',
-            'image' => 'to_do_add.gif',
-            'lang' => true,
-            'url' => $scripturl . '?action=delegator;sa=add',
-            'active'=> true
-        )
-    ), 'right');
+    template_button_strip(array(array(
+        'text' => 'delegator_task_add',
+        'image' => 'to_do_add.gif',
+        'lang' => true,
+        'url' => "$scripturl?action=delegator;sa=add_task",
+        'active'=> true
+        )), 'right'
+    );
 
     // Project add button
-    template_button_strip(array(
-        array(
-            'text' => 'delegator_project_add',
-            'image' => 'to_do_add.gif',
-            'lang' => true,
-            'url' => $scripturl . '?action=delegator;sa=proj',
-            'active'=> true
-        )
-    ), 'right');
+    template_button_strip(array(array(
+        'text' => 'delegator_project_add',
+        'image' => 'to_do_add.gif',
+        'lang' => true,
+        'url' => $scripturl . '?action=delegator;sa=add_project',
+        'active'=> true
+        )), 'right'
+    );
 
     $status = getStatus();
-    echo '<h2 style="font-size:1.5em" >' . $txt["delegator_state_$status"] . '&nbsp;' . $txt['delegator_tasks'] . '</h2> <hr>';
+    echo '<h2 style="font-size:1.5em" >' . $txt["delegator_state_$status"] . '&nbsp;' . $txt['delegator_tasks'] . '</h2><hr>';
 
     // Prestejem taske v posameznih stanjih :)
     $states = count_states(array(0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0), "None", 1);
@@ -59,15 +61,13 @@ function template_main()
     template_show_list('list_tasks');
 }
 
-function template_add()
+function template_add_task()
 {
-	global $scripturl, $context, $txt;
+	global $smcFunc, $scripturl, $context, $txt;
     // id_author, name, description, creation_date, deadline, priority, state
-
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
-    global $smcFunc;
 
-    $id_proj=(isset($_GET['id_proj']) ? $_GET['id_proj'] : FALSE ) ;
+    $id_proj=(isset($_GET['id_proj']) ? (int) $_GET['id_proj'] : FALSE ) ;
 
     $request = $smcFunc['db_query']('', '
              SELECT id, name
@@ -81,11 +81,11 @@ function template_add()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=add_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
+		<form action="', $scripturl, '?action=delegator;sa=add_task_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_add">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_et">
+				<dl class="delegator_edit_task">
 					<dt>
                        <label for="name"> Zadolzitev </label>
 					</dt>
@@ -150,7 +150,7 @@ function template_add()
 
 //funkcija za dodajanje projektov
 //imena morajo ustrezat subactionnom...
-function template_proj()
+function template_add_project()
 {
 	global $scripturl, $context, $txt;
 
@@ -161,11 +161,11 @@ function template_proj()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=add_proj" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
+		<form action="', $scripturl, '?action=delegator;sa=add_project_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_et">
+				<dl class="delegator_edit_task">
 					<dt>
 						<label for="name">', $txt['delegator_project_name'], '</label>
 					</dt>
@@ -202,7 +202,7 @@ function template_proj()
 	</div><br />';
 }
 
-function template_vt() // id bi bil kar dober argument
+function template_view_task() // id bi bil kar dober argument
 {
     /*
       Imena zadolzitev je treba spremeniti v linke, id se lahko posreduje z metodo GET
@@ -212,15 +212,18 @@ function template_vt() // id bi bil kar dober argument
                  Izvajalce...
       2 gumba: Back in Submit (nazaj in sprejmi zadolzitev)
      */
-    global $scripturl, $context, $txt, $settings;
-    global $smcFunc;
+    global $smcFunc, $scripturl, $context, $txt, $settings;
     // id_author, name, description, creation_date, deadline, priority, state
 
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
     $task_id = (int) $_GET['task_id'];
 
     $request = $smcFunc['db_query']('', '
-        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS            deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author,            T1.creation_date AS creation_date, T1.description AS description, T1.id_proj             AS id_proj, T1.id_author AS id_author, T1.end_comment, T1.end_date
+        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name,
+            T1.deadline AS deadline, T1.priority AS priority, T1.state AS state,
+            T3.real_name AS author, T1.creation_date AS creation_date,
+            T1.description AS description, T1.id_proj AS id_proj,
+            T1.id_author AS id_author, T1.end_comment, T1.end_date
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
@@ -267,11 +270,11 @@ function template_vt() // id bi bil kar dober argument
 
     // Seznam delegatov
 
-    $request = $smcFunc['db_query']('',
-		'SELECT T1.id_member, T2.real_name
-		 FROM {db_prefix}workers T1
-		 LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
-         WHERE id_task = {int:task_id}',
+    $request = $smcFunc['db_query']('', '
+        SELECT T1.id_member, T2.real_name
+	    FROM {db_prefix}workers T1
+		LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
+        WHERE id_task = {int:task_id}',
 		array(
 			'task_id' => $task_id
 		)
@@ -285,12 +288,9 @@ function template_vt() // id bi bil kar dober argument
 	$delegates = "&nbsp;&nbsp; (\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
 	if (count($members)) {
         $delegates = ' ';
-		//$delegates = implode(", ", $members);
-        foreach( $members as $id_member => $real_name ){
-            $delegates = $delegates .  '<a href='. $scripturl .'?action=delegator;sa=view_worker;id_member='. $id_member .'">'.$real_name.'</a>&nbsp;';
-
-                       //<a href="\'. $scripturl .\'?action=delegator;sa=view_worker;id_proj=\'. $row[\'id_member\'] .\'">\'.$row[\'member\'].\'</a>\'
-}
+        foreach ($members as $id_member => $real_name) {
+            $delegates = $delegates . "<a href=$scripturl?action=delegator;sa=view_worker;id_member=$id_member\">$real_name</a>&nbsp;";
+        }
 	}
 
     echo '
@@ -303,25 +303,25 @@ function template_vt() // id bi bil kar dober argument
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_et">
+			<dl class="delegator_edit_task">
 				<dt>
 					<label for="name">', $txt['delegator_task_name'], '</label>
 				</dt>
 				<dd>
-                    <h3> ', $row['task_name'] ,' </h3>
+                    <h3>', $row['task_name'], '</h3>
 					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
 				</dd>
                 <dt>
 					<label for="author">', $txt['delegator_task_author'], '</label>
 				</dt>
 				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'] ,'"> ',$row['author'],'</a>
+                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'], '"> ', $row['author'], '</a>
 				</dd>
                 <dt>
 					<label for="project_name">', $txt['delegator_project_name'], '</label>
 				</dt>
 				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
+                    <a href="', $scripturl ,'?action=delegator;sa=view_project;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
 				</dd>
                 <dt>
 					<label for="creation_date">', $txt['delegator_creation_date'], '</label>
@@ -339,13 +339,13 @@ function template_vt() // id bi bil kar dober argument
 					<label for="delegates">', $txt['delegator_task_delegates'], '</label>
 				</dt>
 				<dd>
-					', $delegates , '
+					', $delegates, '
 				</dd>
                 <dt>
 					<label for="description">', $txt['delegator_task_desc'], '</label>
 				</dt>
 				<dd>
-                    ', $row['description'] ,'
+                    ', $row['description'], '
 				</dd>
                 <dt>
 					<label for="priority">', $txt['delegator_priority'], '</label>
@@ -357,40 +357,53 @@ function template_vt() // id bi bil kar dober argument
 					<label for="state">', $txt['delegator_state'], '</label>
 				</dt>
 				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
-                                       ', $row['state'] ,'
-			</dd>';
+                    ', $row['state'], '
+    			</dd>'
+                ;
 
-            if ($row['state'] > 1) echo '
-                 <dt>
-					<label for="end_date">', $txt['delegator_task_end_date'], '</label>
-				</dt>
-				<dd>  ', $row['end_date'] ,'
-                </dd>
-                 <dt>
-					<label for="end_comment">', $txt['delegator_task_end_comment'], '</label>
-				</dt>
-				<dd>  ', $row['end_comment'] ,'
-                </dd>';
+                if ($row['state'] > 1) {
+                    echo '
+                        <dt>
+        					<label for="end_date">', $txt['delegator_task_end_date'], '</label>
+        				</dt>
+        				<dd>
+                            ', $row['end_date'], '
+                        </dd>
+                         <dt>
+        					<label for="end_comment">', $txt['delegator_task_end_comment'], '</label>
+        				</dt>
+        				<dd>
+                            ', $row['end_comment'], '
+                        </dd>'
+                    ;
+                }
 
-			echo '</dl> <br />';
-                 if( $row['state'] < 2) echo $claimButton, '&nbsp;
-                <a href="index.php?action=delegator;sa=et;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
-               <!-- <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';sesc=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> -->
-            ';
-        if(isMemberWorker($task_id) and $row['state']==1) echo '<a href="index.php?action=delegator;sa=en;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+			echo '</dl><br />';
+
+            if ($row['state'] < 2) {
+                echo $claimButton, '&nbsp;
+                    <a href="index.php?action=delegator;sa=edit_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'], '</a>&nbsp;
+                    <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+                ';
+            }
+
+        if (isMemberWorker($task_id) and $row['state']==1) {
+            echo '<a href="index.php?action=delegator;sa=end_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        }
             // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
          // FORA - zakaj pri canceled tasks manjka super_edit???
         //print_r(isMemberCoordinator($row['id_proj'])); print_r($row['state']);
-        if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) echo '<a href="index.php?action=delegator;sa=se;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
-        echo '
-			</div>
-			<span class="botslice"><span></span></span>
-		</div>
-	</div><br />
-';
-$smcFunc['db_free_result']($request);
+        if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) {
+            echo '<a href="index.php?action=delegator;sa=super_edit;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+        }
 
+    echo '
+		</div>
+    	<span class="botslice"><span></span></span>
+    	</div>
+    	</div><br />
+    ';
+    $smcFunc['db_free_result']($request);
 }
 
 //##############################//##############################
@@ -398,7 +411,7 @@ $smcFunc['db_free_result']($request);
 //##############################//##############################
 
 
-function template_view_proj()
+function template_view_project()
 {
 
     global $scripturl, $context, $txt;
@@ -410,77 +423,78 @@ function template_view_proj()
 
     $session_var = $context['session_var']; // we do not understand this ...
 	$session_id = $context['session_id'];
-    
+
     $request = $smcFunc['db_query']('', '
-        SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord, T1.description AS description, T1.start AS start, T1.end AS end, T2.real_name AS coord_name
+        SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord,
+            T1.description AS description, T1.start AS start, T1.end AS end,
+            T2.real_name AS coord_name
 		FROM {db_prefix}projects T1
 		LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
-		WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+		WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj)
+    ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 
     $row = $smcFunc['db_fetch_assoc']($request);
 
     echo '
-    <div id="container">
-    <div class="cat_bar">
-		<h3 class="catbg"><span class="left"></span>
-			', $context['page_title'], '
-		</h3>
-	</div>
-	<div class="windowbg">
-		<span class="topslice"><span></span></span>
-		<div class="content">
-			<dl class="delegator_et">
-				<dt>
-					<label for="name">', $txt['delegator_project_name'], '</label>
-				</dt>
-				<dd>
-                    ', $row['proj_name'] ,'
-				</dd>
-                <dt>
-					<label for="coordinator">', $txt['delegator_project_coord'], '</label>
-				</dt>
-				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_coord'] ,'"> ',$row['coord_name'],'</a>
-				</dd>
-                <dt>
-					<label for="start">', $txt['delegator_project_start'], '</label>
-				</dt>
-				<dd>
-                    <span class="format-date">', $row['start'] ,'</span>
-				</dd>
-                <dt>
-					<label for="end">', $txt['delegator_project_end'], '</label>
-				</dt>
-				<dd>
-                    <span class="format-date">', $row['end'] ,'</span>
-				</dd>
-                <dt>
-					<label for="description">', $txt['delegator_project_desc'], '</label>
-				</dt>
-				<dd>
-                    ', $row['description'] ,'
-				</dd>
+        <div id="container">
+        <div class="cat_bar">
+    		<h3 class="catbg"><span class="left"></span>
+    			', $context['page_title'], '
+    		</h3>
+    	</div>
+    	<div class="windowbg">
+    		<span class="topslice"><span></span></span>
+    		<div class="content">
+    			<dl class="delegator_edit_task">
+    				<dt>
+    					<label for="name">', $txt['delegator_project_name'], '</label>
+    				</dt>
+    				<dd>
+                        ', $row['proj_name'], '
+    				</dd>
+                    <dt>
+    					<label for="coordinator">', $txt['delegator_project_coord'], '</label>
+    				</dt>
+    				<dd>
+                        <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_coord'] ,'"> ',$row['coord_name'],'</a>
+    				</dd>
+                    <dt>
+    					<label for="start">', $txt['delegator_project_start'], '</label>
+    				</dt>
+    				<dd>
+                        <span class="format-date">', $row['start'], '</span>
+    				</dd>
+                    <dt>
+    					<label for="end">', $txt['delegator_project_end'], '</label>
+    				</dt>
+    				<dd>
+                        <span class="format-date">', $row['end'] ,'</span>
+    				</dd>
+                    <dt>
+    					<label for="description">', $txt['delegator_project_desc'], '</label>
+    				</dt>
+    				<dd>
+                        ', $row['description'], '
+    				</dd>
+    			</dl>
+                <br />
+    			<a href="index.php?action=delegator;sa=add_task;id_proj=',$id_proj,'" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
+                ';
+                // preverim, ce se lahko narise gumbek za del project
+                // check if the user has permission to delete project
+                // @todo permission check
+                // '<a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+                echo '<a href="index.php?action=delegator;sa=del_project;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a>';
 
-			</dl>
-            <br />
-			<a href="index.php?action=delegator;sa=add;id_proj=',$id_proj,'" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;';
-    // preverim, ce se lahko narise gumbek za del project
-    // check if the user has permission to delete project
-    // @todo permission check
-    // '<a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a> 
-    echo '<a href="index.php?action=delegator;sa=del_proj;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a>';  
-
-        // '<a href="index.php?action=delegator;sa=del_proj;id_proj=', $id_proj,';" class="button_submit">', $txt['delegator_delete_project'] ,'</a>';
-
-    
-    echo '<!-- <a href="index.php?action=delegator;sa=ep;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_proj'] ,'</a>&nbsp;
-            <a href="index.php?action=delegator;sa=del_proj;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_proj'] ,'</a> -->
-			</div>
-			<span class="botslice"><span></span></span>
-		</div>
-	</div><br />
-</div>
-';
+                echo '
+                <!-- <a href="index.php?action=delegator;sa=edit_project;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_project'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=del_project;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a> -->
+    			</div>
+    			<span class="botslice"><span></span></span>
+    		</div>
+    	</div><br />
+    </div>
+    ';
 
     $smcFunc['db_free_result']($request);
     // This part shows number of tasks in different state
@@ -489,11 +503,11 @@ function template_view_proj()
     $states = count_states(array (0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0), "Project", $id_proj);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
-         echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$states[$status2].'</br>';
+         echo '<a href="'.$scripturl.'?action=delegator;sa=view_project;id_proj='.$id_proj.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$states[$status2].'</br>';
 
     }
-    echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0] + $states[1]).'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;sa=view_proj;id_proj='.$id_proj.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
+    echo '<hr><a href="' . $scripturl . '?action=delegator;sa=view_project;id_proj='.$id_proj.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.($states[0] + $states[1]).'</br>';
+    echo '<a href="' . $scripturl . '?action=delegator;sa=view_project;id_proj='.$id_proj.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
 
     template_show_list('list_tasks_of_proj');
@@ -514,8 +528,10 @@ function template_view_worker()
     $id_member = (int) $_GET['id_member'];
 
     $request = $smcFunc['db_query']('', '
-    SELECT T1.real_name AS name FROM {db_prefix}members T1
-    WHERE T1.id_member={int:id_member}', array('id_member' => $id_member));
+        SELECT T1.real_name AS name FROM {db_prefix}members T1
+        WHERE T1.id_member={int:id_member}',
+        array('id_member' => $id_member)
+    );
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
@@ -525,16 +541,13 @@ function template_view_worker()
     $states = count_states(array (1 => 0, 2 => 0, 3 => 0, 4 => 0), "Worker", $id_member);
     foreach ($states as $status2 => $count){
          // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
-         echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$states[$status2].'</br>';
+         echo '<a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$states[$status2].'</br>';
 
     }
-    echo '<hr><a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
-    echo '<a href="'.$scipturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
-
-
+    echo '<hr><a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
+    echo '<a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
     template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
-
 }
 
 function template_my_tasks()
@@ -542,14 +555,14 @@ function template_my_tasks()
     // Tukaj mora biti privzeit status 1!!!
     global $scripturl, $context, $txt;
     global $smcFunc;
-
     $id_member = $context['user']['id'];
-
     $status = getStatus(true);
 
     $request = $smcFunc['db_query']('', '
-    SELECT T1.real_name AS name FROM {db_prefix}members T1
-    WHERE T1.id_member={int:id_member}', array('id_member' => $id_member) );
+        SELECT T1.real_name AS name FROM {db_prefix}members T1
+        WHERE T1.id_member={int:id_member}',
+        array('id_member' => $id_member)
+    );
 
     $row = $smcFunc['db_fetch_assoc']($request);
     $smcFunc['db_free_result']($request);
@@ -570,15 +583,12 @@ function template_my_tasks()
 
 function template_view_projects()
 {
-
     global $scripturl, $context, $txt;
     global $smcFunc;
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
-    //print_r ("template se nalozi");
 
     template_show_list('list_of_projects'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
-
 }
 
 function template_view_log()
@@ -586,19 +596,20 @@ function template_view_log()
 
     global $scripturl, $context, $txt;
     global $smcFunc;
-
     $session_var = $context['session_var'];
 	$session_id = $context['session_id'];
 
-    template_button_strip(array(array('text' => 'delegator_del_log', 'image' => 'to_do_add.gif', 'lang' => true, 'url' => $scripturl . '?action=delegator' . ';sa=del_log;'.$session_var. '='. $session_id, 'active'=> true)), 'right');
+    template_button_strip(array(array(
+        'text' => 'delegator_del_log',
+        'image' => 'to_do_add.gif',
+        'lang' => true,
+        'url' => "$scripturl?action=delegator;sa=del_log;$session_var=$session_id",
+        'active'=> true
+        )), 'right'
+    );
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_log'] .' </h2><hr>';
-    //print_r ("template se nalozi");
-
     //echo '<a href="index.php?action=delegator;sa=del_log;'. $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_del_log'] . '</a>';
-
-
-
 
     template_show_list('log'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
 }
@@ -609,7 +620,7 @@ function template_view_log()
 //##############################//##############################
 //##############################//##############################
 
-function template_et()
+function template_edit_task()
 {
 
     global $scripturl, $context, $txt;
@@ -618,12 +629,13 @@ function template_et()
     $id_task = (int) $_GET['task_id'];
 
     $request = $smcFunc['db_query']('', '
-        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority, T1.id_proj
+        SELECT T1.id, T1.name AS task_name,  T1.deadline,
+            T1.description, T1.priority, T1.id_proj
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
         WHERE T1.id = {int:id_task}',
-        array( 'id_task' => $id_task)
+        array('id_task' => $id_task)
     );
 
     $row = $smcFunc['db_fetch_assoc']($request);
@@ -663,11 +675,11 @@ function template_et()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=edit_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
+		<form action="', $scripturl, '?action=delegator;sa=edit_task_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-                <dl class="delegator_et">
+                <dl class="delegator_edit_task">
 					<dt>
                         <label for="name">', $txt['delegator_task_name'], '</label>
 					</dt>
@@ -735,45 +747,50 @@ function template_et()
 // en je okrajsava za end task...
 // en is short for end task
 
-function template_en()
+function template_end_task()
 {
-	global $scripturl, $context, $txt, $settings;
-    global $smcFunc;
+	global $smcFunc, $scripturl, $context, $txt, $settings;
 
 	//$session_var = $context['session_var'];
 	//$session_id = $context['session_id'];
 
     $id_task = (int) $_GET['task_id'];
 
-/***************************************************************************
- ******************* * Podvojeno iz vt *************************************
- **************************************************************************/
+    /***************************************************************************
+     ******************* * Podvojeno iz vt *************************************
+     **************************************************************************/
 
     $request = $smcFunc['db_query']('', '
-       SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name, T1.deadline AS deadline, T1.priority AS priority, T1.state AS state, T3.real_name AS author, T1.creation_date AS creation_date, T1.description AS description, T1.id_proj AS id_proj, T1.id_author AS id_author
+        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name,
+            T1.deadline AS deadline, T1.priority AS priority, T1.state AS state,
+            T3.real_name AS author, T1.creation_date AS creation_date,
+            T1.description AS description, T1.id_proj AS id_proj,
+            T1.id_author AS id_author
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-		WHERE T1.id = {int:id_task} ', array('id_task' => $id_task) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
-// id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
+		WHERE T1.id = {int:id_task}',
+        array('id_task' => $id_task)
+    ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 
-// id od zeljenega taska potrebujemo podatke
+    // id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
+    // id od zeljenega taska potrebujemo podatke
     $row = $smcFunc['db_fetch_assoc']($request);
-// v tale echo bo padla tudi kaka forma / claim task / edit task
+    // v tale echo bo padla tudi kaka forma / claim task / edit task
 
-    if ($row['priority'] == 0)
+    if ($row['priority'] == 0) {
 		$pimage = 'warning_watch';
-	elseif ($row['priority'] == 1)
+    } elseif ($row['priority'] == 1) {
 		$pimage = 'warn';
-	elseif ($row['priority'] == 2)
+    } elseif ($row['priority'] == 2) {
 		$pimage = 'warning_mute';
-
+    }
 
 	// Imam task claiman?
 	$member_id = (int) $context['user']['id'];
 
-	$request = $smcFunc['db_query']('',
-		'SELECT id
+	$request = $smcFunc['db_query']('', '
+        SELECT id
 		FROM {db_prefix}workers
 		WHERE id_task = {int:id_task} AND id_member = {int:member_id}',
 		array(
@@ -784,12 +801,10 @@ function template_en()
 
 
     // Seznam delegatov
-
-    $request = $smcFunc['db_query']('',
-		'SELECT T2.real_name
+    $request = $smcFunc['db_query']('', '
+        SELECT T2.real_name
 		FROM {db_prefix}workers T1
-			LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
-
+		LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
 		WHERE id_task = {int:id_task}',
 		array(
 			'id_task' => $id_task
@@ -806,7 +821,7 @@ function template_en()
 		$delegates = implode(", ", $members);
 	}
 
-echo '
+    echo '
     <div id="container">
     <div class="cat_bar">
 		<h3 class="catbg"><span class="left"></span>
@@ -821,7 +836,7 @@ echo '
 					<label for="name">', $txt['delegator_task_name'], '</label>
 				</dt>
 				<dd>
-                    <h3> ', $row['task_name'] ,' </h3>
+                    <h3>', $row['task_name'], '</h3>
 					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
 				</dd>
                 <dt>
@@ -834,7 +849,7 @@ echo '
 					<label for="project_name">', $txt['delegator_project_name'], '</label>
 				</dt>
 				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_proj;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
+                    <a href="', $scripturl ,'?action=delegator;sa=view_project;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
 				</dd>
                 <dt>
 					<label for="creation_date">', $txt['delegator_creation_date'], '</label>
@@ -852,7 +867,7 @@ echo '
 					<label for="delegates">', $txt['delegator_task_delegates'], '</label>
 				</dt>
 				<dd>
-					', $delegates , '
+					', $delegates, '
 				</dd>
                 <dt>
 					<label for="description">', $txt['delegator_task_desc'], '</label>
@@ -870,29 +885,26 @@ echo '
 					<label for="state">', $txt['delegator_state'], '</label>
 				</dt>
 				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
-                                       ', $row['state'] ,'
+                   ', $row['state'] ,'
 				</dd>
 			 </dl>
 			 <br />
-        <!-- teh gumbkov ni vec, ker smo ze v end_task -->
-
+            <!-- teh gumbkov ni vec, ker smo ze v end_task -->
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
-	</div><br />
-';
-$smcFunc['db_free_result']($request);
+    	</div><br />
+    ';
+    $smcFunc['db_free_result']($request);
 
+    /***************************************************************************
+     ****************** Konec Podvojitve ***************************************
+     **************************************************************************/
 
-
-/***************************************************************************
- ****************** Konec Podvojitve ***************************************
- **************************************************************************/
-
-/**************************************************************************
- *********** Lepo je, ce se najprej prikaze specifikacija taska
- *******  Treba je se enkrat preverit, ce je trenutni uporabnik tudi izvajalec nadloge!
- ***************************************************************************/
+    /**************************************************************************
+     *********** Lepo je, ce se najprej prikaze specifikacija taska
+     *******  Treba je se enkrat preverit, ce je trenutni uporabnik tudi izvajalec nadloge!
+     ***************************************************************************/
 
 
 	echo '
@@ -902,11 +914,11 @@ $smcFunc['db_free_result']($request);
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=end_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_end_task">
+		<form action="', $scripturl, '?action=delegator;sa=end_task_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_end_task">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_et">
+				<dl class="delegator_edit_task">
 					<dt> <!-- tukaj more priti dolartxt[name]-->
                        <label for="name"> End Comment</label>
 					</dt>
@@ -919,7 +931,7 @@ $smcFunc['db_free_result']($request);
                         <!-- tukaj bo dolartxt spremenljivka -->
  					</dt>
                     <dd>
-                        	<ul class="reset">
+                    	<ul class="reset">
 							<li><input type="radio" name="state" value="2"  class="input_radio" checked="checked" /> ', $txt['delegator_state_2'], '</li>
 							<li><input type="radio" name="state"  value="3" class="input_radio" /> ', $txt['delegator_state_3'], '</li>
 							<li><input type="radio" name="state"  value="4" class="input_radio" /> ', $txt['delegator_state_4'], '</li>
@@ -938,21 +950,18 @@ $smcFunc['db_free_result']($request);
 	</div><br />';
 }
 
-function template_se()
-{
-
-    global $scripturl, $context, $txt;
-    global $smcFunc;
+function template_super_edit() {
+    global $smcFunc, $scripturl, $context, $txt;
 
     $id_task = (int) $_GET['task_id'];
-
     $request = $smcFunc['db_query']('', '
-        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority, T1.id_proj, T1.state, T1.start_date, T1.end_date, T1.end_comment
+        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority,
+            T1.id_proj, T1.state, T1.start_date, T1.end_date, T1.end_comment
 		FROM {db_prefix}tasks T1
 		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
 		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
         WHERE T1.id = {int:id_task}',
-        array( 'id_task' => $id_task)
+        array('id_task' => $id_task)
     );
 
     $row = $smcFunc['db_fetch_assoc']($request);
@@ -992,11 +1001,11 @@ function template_se()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=super_edit" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
+		<form action="', $scripturl, '?action=delegator;sa=super_edit_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_et">
+					<dl class="delegator_edit_task">
 						<dt>
                             <label for="name">', $txt['delegator_task_name'], '</label>
 						</dt>
@@ -1040,7 +1049,7 @@ function template_se()
 					<dd>
                     	<select name="id_proj">'; // nadomestil navadno vejico
 					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-					            if ($row_p['id'] == $row['id_proj']){
+					            if ($row_p['id'] == $row['id_proj']) {
 					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
 					            }
 					            else {
@@ -1048,52 +1057,43 @@ function template_se()
 					            }
 					        }
         					$smcFunc['db_free_result']($request_p);
-
             			echo '
             			</select>
 					</dd>
 
-						<dt>
-							<label for="state">', $txt['delegator_state'], '</label>
-						</dt>
-						<dd>
-                            <select name="state">';
-
-                        for ($i = 0; $i <= 5; $i++){
-                            if ($row['state'] == $i) echo '<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> ';
-                            else echo '<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ';
-
-                        }
-
-
-                        echo   ' </select>
-
-                        </dd>
-
-						<dt>
-							<label for="start_date">', $txt['delegator_task_start_date'], '</label>
-						</dt>
-						<dd>
-							<input class="kalender" type="text" name="start_date" value="' . $row['start_date'] . '"/>
-                        </dd>
-
-                       <dt>
-							<label for="end_date">', $txt['delegator_task_end_date'], '</label>
-						</dt>
-						<dd>
-							<input class="kalender" type="text" name="en_ddate" value="'. $row['start_date'] . '"/>
-
-                        </dd>
-
-                        <dt>
-                		    <label for="description">', $txt['delegator_end_comment'], '</label>
- 						</dt>
-                        <dd>
-                			<textarea name="end_comment" rows="3" cols="30" > '.$row['end_comment'].' </textarea>
-                        </dd>
-
-
-
+					<dt>
+						<label for="state">', $txt['delegator_state'], '</label>
+					</dt>
+					<dd>
+                        <select name="state">';
+                            for ($i = 0; $i <= 5; $i++) {
+                                if ($row['state'] == $i) {
+                                    echo '<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> ';
+                                } else {
+                                    echo '<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ';
+                                }
+                            }
+                        echo
+                        '</select>
+                    </dd>
+					<dt>
+						<label for="start_date">', $txt['delegator_task_start_date'], '</label>
+					</dt>
+					<dd>
+						<input class="kalender" type="text" name="start_date" value="' . $row['start_date'] . '"/>
+                    </dd>
+                    <dt>
+						<label for="end_date">', $txt['delegator_task_end_date'], '</label>
+					</dt>
+					<dd>
+						<input class="kalender" type="text" name="end_date" value="'. $row['end_date'] . '"/>
+                    </dd>
+                    <dt>
+            		    <label for="description">', $txt['delegator_end_comment'], '</label>
+					</dt>
+                    <dd>
+            			<textarea name="end_comment" rows="3" cols="30" > '.$row['end_comment'].' </textarea>
+                    </dd>
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
@@ -1106,9 +1106,7 @@ function template_se()
 	</div><br />';
 }
 
-//en je okrajsava za end task...
-
-function template_edit_proj()
+function template_edit_project()
 {
 
     global $scripturl, $context, $txt;
@@ -1230,7 +1228,3 @@ function template_edit_proj()
     ' . generateMemberSuggest("to-add", "user-list", "member_add") .  '
 	</div><br />';
 }
-
-
-
-?>
