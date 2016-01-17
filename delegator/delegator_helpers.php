@@ -97,11 +97,13 @@ function numberOfWorkers($id_task){
 
 }
 
+/**
+ * Writes Log about current action.
+ *
+ * Notation: When there is action on project id_task is less than zero (-1)
+ */
+
 function zapisiLog($id_proj, $id_task, $action){
-    // Input: action - selfexplanatory
-    // Output: None
-    // What function does: Writes action into log table
-    // Notation: When there is action on project id_task is less than zero (-1)
 
     global $smcFunc, $context;
 
@@ -131,13 +133,14 @@ function zapisiLog($id_proj, $id_task, $action){
 // Druga Funkcija dobi iste argumente in vrne stevilo taskov...
 // Fora je, da se bo dalo rezultate obeh funkcij združit/seštet...
 
-
+/**
+ * Returns array of tasks given the paramaters.
+ *
+ * @var: int(status), string(what), (int)value
+ * $what = [None, Project, Worker]
+ * @return: list of tasks (as $row)
+ */
 function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
-    /*****************************************
-    Input: $status (int), $what(string) $value(int)
-    !!! Much attention needed: $what = [None, Project, Worker]
-
-     **************************************** */
 
     global $smcFunc;
     if ($what == "None") {
@@ -565,6 +568,32 @@ function delegator_send_mail(){
 		//$emaildata = loadEmailTemplate('new_announcement', $replacements, $cur_language);
 
 
+}
+
+/**
+ * Deletes from database.
+ */
+
+function db_del_task($id_task){
+    
+    zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
+
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}tasks
+        WHERE id = {int:id_task}',
+        array(
+            'id_task' => $id_task
+        )
+    );
+
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}workers
+        WHERE id_task = {int:id_task}',
+        array(
+            'id_task' => $id_task
+        )
+    );
+    
 }
 
 ?>

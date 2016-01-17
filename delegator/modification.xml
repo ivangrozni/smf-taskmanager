@@ -1,4 +1,4 @@
-                        <?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE modification SYSTEM "http://www.simplemachines.org/xml/modification">
 <modification xmlns="http://www.simplemachines.org/xml/modification" xmlns:smf="http://www.simplemachines.org/">
 	<id>Iskra:Delegator</id>
@@ -150,6 +150,8 @@ $txt['delegator_coordinator_name'] = 'Name of Coordinator';
 $txt['delegator_view_projects'] = 'View All Projects';
 $txt['delegator_projects'] = 'View Projects';
 $txt['delegator_projects_empty'] = 'No Projects';
+$txt['delegator_delete_project'] = 'Delete Project';
+$txt['delegator_edit_project'] = 'Edit Project';
 // Log
 $txt['delegator_view_log'] = 'View log';
 $txt['delegator_del_log'] = 'Del log';

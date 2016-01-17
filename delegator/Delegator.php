@@ -72,6 +72,7 @@ function Delegator()
         'super_edit'    => 'super_edit',
         'del_log'       => 'del_log',
         'edit_proj'     => 'edit_proj', // loads add-proj with preloaded fields
+        'edit_proj_save'=> 'edit_proj_save',
         'del_proj'      => 'del_proj',
 
             // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
@@ -771,32 +772,21 @@ function edit_task()
     redirectexit('action=delegator;sa=vt&task_id='.$id_task);
 }
 
+/**
+ * Invokes db_delete functions.
+ *
+ * Wraper is made, because we are deleting tasks on more occasions.
+ */
 
 function del_task()
 {
     global $smcFunc, $context;
-
+    
     checkSession('get');
 
     $id_task = (int) $_GET['task_id'];
 
-    zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
-
-    $smcFunc['db_query']('', '
-        DELETE FROM {db_prefix}tasks
-        WHERE id = {int:id_task}',
-        array(
-            'id_task' => $id_task
-        )
-    );
-
-    $smcFunc['db_query']('', '
-        DELETE FROM {db_prefix}workers
-        WHERE id_task = {int:id_task}',
-        array(
-            'id_task' => $id_task
-        )
-    );
+    db_del_task($id_task);
 
     redirectexit('action=delegator');
 }
@@ -1180,6 +1170,119 @@ function super_edit()
 }
 
 
+/**
+ * Delete project function
+ *
+ * When project gets deleted - all the tasks gets deleted also
+ * When task gets deleted - you must also delete some fields in workers
+ * table. But this is already in del_task function.
+ * What we need is list of tasks in project.
+ * BE CAREFUL WITH PERMISSIONS FOR THIS FUNCTION!
+ *
+ * Delete project happens only on this occasion, so we do not need a wrapper or sub.
+ */
+
+function del_proj()
+{
+    global $smcFunc, $context;
+
+    checkSession('get');
+
+    $id_proj = (int) $_GET['id_proj'];
+
+
+
+    $tasks = array();     // get list of tasks in projects
+    for ($i=0; $i <= 4; ++$i ){
+        $tasks = array_merge($tasks, ret_tasks($status, "Project", $id_proj, "deadline", 0, 30) );
+    }
+
+    // delete these tasks is clean.
+    for ($i=0; $i < count($tasks); ++$i) {
+        $id_task = $tasks[$i]["id_task"]; // kako dostopam do task_id-ja sedaj?
+        db_del_task($id_task);
+    }
+    
+    zapisiLog($id_proj, -1, 'del_proj'); // Has to behappen before DELETE happens...
+    
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}projects
+        WHERE id = {int:id_proj}',
+        array(
+            'id_proj' => $id_proj
+        )
+    );
+
+    redirectexit('action=delegator');
+}
+
+/**
+ * Edit project function.
+ *
+ * Based on edit task.
+ * Does not work yet.
+ */
+
+function edit_proj()
+{
+    // prebere podatke o tem tasku
+    // odpre template z vpisanimi podatki
+    // naredis UPDATE v bazi z novimi podatki -> funkcija edit_task
+
+    global $smcFunc, $scripturl, $context, $txt;
+
+    $context['sub_template'] = 'edit_proj';
+    $context['linktree'][] = array(
+        'url' => $scripturl . '?action=delegator;sa=edit_proj',
+        'name' => $txt['delegator_edit_project']
+    );
+}
+
+
+function edit_proj_save()
+{
+    global $smcFunc, $context;
+
+    //isAllowedTo('add_new_todo');
+
+    checkSession();
+
+    $id_author = $context['user']['id'];
+    $id_task = (int) $_POST['id_task'];
+    $id_proj = $_POST['id_proj'];
+
+    $members = $_POST["member_add"];
+
+    $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
+    $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
+    $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
+
+    $priority = (int) $_POST['priority'];
+
+    $smcFunc['db_query']('','
+        UPDATE {db_prefix}tasks
+        SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}, state={int:state}
+        WHERE id = {int:id_task}',
+                         array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task, 'priority' => $priority, 'state' => (count($members) ? 1 : 0 ) )
+    );
+
+    // Dodaj delegirane memberje
+    $smcFunc['db_query']('', '
+        DELETE FROM {db_prefix}workers
+            WHERE id_task={int:id_task}',
+        array('id_task' => $id_task)
+    );
+    foreach ( $members as $member) {
+        $smcFunc['db_insert']('', '{db_prefix}workers',
+                              array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
+                              array((int) $member, $id_task, 1)
+        );
+    }
+
+    zapisiLog($id_proj, $id_task, 'edit_task');
+
+    redirectexit('action=delegator;sa=vt&task_id='.$id_task);
+}
 
 
 is_not_guest();

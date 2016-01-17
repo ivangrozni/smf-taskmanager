@@ -17,19 +17,29 @@
 
 * 160117
   
-** TODO Coding guidelines
+** TODO Coding guidelines [1/2]
 
    Gremo kodo spravit v obliko, kakržno zahteva ljudi na SMFju.
    [[http://wiki.simplemachines.org/smf/Coding_Guidelines][smf-coding-guidelines]]
 
-   - rename functions: ~add~ -> task, ~vt~ -> view-task, ~et~ -> edit-task
-   - remove database queries from template files
+   - [X] rename functions: ~add~ -> task, ~vt~ -> view-task, ~et~ -> edit-task
+   - [ ] remove database queries from template files
 
-** TODO Edit/delete project
+** TODO Edit/delete project [0/2]
    V Delegator.php dodaj funkciji.
-
 
    V Delegator.templates.php dodaj gumbke. K Project_view (gumbek edit-proj in del-proj).
    Fora pa je, da naj jih vidi samo administrator.
 
+   - [ ] delete-project
+   - [ ] edit project
+
 ** TODO Commit v mod database
+   
+   Tole bomo dodali na tem linku:
+   [[http://custom.simplemachines.org/mods/][dodaj-mod-na-smf]]
+
+** Random bugi [0/2]
+   
+   - [ ] end-date se vnase narobe
+   - [ ] opomba polje v log (kamor se bo zapisalo ime taska oz projekta)
