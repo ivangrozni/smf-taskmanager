@@ -59,7 +59,7 @@ function show(){
 
     echo '<hr><table class="delegator-sidebar">';
     while ($row = $smcFunc['db_fetch_assoc']($request)){
-        echo '<tr><td><a href="', $scripturl ,'?action=delegator;sa=view_task;task_id=', $row['id_task'] ,'"> ',$row['task_name'],'</a></td>
+        echo '<tr><td><a href="', $scripturl ,'?action=delegator;sa=view_task;id_task=', $row['id_task'] ,'"> ',$row['task_name'],'</a></td>
           <td><a href="', $scripturl ,'?action=delegator;sa=view_project;id_proj=', $row['id_proj'] ,'"> ',$row['project_name'],'</a></td>
           <td>';
         if ($today > $row['deadline']) echo '<span class="overdue">' .$row['deadline'].'</span></td>';

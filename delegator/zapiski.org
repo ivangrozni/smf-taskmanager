@@ -74,3 +74,4 @@
 
    - funkcija project_info
    - funkcija task_info (edit_task, super_edit_task, view_task)
+   - iz template datoteke prenašam poizvedbe

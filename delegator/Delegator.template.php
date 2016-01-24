@@ -208,7 +208,6 @@ function template_add_project()
 /**
  * Template shows particular task.
  *
- * @todo Database querry must go into Subs_Delegator.php 
  */
 function template_view_task() // id bi bil kar dober argument
 {
@@ -217,7 +216,7 @@ function template_view_task() // id bi bil kar dober argument
     $session_var = $context['session_var'];
 	$session_id = $context['session_id'];
 
-    $id_task = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['id_task'];
 
     $row = task_info($id_task);
 
@@ -229,9 +228,9 @@ function template_view_task() // id bi bil kar dober argument
 		$pimage = 'warning_mute';
 
     if (isMemberWorker($id_task)) {
-		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;task_id=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
+		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;id_task=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
     } else {
-    	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;task_id=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
+    	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;id_task=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
     }
 
     $workers = workers_on_task($id_task);
@@ -333,19 +332,19 @@ function template_view_task() // id bi bil kar dober argument
 
             if ($row['state'] < 2) {
                 echo $claimButton, '&nbsp;
-                    <a href="index.php?action=delegator;sa=edit_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_edit_task'], '</a>&nbsp;
-                    <a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+                    <a href="index.php?action=delegator;sa=edit_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_edit_task'], '</a>&nbsp;
+                    <a href="index.php?action=delegator;sa=del_task;id_task=', $id_task, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
                 ';
             }
 
-        if (isMemberWorker($task_id) and $row['state']==1) {
-            echo '<a href="index.php?action=delegator;sa=end_task;task_id=', $task_id, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+        if (isMemberWorker($id_task) and $row['state']==1) {
+            echo '<a href="index.php?action=delegator;sa=end_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
         }
             // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
          // FORA - zakaj pri canceled tasks manjka super_edit???
         //print_r(isMemberCoordinator($row['id_proj'])); print_r($row['state']);
         if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) {
-            echo '<a href="index.php?action=delegator;sa=super_edit;task_id=', $task_id,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+            echo '<a href="index.php?action=delegator;sa=super_edit;id_task=', $id_task,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         }
 
     echo '
@@ -425,12 +424,12 @@ function template_view_project()
                 // preverim, ce se lahko narise gumbek za del project
                 // check if the user has permission to delete project
                 // @todo permission check
-                // '<a href="index.php?action=delegator;sa=del_task;task_id=', $task_id, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
+    // kako je s tem $scripturl
                 echo '<a href="index.php?action=delegator;sa=del_project;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a>';
 
                 echo '
-                <!-- <a href="index.php?action=delegator;sa=edit_project;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_edit_project'] ,'</a>&nbsp;
-                <a href="index.php?action=delegator;sa=del_project;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a> -->
+                <a href="index.php?action=delegator;sa=edit_project;id_proj=', $id_proj, '";class="button_submit">', $txt['delegator_edit_project'] ,'</a>&nbsp;
+                <!-- <a href="'.$scripturl.'?action=delegator;sa=del_project;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a> -->
     			</div>
     			<span class="botslice"><span></span></span>
     		</div>
@@ -567,7 +566,7 @@ function template_edit_task()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
-    $id_task = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['id_task'];
 
     $row_task = task_info($id_task);
 
@@ -670,7 +669,7 @@ function template_end_task()
 	//$session_var = $context['session_var'];
 	//$session_id = $context['session_id'];
 
-    $id_task = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['id_task'];
     $row = task_info($id_task);
 
     if ($row['priority'] == 0) {
@@ -821,8 +820,7 @@ function template_end_task()
 function template_super_edit() {
     global $smcFunc, $scripturl, $context, $txt;
 
-    $id_task = (int) $_GET['task_id'];
-    // @todo task_id -> id_task
+    $id_task = (int) $_GET['id_task'];
 
     $row = task_info($id_task);
 
@@ -962,7 +960,8 @@ function template_edit_project()
     //////// Copied mostly from add_project ///////////////////////
     ///////////////////////////////////////////////////////////////
 
-    
+    $id_proj = (int) $_GET('id_proj');
+    $row_p = project_info($id_proj);
 
 
 	echo '
@@ -972,7 +971,7 @@ function template_edit_project()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=add_project_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
+		<form action="', $scripturl, '?action=delegator;sa=edit_project_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_project_save">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
@@ -981,30 +980,31 @@ function template_edit_project()
 						<label for="name">', $txt['delegator_project_name'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
+						<input type="text" name="name" value=" '.$row_p['proj_name'].' " size="50" maxlength="255" class="input_text" />
 					</dd>
 
 					<dt>
 						<label for="description">', $txt['delegator_project_desc'], '</label>
 					</dt>
 					<dd>
-					   <textarea name="description" rows="3" cols="30"> </textarea>
+					   <textarea name="description" rows="3" cols="30">'.$row_p['description'].' </textarea>
 					</dd>
                     <dt>
 						<label for="start">', $txt['delegator_project_start'], '</label><br />
 					</dt>
 					<dd>
-						<input type="text" name="start" class="input_text kalender" />
+						<input type="text" name="start" class="input_text kalender" value="'.$row_p['start'].'" />
 					</dd>
                     <dt>
 						<label for="end">', $txt['delegator_project_end'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="end" class="input_text kalender" />
+						<input type="text" name="end" class="input_text kalender" value="'.$row_p['end'].'" />
 					</dd>
 				</dl>
                 <br />
-				<input type="submit" name="submit" value="', $txt['delegator_project_add'], '" class="button_submit" />
+                <input type="submit" name="id_coord" value="'.$row_p['id_coord'].'" />
+				<input type="submit" name="submit" value="', $txt['delegator_edit_project'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

@@ -99,6 +99,8 @@ function isMemberCoordinator($id_proj) {
  * @return: Array of workers(id => name)
  */
 function workers_on_task($id_task){
+    global $smcFunc;
+
     $request = $smcFunc['db_query']('', '
         SELECT T1.id_member, T2.real_name
         FROM {db_prefix}workers T1
@@ -178,9 +180,10 @@ function zapisiLog($id_proj, $id_task, $action) {
 // Fora je, da se bo dalo rezultate obeh funkcij združit/seštet...
 
 /**
- * Returns array of tasks or projects or workers given the paramaters.
+ * Returns array of tasks given the paramaters.
  *
- * @var: int(status), string(what), (int)value
+ * Tasks of specific state, worker or project
+ * @var: int(status), string(what), (int)value, sort=deadline, start=0, items_per_page=30
  * $what = [None, Project, Worker]
  * @return: list of tasks (as $row)
  */
@@ -309,14 +312,13 @@ function ret_num($status, $what, $value){
  * @return list of tasks.
  */
 function show_task_list($status) {
+    global $txt, $scripturl;
+
     if ($status === "unfinished") {
         $status = 0;
     } elseif ($status === "finished") {
         $status = 2;
     }
-
-    global $txt, $scripturl;
-    //ena moznost je, da preverim stanje tu v funkciji, druga pa, da ga dam kot argument...
 
     $columns = array(
         'name' => array(		// TASK
@@ -324,8 +326,8 @@ function show_task_list($status) {
                 'value' => $txt['delegator_task_name'],  //Napisi v header "Name"... potegne iz index.english.php
             ),
             'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                'function' => function($row) {
-                    return '<a href="'. $scripturl .'?action=delegator;sa=view_task;task_id='. $row['id_task'] .'">'.$row['task_name'].'</a>';
+                'function' => function($row) use ($scripturl) {
+                    return '<a href="'. $scripturl .'?action=delegator;sa=view_task;id_task='. $row['id_task'] .'">'.$row['task_name'].'</a>';
                 }
             ),
             'sort' =>  array(
@@ -338,7 +340,7 @@ function show_task_list($status) {
                 'value' => $txt['delegator_project_name'],      //dodano v modification.xml
             ),
             'data' => array(
-                'function' => function($row) {
+                'function' => function($row) use ($scripturl) {
                     return '<a href="'. $scripturl .'?action=delegator;sa=view_project;id_proj='. $row['id_proj'] .'">'.$row['project_name'].'</a>';
                 }
             ),
@@ -353,7 +355,7 @@ function show_task_list($status) {
                 'value' => $txt['delegator_author'],      //dodano v modification.xml
             ),
             'data' => array(
-                'function' => function($row) {
+                'function' => function($row) use ($scripturl) {
                     return '<a href="'. $scripturl .'?action=delegator;sa=view_worker;id_member='. $row['id_author'] .'">'.$row['author'].'</a>';
                 }
             ),
@@ -392,6 +394,7 @@ function show_task_list($status) {
                 'value' => $txt['delegator_priority'],
             ),
             'data' => array(
+                // @todo  Use of undefined constant getPriorityIcon - assumed 'getPriorityIcon'
                 'function' => getPriorityIcon,
                 'style' => 'width: 10%; text-align: center;',
             ),
@@ -424,24 +427,24 @@ function show_task_list($status) {
                         // ali pa ce bi to totalno skrajsal...
                         if (isMemberCoordinator($row['id_proj'])===TRUE) {
                             return '
-                                <a title="Super Edit task" href="'. $scripturl. '?action=delegator;sa=super_edit;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                                <a title="Super Edit task" href="'. $scripturl. '?action=delegator;sa=super_edit;id_task='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                                     <img src="'. $settings['images_url']. '/buttons/super_edit.gif" alt="Edit task" />
                                 </a>
-                                <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                                <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;id_task='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                                     <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
                                 </a>';
                         } else {
                             return '
-                                <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=edit_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                                <a title="Edit task" href="'. $scripturl. '?action=delegator;sa=edit_task;id_task='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                                     <img src="'. $settings['images_url']. '/buttons/im_reply_all.gif" alt="Edit task" />
                                 </a>
-                                <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                                <a title="Delete task" href="'. $scripturl. '?action=delegator;sa=del_task;id_task='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                                     <img src="'. $settings['images_url']. '/icons/quick_remove.gif" alt="Delete task" />
                                 </a>';
                         }
                     } else {
                         return '
-                            <a title="Super Edit task" href="'. $scripturl. '?action=delegator;sa=super_edit;task_id='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
+                            <a title="Super Edit task" href="'. $scripturl. '?action=delegator;sa=super_edit;id_task='. $row['id_task']. ';' . $context['session_var'] . '=' . $context['session_id'] . '">
                                 <img src="'. $settings['images_url']. '/buttons/super_edit.gif" alt="Edit task" />
                             </a>';
                     }
@@ -539,6 +542,9 @@ function count_states($states, $what, $value){
 }
 
 function delegator_send_mail(){
+
+    global $smcFunc, $txt, $scripturl, $context;
+
 	$request = $smcFunc['db_query']('', '
         SELECT T2.real_name AS member, T2.email_address AS email, T3.name AS project_name,
             T4.name AS task_name, T4.description AS description
@@ -600,6 +606,8 @@ function delegator_send_mail(){
  */
 function db_del_task($id_task){
 
+    global $smcFunc, $txt, $scripturl, $context;
+
     zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
 
     $smcFunc['db_query']('', '
@@ -627,6 +635,8 @@ function db_del_task($id_task){
  */
 function project_info($id_proj){
 
+    global $smcFunc, $txt, $scripturl, $context;
+
     $request = $smcFunc['db_query']('', '
         SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord,
             T1.description AS description, T1.start AS start, T1.end AS end,
@@ -650,6 +660,8 @@ function project_info($id_proj){
  */
 
 function list_projects(){
+    global $smcFunc, $txt, $scripturl, $context;
+
     $request_p = $smcFunc['db_query']('', '
         SELECT id, name
         FROM  {db_prefix}projects'
@@ -674,6 +686,8 @@ function list_projects(){
  */
 function task_info($id_task){
     
+    global $smcFunc, $txt, $scripturl, $context;
+
     $request = $smcFunc['db_query']('', '
         SELECT T1.id, T1.name AS task_name,  T1.deadline,
             T1.description, T1.priority, T1.id_proj, T1.id_author, T1.state, T1.start_date,

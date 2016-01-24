@@ -440,6 +440,7 @@ function view_projects()
             /*
             query posodobljen - zdaj sta zdruzeni tabela taskov in projektov
             nadalje moramo query urediti tako, da bo se dodana tabela memberjov
+            @todo projects function from delegator_helpers.php
             */
             'function' => function($start, $items_per_page, $sort, $id_member) {
 				global $smcFunc;
@@ -491,7 +492,7 @@ function view_projects()
                     'value' => $txt['delegator_project_name'],  //Napisi v header "Name"... potegne iz index.english.php
                 ),
                 'data' => array( // zamenjal sem napisano funkcijo od grafitus-a...
-                    'function' => function($row) {
+                    'function' => function($row) use ($scripturl){
                         return "<a href=\"$scripturl?action=delegator;sa=view_project;id_proj=" . $row['id'] . '">' . $row['project_name'] . '</a>';
                     }
                 ),
@@ -506,7 +507,7 @@ function view_projects()
                     'value' => $txt['delegator_coordinator_name'],      //dodano v modification.xml
                 ),
                 'data' => array(
-                    'function' => function($row) {
+                    'function' => function($row) use ($scripturl) {
                         return "<a href=\"$scripturl?action=delegator;sa=view_worker;id_member=" . $row['id_coord'] . '">' . $row['coordinator'] . '</a>';
                     }
                 ),
@@ -766,7 +767,7 @@ function edit_task_save()
     }
 
     zapisiLog($id_proj, $id_task, 'edit_task');
-    redirectexit("action=delegator;sa=view_task&task_id=$id_task");
+    redirectexit("action=delegator;sa=view_task&id_task=$id_task");
 }
 
 /**
@@ -779,7 +780,7 @@ function del_task()
 {
     global $smcFunc, $context;
     checkSession('get');
-    $id_task = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['id_task'];
 
     db_del_task($id_task);
     redirectexit('action=delegator');
@@ -789,7 +790,7 @@ function claim_task()
 {
     global $smcFunc, $context, $scripturl;
     checkSession('get');
-    $id_task = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['id_task'];
     $member_id = (int) $context['user']['id'];
 
     // ubistvu moram to narest samo če je state 1
@@ -817,14 +818,14 @@ function claim_task()
     );
 
     zapisiLog(-1, $id_task, 'claim_task');
-    redirectexit("action=delegator;sa=view_task;task_id=$id_task");
+    redirectexit("action=delegator;sa=view_task;id_task=$id_task");
 }
 
 function unclaim_task()
 {
     global $smcFunc, $context, $scripturl;
     checkSession('get');
-    $id_task = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['id_task'];
     $id_member = (int) $context['user']['id'];
 
     $smcFunc['db_query']('', '
@@ -850,8 +851,7 @@ function unclaim_task()
     }
 
     zapisiLog(-1, $id_task, 'unclaim_task');
-    //redirectexit($scripturl . '?action=delegator;sa=view_task;task_id=' . $task_id);
-    redirectexit("action=delegator;sa=view_task&task_id=$id_task");
+    redirectexit("action=delegator;sa=view_task&id_task=$id_task");
 }
 
 
@@ -911,7 +911,7 @@ function end_task_save()
         redirectexit('action=delegator;sa=my_tasks');
     }
 
-    redirectexit("action=delegator;sa=view_task;task_id=$id_task");
+    redirectexit("action=delegator;sa=view_task;id_task=$id_task");
 }
 
 function view_log()
@@ -1046,7 +1046,7 @@ function view_log()
                 ),
                 'data' => array(
                     'function' => create_function('$row',
-                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_task;task_id=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
+                    'return \'<a href="\'. $scripturl .\'?action=delegator;sa=view_task;id_task=\'. $row[\'id_task\'] .\'">\'.$row[\'task_name\'].\'</a>\'; '
 
 					),
                 ),
@@ -1168,9 +1168,9 @@ function super_edit_save()
         }
 
         zapisiLog($id_proj, $id_task, 'super_edit');
-        redirectexit("action=delegator;sa=view_task&task_id=$id_task");
+        redirectexit("action=delegator;sa=view_task&id_task=$id_task");
     } else {
-        redirectexit("action=delegator;sa=view_task&task_id=$id_task");
+        redirectexit("action=delegator;sa=view_task&id_task=$id_task");
     }
 }
 
@@ -1196,7 +1196,7 @@ function del_project()
 
     $tasks = array();     // get list of tasks in projects
     for ($i=0; $i <= 4; ++$i ){
-        $tasks = array_merge($tasks, ret_tasks($status, "Project", $id_proj, "deadline", 0, 30) );
+        $tasks = array_merge($tasks, ret_tasks($i, "Project", $id_proj, "deadline", 0, 30) );
     }
 
     // delete these tasks is clean.
@@ -1222,7 +1222,6 @@ function del_project()
  * Edit project function.
  *
  * Based on edit task.
- * Does not work yet.
  */
 
 function edit_project()
@@ -1253,14 +1252,13 @@ function edit_project_save()
 
     checkSession();
 
-    $id_proj = $_POST['id_proj'];
-    $id_coord = $_POST['id_coord'];
+    $id_proj = (int) $_POST['id_proj'];
+    $id_coord = (int) $_POST['id_coord'];
+
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $start = strtr($smcFunc['htmlspecialchars']($_POST['start']), array("\r" => '', "\n" => '', "\t" => ''));
     $end = strtr($smcFunc['htmlspecialchars']($_POST['end']), array("\r" => '', "\n" => '', "\t" => ''));
-
-    $id_coord = (int) $_POST['id_coord'];
 
     $smcFunc['db_query']('','
         UPDATE {db_prefix}projects
