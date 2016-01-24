@@ -4,9 +4,9 @@
 ***********************************************************************************
 * Delegator                                                                       *
 * =============================================================================== *
-* Software Version:           Delegator 0.1                                       *
+* Software Version:           Delegator 0.99                                      *
 * Software by:                iskra dot@studentska-iskra.org                      *
-* Original software: 	      To-Do list          				  *
+* Original software: 	      To-Do list                         				  *
 * Original software by:       grafitus (beratdogan@hileci.org)                    *
 * Copyright 2009-2014 by:     grafitus (beratdogan@hileci.org)                    *
 * Support, News, Updates at:  http://www.simplemachines.org                       *
@@ -24,20 +24,21 @@
 * Delegator is continued work from To Do list created by grafitus - slava mu      *
 **********************************************************************************/
 
-// First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. Sledeci vrstici sta dodani, da kdo ne sheka (SMF uporablja v vseh fajlih, mod ni uporabljal).
+// First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file.
+// Sledeci vrstici sta dodani, da kdo ne sheka (SMF uporablja v vseh fajlih, mod ni uporabljal).
 if (!defined('SMF'))
     die('Hack Attempt...');
 
 /*******************
  * Helper funkcije *
  ******************/
+// @todo rename into Subs_Delegator.php
 require_once 'delegator_helpers.php';
 
 //Tu se zacne originalni To-Do list mod
 function Delegator()
 {
     global $context, $txt, $scripturl, $settings; // potrebne variable
-    // $context - ne vem, se za kaj se uporablja
     // $txt - notri so vsa prikazana besedila (zaradi prevodov)
     // $scripturl - za razlicne URL-je brskalnika, da gre na pravo stran?
 
@@ -74,8 +75,6 @@ function Delegator()
         'super_edit_save'  => 'super_edit_save',  // super edit - shrani
 
         // Kasneje bomo dodali se razlicne view-je - prikaz casovnice...
-        // Spodnji komentarji so stara To-Do list mod koda
-        // Tole sem dodal z zalinega racunalnika, prek ssh
     );
 
 	// Delegator v celoti je kot en modul. Razni viewi so "subactioni". Defaulten subaction je delegator. Ce
@@ -109,6 +108,11 @@ function Delegator()
 // Sixth, begin doing all the stuff that we want this action to display
 // Store the results of this stuff in the $context array.
 // This action's template(s) will display the contents of $context.
+/**
+ * Main delegator function.
+ * 
+ * Shows unclaimed (unfinished) tasks. 
+ */
 function delegator_main() //glavna funkcija - prikaze taske
 {
     // tukaj bi rad prikazal projekte in zadolzitve - mogoce je pomembnejse najprej zadolzitve
@@ -164,6 +168,8 @@ function delegator_main() //glavna funkcija - prikaze taske
 
 /**
  * Add task button.
+ *
+ * Also loads add_task template.
  */
 function add_task()   //ni se prava funkcija za dodajanje - samo za gumb?
 {
@@ -177,12 +183,11 @@ function add_task()   //ni se prava funkcija za dodajanje - samo za gumb?
     );
 }
 
-//Prava funkcija za dodajanje taska:
-// Kaj se vpise v bazo, ko se ustvari task?
-//id, id_proj, id_author, name, description, creation_date, deadline, priority, state
-// MANJKA: description
 /**
  * Function that actually adds new task.
+ *
+ * When task is created; id, id_proj, id_author, name, description, creation_date, deadline, priority, state
+ * are written into database.
  */
 function add_task_save()
 {
@@ -261,9 +266,12 @@ function add_project()
 }
 
 
-// add_project: id, id_coord, name, description, start, end
+
 /**
   * Function that actually writes project into database.
+  *
+  * add_project: id, id_coord, name, description, start, end
+  * are written into database (delegator_projects table)
   */
 function add_project_save() // mrbit bi moral imeti se eno funkcijo, v stilu add pri taskih
 {
@@ -287,11 +295,11 @@ function add_project_save() // mrbit bi moral imeti se eno funkcijo, v stilu add
     }
 
     $smcFunc['db_insert']('', '{db_prefix}projects', array(
-            'id_coord' => 'int',
-            'name' => 'string',
+            'id_coord'    => 'int',
+            'name'        => 'string',
             'description' => 'string',
-            'start' => 'date',
-            'end' => 'date'
+            'start'       => 'date',
+            'end'         => 'date'
         ),
         array(
             $id_coord, $name, $description, $start, $end
@@ -335,7 +343,9 @@ function view_task()
 ##################################################################
 ################### view project #################################
 ##################################################################
-
+/**
+ * Initializes view project.
+ */
 function view_project()
 {
     global $smcFunc, $scripturl, $context, $txt, $sourcedir;
@@ -406,8 +416,10 @@ function view_project()
 ##################################################################
 ##################################################################
 
-# prikaze vse projekte in to v lepo urejeni tabeli...
 
+/**
+ * Shows projects in nice table.
+ */
 function view_projects()
 {
     global $context, $scripturl, $sourcedir, $smcFunc, $txt;   //globalne spremenljivke lahko kliceju funkcije iz zunaj kajne?
@@ -1182,8 +1194,6 @@ function del_project()
 
     $id_proj = (int) $_GET['id_proj'];
 
-
-
     $tasks = array();     // get list of tasks in projects
     for ($i=0; $i <= 4; ++$i ){
         $tasks = array_merge($tasks, ret_tasks($status, "Project", $id_proj, "deadline", 0, 30) );
@@ -1230,7 +1240,11 @@ function edit_project()
     );
 }
 
-
+/**
+ * Writes edited project to database.
+ *
+ * What happens with the coordinator? Do we also change it?
+ */
 function edit_project_save()
 {
     global $smcFunc, $context;
@@ -1239,41 +1253,25 @@ function edit_project_save()
 
     checkSession();
 
-    $id_author = $context['user']['id'];
-    $id_task = (int) $_POST['id_task'];
     $id_proj = $_POST['id_proj'];
-
-    $members = $_POST["member_add"];
-
+    $id_coord = $_POST['id_coord'];
     $name = strtr($smcFunc['htmlspecialchars']($_POST['name']), array("\r" => '', "\n" => '', "\t" => ''));
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
-    $deadline = strtr($smcFunc['htmlspecialchars']($_POST['deadline']), array("\r" => '', "\n" => '', "\t" => ''));
+    $start = strtr($smcFunc['htmlspecialchars']($_POST['start']), array("\r" => '', "\n" => '', "\t" => ''));
+    $end = strtr($smcFunc['htmlspecialchars']($_POST['end']), array("\r" => '', "\n" => '', "\t" => ''));
 
-    $priority = (int) $_POST['priority'];
+    $id_coord = (int) $_POST['id_coord'];
 
     $smcFunc['db_query']('','
-        UPDATE {db_prefix}tasks
-        SET name={string:name}, description={string:description}, deadline={string:deadline}, id_proj={int:id_proj}, priority={int:priority}, state={int:state}
-        WHERE id = {int:id_task}',
-                         array('name' => $name, 'description' => $description, 'deadline' => $deadline, 'id_proj' => $id_proj, 'id_task' => $id_task, 'priority' => $priority, 'state' => (count($members) ? 1 : 0 ) )
+        UPDATE {db_prefix}projects
+        SET name={string:name}, description={string:description}, start={date:start}, end={date:end}, id_coord={int:id_coord}
+        WHERE id = {int:id_proj}',
+                         array('name' => $name, 'description' => $description, 'start' => $start, 'end' => $end, 'id_proj' => $id_proj)
     );
 
-    // Dodaj delegirane memberje
-    $smcFunc['db_query']('', '
-        DELETE FROM {db_prefix}workers
-            WHERE id_task={int:id_task}',
-        array('id_task' => $id_task)
-    );
-    foreach ( $members as $member) {
-        $smcFunc['db_insert']('', '{db_prefix}workers',
-                  array('id_member' => 'int', 'id_task' => 'int', 'status' => 'int'),
-                  array((int) $member, $id_task, 1)
-        );
-    }
+    zapisiLog($id_proj, -1, 'edit_proj');
 
-    zapisiLog($id_proj, $id_task, 'edit_task');
-
-    redirectexit('action=delegator;sa=view_task&task_id='.$id_task);
+    redirectexit('action=delegator;sa=view_project&id_proj='.$id_proj);
 }
 
 is_not_guest();

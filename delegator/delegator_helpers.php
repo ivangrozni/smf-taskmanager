@@ -1,4 +1,10 @@
 <?php
+/**
+ * Helper functions for Delegator (SMF taskmanager mod)
+ *
+ * Here are most of db querries.
+ */
+
 // First of all, we make sure we are accessing the source file via SMF so that people can not directly access the file. Sledeci vrstici sta dodani, da kdo ne sheka (SMF uporablja v vseh fajlih, mod ni uporabljal).
 if (!defined('SMF'))
     die('Hack Attempt...');
@@ -87,10 +93,35 @@ function isMemberCoordinator($id_proj) {
     return $ret;
 }
 
+/**
+ * List of workers that are working on task.
+ *
+ * @return: Array of workers(id => name)
+ */
+function workers_on_task($id_task){
+    $request = $smcFunc['db_query']('', '
+        SELECT T1.id_member, T2.real_name
+        FROM {db_prefix}workers T1
+        LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
+        WHERE T1.id_task = {int:id_task}',
+        array('id_task' => $id_task)
+    );
+    
+    $delegates = array();
+    while ($member = $smcFunc['db_fetch_assoc']($request)){
+        $delegates[$member["id_member"]] = $member["real_name"];
+    }
 
+    $smcFunc['db_free_result']($request);
+    return $delegates;
+}
+
+
+/**
+ * Counts number of workers working on a specific task.
+ */
 function numberOfWorkers($id_task) {
-    // Presteje Stevilo Workerjev
-    // Trenutno se uporabi zgolj v unclaim, saj smo add_task in edit_task resili bolj elegantno...
+
     global $context, $smcFunc;
 
     $request = $smcFunc['db_query']('', '
@@ -147,7 +178,7 @@ function zapisiLog($id_proj, $id_task, $action) {
 // Fora je, da se bo dalo rezultate obeh funkcij združit/seštet...
 
 /**
- * Returns array of tasks given the paramaters.
+ * Returns array of tasks or projects or workers given the paramaters.
  *
  * @var: int(status), string(what), (int)value
  * $what = [None, Project, Worker]
@@ -227,6 +258,13 @@ function ret_tasks($status, $what, $value, $sort, $start, $items_per_page){
     return $tasks;  //funkcija vrne taske
 }
 
+/**
+ * Returns number of database fields (tasks, projects and workers).
+ *
+ * @var: int(status), string(what), (int)value
+ * $what = [None, Project, Worker]
+ * @return: number of tasks/workers/projects (as $row)
+ */
 function ret_num($status, $what, $value){
     global $smcFunc;
 
@@ -264,6 +302,12 @@ function ret_num($status, $what, $value){
 // status bi lahko bil argument in glede na to vrnil deadline...
 // @todo function show_task_list($finished=false) {
 // @todo lahko bi se napisalo funkcijo, ki dobi argumente 'name', 'header', 'data'...
+
+/**
+ * Complete list of tasks compatible with SMF presentation.
+ *
+ * @return list of tasks.
+ */
 function show_task_list($status) {
     if ($status === "unfinished") {
         $status = 0;
@@ -318,43 +362,7 @@ function show_task_list($status) {
                 'reverse' => 'author DESC',
             ),
         ),
-        //////////////////////////////// Ali bi lahko tukaj if stavek uturil?
-        /////////////////////////////// Mislim, da ne, ker sem v arrayu...
-        /*'deadline' => array(
-            'header' => array(
-                'value' => function () use ($status, $txt){
-                    if ($status < 2) return $txt['delegator_deadline'];
-                    else return $txt['delegator_task_end_date'];
-                },
-            ),
-            'data' => array(
-                'function' => function($row) use ($status) {
-                    if ($status < 2) {
-                        $deadline = $row['deadline'];
-                        if (date('Y-m-d') > $deadline) return "<font color=\"red\"><span class=\"relative-time\">$deadline</span></font>";
-                        else return "<span class=\"relative-time\">$deadline</span>";
-                    }
-                    else {
-                        return $row['end_date'];
-                    }
-                },
-                ),
-            //'style' => 'width: 20%; text-align: center;',
 
-            'sort' =>  array(
-                'default' => 'deadline',
-                'reverse' => 'deadline DESC',
-
-                //'default' => function () use ($status){
-                //    if ($status < 2) return 'deadline';
-                //    else return 'end_date';
-                //},
-                //'reverse' => function () use ($status){
-                //    if ($status < 2) return 'deadline DESC';
-                //    else return 'end_date DESC';
-                //    }
-            ),
-        ),*/
         'deadline' => array(
             'header' => array(
                 'value' => $txt['delegator_deadline'],
@@ -378,8 +386,7 @@ function show_task_list($status) {
                 'reverse' => 'deadline DESC',
             ),
         ),
-        //////////////////////////////////////
-             // spet undefined index priority je v errolog-u
+        // spet undefined index priority je v errolog-u
         'priority' => array(      //POMEMBNOST
             'header' => array(
                 'value' => $txt['delegator_priority'],
@@ -444,29 +451,6 @@ function show_task_list($status) {
         ),
     );
 
-    /* Hotel sem zamenjat deadline z end_date, pa query potem noce vec delat...
-    if ($status > 1){
-        $end_date = array (
-            'header' => array(
-                'value' => $txt['delegator_task_end_date'],
-            ),
-            'data' => array(
-                'function' => function($row) {
-                    if ($row['end_date'] > $row['deadline']) return '<font color=\"red\">'.$row['end_date'].'</font>';
-                    return $row['end_date']; },
-                //'style' => 'width: 20%; text-align: center;',
-            ),
-            'sort' =>  array(
-                'default' => 'end_date',
-                'reverse' => 'end_date DESC',
-            ),
-        );
-        // sedaj moram pa to zamenjat...
-        //$columns['end_date'] = $end_date;
-        //unset($columns['deadline']);
-        }*/
-
-
     return $columns;
 }
 
@@ -500,6 +484,15 @@ function generateMemberSuggest ($input, $container, $param) {
         // ]]></script>';
 }
 
+/**
+ * Recieves table of states and counts the databes imports of given state.
+ *
+ * @var: array(states), string(what), (int)value
+ * $what = [None, Project, Worker]
+ * @return: list of tasks (as $row)
+ * 
+ * @todo case statement 
+ */
 function count_states($states, $what, $value){
     //dobi tabelo stanj in jo dopolni...
     // @todo Naslednji korak k temu, da iz Delegator.template odstranimo queryje
@@ -605,7 +598,6 @@ function delegator_send_mail(){
 /**
  * Deletes from database.
  */
-
 function db_del_task($id_task){
 
     zapisiLog(-1, $id_task, 'del_task'); // Has to be before DELETE happens...
@@ -626,3 +618,76 @@ function db_del_task($id_task){
         )
     );
 }
+
+/**
+ * Returns project information as row.
+ *
+ * Creates a database querry.
+ * IN: template_view_project
+ */
+function project_info($id_proj){
+
+    $request = $smcFunc['db_query']('', '
+        SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord,
+            T1.description AS description, T1.start AS start, T1.end AS end,
+            T2.real_name AS coord_name
+		FROM {db_prefix}projects T1
+		LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
+		WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj)
+    ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
+    
+    $row = $smcFunc['db_fetch_assoc']($request);
+
+    $smcFunc['db_free_result']($request);
+
+    return $row;
+}
+
+/**
+ * Returns list of projects
+ *
+ * IN: template_edit_task, template_add_task
+ */
+
+function list_projects(){
+    $request_p = $smcFunc['db_query']('', '
+        SELECT id, name
+        FROM  {db_prefix}projects'
+    );
+    
+    $projects = array();
+    
+    while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
+        $projects[$row_p["id"]] = $row_p["name"];
+    }
+    $smcFunc['db_free_result']($request_p);
+    
+    return $projects;
+}
+
+/**
+ * Information about task.
+ *
+ * Workers/delegates are missing.
+ * IN: template_edit_task,
+ * @return task info as (array)row.
+ */
+function task_info($id_task){
+    
+    $request = $smcFunc['db_query']('', '
+        SELECT T1.id, T1.name AS task_name,  T1.deadline,
+            T1.description, T1.priority, T1.id_proj, T1.id_author, T1.state, T1.start_date,
+            T1.end_date, T1.end_comment, T3.real_name AS author, T1.creation_date,
+            T2.name AS project_name
+		FROM {db_prefix}tasks T1
+		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
+		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
+        WHERE T1.id = {int:id_task}',
+        array('id_task' => $id_task)
+    );
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+    return $row;
+}
+

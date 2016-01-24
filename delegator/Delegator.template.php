@@ -13,12 +13,14 @@ if (!defined('SMF'))
 require_once "$sourcedir/delegator_helpers.php";
 // Tukaj znajo biti se tezave...
 
-// @todo se bo v helper dalo, ampak bi sel rad spat zdaj :)
-
 /******************
  *    Templati    *
  ******************/
-
+/**
+ * Main template
+ *
+ * Shows unclaimed unfinished tasks.
+ */
 function template_main()
 {
     global $scripturl, $smcFunc, $txt;
@@ -148,8 +150,9 @@ function template_add_task()
 	</div><br />';
 }
 
-//funkcija za dodajanje projektov
-//imena morajo ustrezat subactionnom...
+/**
+ * Template for adding projects.
+ */
 function template_add_project()
 {
 	global $scripturl, $context, $txt;
@@ -202,40 +205,21 @@ function template_add_project()
 	</div><br />';
 }
 
+/**
+ * Template shows particular task.
+ *
+ * @todo Database querry must go into Subs_Delegator.php 
+ */
 function template_view_task() // id bi bil kar dober argument
 {
-    /*
-      Imena zadolzitev je treba spremeniti v linke, id se lahko posreduje z metodo GET
-      Iz baze moram potegniti podatke o tasku
-      Prikazati: Ime, rok, pomembnost
-                 Opis, opis, opis, opis, opis
-                 Izvajalce...
-      2 gumba: Back in Submit (nazaj in sprejmi zadolzitev)
-     */
+
     global $smcFunc, $scripturl, $context, $txt, $settings;
-    // id_author, name, description, creation_date, deadline, priority, state
+    $session_var = $context['session_var'];
+	$session_id = $context['session_id'];
 
-    // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
-    $task_id = (int) $_GET['task_id'];
+    $id_task = (int) $_GET['task_id'];
 
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name,
-            T1.deadline AS deadline, T1.priority AS priority, T1.state AS state,
-            T3.real_name AS author, T1.creation_date AS creation_date,
-            T1.description AS description, T1.id_proj AS id_proj,
-            T1.id_author AS id_author, T1.end_comment, T1.end_date
-		FROM {db_prefix}tasks T1
-		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-		WHERE T1.id = {int:task_id} ', array('task_id' => $task_id) ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
-// id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
-
-/*          SELECT *
-          FROM {db_prefix}tasks
-          WHERE id = '.$task_id .'', array() ); // pred array je manjkala vejica in je sel cel forum v k*/
-// id od zeljenega taska potrebujemo podatke
-    $row = $smcFunc['db_fetch_assoc']($request);
-// v tale echo bo padla tudi kaka forma / claim task / edit task
+    $row = task_info($id_task);
 
     if ($row['priority'] == 0)
 		$pimage = 'warning_watch';
@@ -244,51 +228,18 @@ function template_view_task() // id bi bil kar dober argument
 	elseif ($row['priority'] == 2)
 		$pimage = 'warning_mute';
 
-	$session_var = $context['session_var'];
-	$session_id = $context['session_id'];
-
-    // Imam task claiman?
-	$member_id = (int) $context['user']['id'];
-
-	$request = $smcFunc['db_query']('',
-		'SELECT id
-		FROM {db_prefix}workers
-		WHERE id_task = {int:task_id} AND id_member = {int:member_id}',
-		array(
-			'task_id' => $task_id,
-			'member_id' => $member_id
-		)
-	);
-
-    $amClaimed = $smcFunc['db_fetch_assoc']($request);
-
-    if ($amClaimed !== false) {
-		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;task_id=' . $task_id . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
+    if (isMemberWorker($id_task)) {
+		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;task_id=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
     } else {
-    	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;task_id=' . $task_id . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
+    	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;task_id=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
     }
 
-    // Seznam delegatov
-
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id_member, T2.real_name
-	    FROM {db_prefix}workers T1
-		LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
-        WHERE id_task = {int:task_id}',
-		array(
-			'task_id' => $task_id
-		)
-	);
-
-    $members = array();
-    while ($m = $smcFunc['db_fetch_assoc']($request)) {
-    	$members[$m['id_member']] = $m["real_name"];
-    }
+    $workers = workers_on_task($id_task);
 
 	$delegates = "&nbsp;&nbsp; (\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
-	if (count($members)) {
+	if (count($workers)) {
         $delegates = ' ';
-        foreach ($members as $id_member => $real_name) {
+        foreach ($workers as $id_member => $real_name) {
             $delegates = $delegates . "<a href=$scripturl?action=delegator;sa=view_worker;id_member=$id_member\">$real_name</a>&nbsp;";
         }
 	}
@@ -403,7 +354,6 @@ function template_view_task() // id bi bil kar dober argument
     	</div>
     	</div><br />
     ';
-    $smcFunc['db_free_result']($request);
 }
 
 //##############################//##############################
@@ -424,16 +374,8 @@ function template_view_project()
     $session_var = $context['session_var']; // we do not understand this ...
 	$session_id = $context['session_id'];
 
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id AS id, T1.name AS proj_name, T1.id_coord AS id_coord,
-            T1.description AS description, T1.start AS start, T1.end AS end,
-            T2.real_name AS coord_name
-		FROM {db_prefix}projects T1
-		LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
-		WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj)
-    ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
 
-    $row = $smcFunc['db_fetch_assoc']($request);
+    $row = project_info($id_proj);
 
     echo '
         <div id="container">
@@ -496,7 +438,6 @@ function template_view_project()
     </div>
     ';
 
-    $smcFunc['db_free_result']($request);
     // This part shows number of tasks in different state
     // @todo this part should be part of some upper div...
     // also upper div should be edited properly and nicely
@@ -628,45 +569,20 @@ function template_edit_task()
 
     $id_task = (int) $_GET['task_id'];
 
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id, T1.name AS task_name,  T1.deadline,
-            T1.description, T1.priority, T1.id_proj
-		FROM {db_prefix}tasks T1
-		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-        WHERE T1.id = {int:id_task}',
-        array('id_task' => $id_task)
-    );
+    $row_task = task_info($id_task);
 
-    $row = $smcFunc['db_fetch_assoc']($request);
-    $smcFunc['db_free_result']($request);
-
-    // Delegirani uporabniki
-    $request_d = $smcFunc['db_query']('', '
-        SELECT T1.id_member, T2.real_name
-        FROM {db_prefix}workers T1
-        LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
-        WHERE T1.id_task = {int:id_task}',
-        array('id_task' => $id_task)
-    );
-
+    $workers = workers_on_task($id_task);
     $delegates = "";
-    while ($member = $smcFunc['db_fetch_assoc']($request_d)) {
-        $id = $member["id_member"];
-        $name = $member["real_name"];
+    foreach ($workers as $id_worker => $real_name){
         $delegates .=
-            '<div id="suggest_to-add_' . $id . '">
-                <input name="member_add[]" value="' . $id . '" type="hidden">
-                <a href="index.php?action=profile;u=' . $id . '" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">' . $name . '</a>
+            '<div id="suggest_to-add_' . $id_worker . '">
+                <input name="member_add[]" value="' . $id_worker . '" type="hidden">
+                <a href="index.php?action=profile;u=' . $id_worker . '" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">' . $real_name . '</a>
                 <img src="Themes/default/images/pm_recipient_delete.gif" alt="Delete Item" title="Delete Item" onclick="return oAddMemberSuggest.deleteAddedItem(' . $id . ');">
             </div>';
     }
-    $smcFunc['db_free_result']($request_d);
 
-    $request_p = $smcFunc['db_query']('', '
-        SELECT id, name
-        FROM  {db_prefix}projects'
-    );
+    $projects = list_projects();
 
 	echo '
 	<div id="container">
@@ -684,20 +600,20 @@ function template_edit_task()
                         <label for="name">', $txt['delegator_task_name'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
+						<input type="text" name="name" value="'.$row_task['task_name'].'" size="50" maxlength="255" class="input_text" />
                         <input type="hidden" name="id_task" value ="'.$id_task.'" />
 					</dd>
                     <dt>
                		    <label for="description">', $txt['delegator_task_desc'], '</label>
  					</dt>
                     <dd>
-               			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
+               			<textarea name="description" rows="3" cols="30" > '.$row_task['description'].' </textarea>
                     </dd>
 					<dt>
 			    		<label for="deadline">', $txt['delegator_deadline'], '</label>
 					</dt>
 					<dd>
-						<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
+						<input class="kalender" type="text" name="deadline" value="' . $row_task['deadline'] . '"/>
                     </dd>
 					<dt>
 						<label for="user">', $txt['delegator_task_delegates'], '</label>
@@ -721,15 +637,15 @@ function template_edit_task()
                     </dt>
                     <dd>
                         <select name="id_proj">'; // nadomestil navadno vejico
-                            while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-                                if ($row_p['id'] == $row['id_proj']){
-                                    echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
-                                } else {
-                                    echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
-                                }
-                            }
-                            $smcFunc['db_free_result']($request_p);
-                            echo '
+    foreach ($projects as $id_proj => $proj_name){
+        if ($id_proj == $row_task['id_proj']){
+            echo '<option value="'.$id_proj.'" selected >--'.$proj_name.'--</option> ';
+        } else {
+            echo '<option value="'.$id_proj.'" > '.$proj_name.'</option> ';
+        }
+    }
+    
+    echo '
                         </select>
                     </dd>
 				</dl>
@@ -755,28 +671,7 @@ function template_end_task()
 	//$session_id = $context['session_id'];
 
     $id_task = (int) $_GET['task_id'];
-
-    /***************************************************************************
-     ******************* * Podvojeno iz vt *************************************
-     **************************************************************************/
-
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id AS id, T1.name AS task_name, T2.name AS project_name,
-            T1.deadline AS deadline, T1.priority AS priority, T1.state AS state,
-            T3.real_name AS author, T1.creation_date AS creation_date,
-            T1.description AS description, T1.id_proj AS id_proj,
-            T1.id_author AS id_author
-		FROM {db_prefix}tasks T1
-		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-		WHERE T1.id = {int:id_task}',
-        array('id_task' => $id_task)
-    ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
-
-    // id_proj in id_author searchamo, da bomo lahko linkali na view_person in view_proj
-    // id od zeljenega taska potrebujemo podatke
-    $row = $smcFunc['db_fetch_assoc']($request);
-    // v tale echo bo padla tudi kaka forma / claim task / edit task
+    $row = task_info($id_task);
 
     if ($row['priority'] == 0) {
 		$pimage = 'warning_watch';
@@ -788,38 +683,18 @@ function template_end_task()
 
 	// Imam task claiman?
 	$member_id = (int) $context['user']['id'];
-
-	$request = $smcFunc['db_query']('', '
-        SELECT id
-		FROM {db_prefix}workers
-		WHERE id_task = {int:id_task} AND id_member = {int:member_id}',
-		array(
-			'id_task' => $id_task,
-			'member_id' => $member_id
-		)
-	);
-
-
-    // Seznam delegatov
-    $request = $smcFunc['db_query']('', '
-        SELECT T2.real_name
-		FROM {db_prefix}workers T1
-		LEFT JOIN {db_prefix}members T2 on T1.id_member = T2.id_member
-		WHERE id_task = {int:id_task}',
-		array(
-			'id_task' => $id_task
-		)
-	);
-
-    $members = array();
-    while ($m = $smcFunc['db_fetch_assoc']($request)) {
-    	$members[] = $m["real_name"];
-    }
-
+    $wokers = workers_on_task($id_task);
 	$delegates = "&nbsp;&nbsp;&nbsp;(\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
-	if (count($members)) {
-		$delegates = implode(", ", $members);
+
+        
+
+	if (count($worker)) {
+		$delegates = implode(", ", $workers);
 	}
+
+    //////////////////////////////////////////////////////////////
+    // kako podvojeno iz view_task
+    //////////////////////////////////////////////////////////////
 
     echo '
     <div id="container">
@@ -895,17 +770,10 @@ function template_end_task()
 		</div>
     	</div><br />
     ';
-    $smcFunc['db_free_result']($request);
 
     /***************************************************************************
      ****************** Konec Podvojitve ***************************************
      **************************************************************************/
-
-    /**************************************************************************
-     *********** Lepo je, ce se najprej prikaze specifikacija taska
-     *******  Treba je se enkrat preverit, ce je trenutni uporabnik tudi izvajalec nadloge!
-     ***************************************************************************/
-
 
 	echo '
 	<div id="container">
@@ -954,32 +822,15 @@ function template_super_edit() {
     global $smcFunc, $scripturl, $context, $txt;
 
     $id_task = (int) $_GET['task_id'];
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority,
-            T1.id_proj, T1.state, T1.start_date, T1.end_date, T1.end_comment
-		FROM {db_prefix}tasks T1
-		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-        WHERE T1.id = {int:id_task}',
-        array('id_task' => $id_task)
-    );
+    // @todo task_id -> id_task
 
-    $row = $smcFunc['db_fetch_assoc']($request);
-    $smcFunc['db_free_result']($request);
+    $row = task_info($id_task);
 
     // Delegirani uporabniki
-    $request_d = $smcFunc['db_query']('', '
-        SELECT T1.id_member, T2.real_name
-        FROM {db_prefix}workers T1
-        LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
-        WHERE T1.id_task = {int:id_task}',
-        array('id_task' => $id_task)
-    );
+    $workers = workers_on_task($id_task);
 
     $delegates = "";
-    while ($member = $smcFunc['db_fetch_assoc']($request_d)) {
-        $id = $member["id_member"];
-        $name = $member["real_name"];
+    foreach ($workers as $id => $name){
         $delegates .=
             '<div id="suggest_to-add_' . $id . '">
                 <input name="member_add[]" value="' . $id . '" type="hidden">
@@ -987,12 +838,8 @@ function template_super_edit() {
                 <img src="Themes/default/images/pm_recipient_delete.gif" alt="Delete Item" title="Delete Item" onclick="return oAddMemberSuggest.deleteAddedItem(' . $id . ');">
             </div>';
     }
-    $smcFunc['db_free_result']($request_d);
 
-    $request_p = $smcFunc['db_query']('', '
-        SELECT id, name
-        FROM  {db_prefix}projects'
-    );
+    $projects = list_of_projects();
 
 	echo '
 	<div id="container">
@@ -1048,16 +895,15 @@ function template_super_edit() {
 					</dt>
 					<dd>
                     	<select name="id_proj">'; // nadomestil navadno vejico
-					        while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-					            if ($row_p['id'] == $row['id_proj']) {
-					                echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
-					            }
-					            else {
-					                echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
-					            }
-					        }
-        					$smcFunc['db_free_result']($request_p);
-            			echo '
+    foreach ($projects as $id_proj => $proj_name){
+        if ($id_proj == $row['id_proj']) {
+            echo '<option value="'.$id_proj.'" selected >--'.$proj_name.'--</option> ';
+        }
+        else {
+            echo '<option value="'.$id_proj.'" > '.$proj_name.'</option> ';
+        }
+    }
+    echo '
             			</select>
 					</dd>
 
@@ -1112,46 +958,12 @@ function template_edit_project()
     global $scripturl, $context, $txt;
     global $smcFunc;
 
-    $id_task = (int) $_GET['task_id'];
+    ///////////////////////////////////////////////////////////////
+    //////// Copied mostly from add_project ///////////////////////
+    ///////////////////////////////////////////////////////////////
 
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.id, T1.name AS task_name,  T1.deadline, T1.description, T1.priority, T1.id_proj
-		FROM {db_prefix}tasks T1
-		LEFT JOIN {db_prefix}projects T2 ON T1.id_proj = T2.id
-		LEFT JOIN {db_prefix}members T3 ON T1.id_author = T3.id_member
-        WHERE T1.id = {int:id_task}',
-        array( 'id_task' => $id_task)
-    );
+    
 
-    $row = $smcFunc['db_fetch_assoc']($request);
-    $smcFunc['db_free_result']($request);
-
-    // Delegirani uporabniki
-    $request_d = $smcFunc['db_query']('', '
-        SELECT T1.id_member, T2.real_name
-        FROM {db_prefix}workers T1
-        LEFT JOIN {db_prefix}members T2 ON T1.id_member = T2.id_member
-        WHERE T1.id_task = {int:id_task}',
-        array('id_task' => $id_task)
-    );
-
-    $delegates = "";
-    while ($member = $smcFunc['db_fetch_assoc']($request_d)) {
-        $id = $member["id_member"];
-        $name = $member["real_name"];
-        $delegates .=
-            '<div id="suggest_to-add_' . $id . '">
-                <input name="member_add[]" value="' . $id . '" type="hidden">
-                <a href="index.php?action=profile;u=' . $id . '" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">' . $name . '</a>
-                <img src="Themes/default/images/pm_recipient_delete.gif" alt="Delete Item" title="Delete Item" onclick="return oAddMemberSuggest.deleteAddedItem(' . $id . ');">
-            </div>';
-    }
-    $smcFunc['db_free_result']($request_d);
-
-    $request_p = $smcFunc['db_query']('', '
-        SELECT id, name
-        FROM  {db_prefix}projects'
-    );
 
 	echo '
 	<div id="container">
@@ -1160,71 +972,44 @@ function template_edit_project()
 				', $context['page_title'], '
 			</h3>
 		</div>
-		<form action="', $scripturl, '?action=delegator;sa=edit_task" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
+		<form action="', $scripturl, '?action=delegator;sa=add_project_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_proj">
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-                <dl class="delegator_et">
+				<dl class="delegator_edit_task">
 					<dt>
-                        <label for="name">', $txt['delegator_task_name'], '</label>
+						<label for="name">', $txt['delegator_project_name'], '</label>
 					</dt>
 					<dd>
-						<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
-                        <input type="hidden" name="id_task" value ="'.$id_task.'" />
+						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
+					</dd>
+
+					<dt>
+						<label for="description">', $txt['delegator_project_desc'], '</label>
+					</dt>
+					<dd>
+					   <textarea name="description" rows="3" cols="30"> </textarea>
 					</dd>
                     <dt>
-               		    <label for="description">', $txt['delegator_task_desc'], '</label>
- 					</dt>
-                    <dd>
-               			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
-                    </dd>
-					<dt>
-			    		<label for="deadline">', $txt['delegator_deadline'], '</label>
+						<label for="start">', $txt['delegator_project_start'], '</label><br />
 					</dt>
 					<dd>
-						<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
-                    </dd>
-					<dt>
-						<label for="user">', $txt['delegator_task_delegates'], '</label>
-					</dt>
-					<dd>
-						<input id="to-add" type="text" name="user">
-						<div id="user-list">
-                            ' . $delegates . '
-                        </div>
-					</dd>
-					<dt>
-						<label>', $txt['delegator_priority'], '</label>
-					</dt>
-					<dd>
-						<ul class="reset">
-							' . getPriorities($row, $txt) . '
-						</ul>
+						<input type="text" name="start" class="input_text kalender" />
 					</dd>
                     <dt>
-                        <label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
-                    </dt>
-                    <dd>
-                        <select name="id_proj">'; // nadomestil navadno vejico
-                            while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
-                                if ($row_p['id'] == $row['id_proj']){
-                                    echo '<option value="'.$row_p['id'].'" selected >--'.$row_p['name'].'--</option> ';
-                                } else {
-                                    echo '<option value="'.$row_p['id'].'" > '.$row_p['name'].'</option> ';
-                                }
-                            }
-                            $smcFunc['db_free_result']($request_p);
-                            echo '
-                        </select>
-                    </dd>
+						<label for="end">', $txt['delegator_project_end'], '</label>
+					</dt>
+					<dd>
+						<input type="text" name="end" class="input_text kalender" />
+					</dd>
 				</dl>
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<br />
-				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
+                <br />
+				<input type="submit" name="submit" value="', $txt['delegator_project_add'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</div>
 		</form>
-    ' . generateMemberSuggest("to-add", "user-list", "member_add") .  '
 	</div><br />';
+
 }
