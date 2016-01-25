@@ -1263,7 +1263,7 @@ function edit_project_save()
         UPDATE {db_prefix}projects
         SET name={string:name}, description={string:description}, start={date:start}, end={date:end}, id_coord={int:id_coord}
         WHERE id = {int:id_proj}',
-                         array('name' => $name, 'description' => $description, 'start' => $start, 'end' => $end, 'id_proj' => $id_proj, 'id_coord'=$id_coord)
+                         array('name' => $name, 'description' => $description, 'start' => $start, 'end' => $end, 'id_proj' => $id_proj, 'id_coord' => $id_coord)
     );
 
     zapisiLog($id_proj, -1, 'edit_proj');
