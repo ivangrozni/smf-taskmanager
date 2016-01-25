@@ -186,7 +186,8 @@ function add_task()   //ni se prava funkcija za dodajanje - samo za gumb?
 /**
  * Function that actually adds new task.
  *
- * When task is created; id, id_proj, id_author, name, description, creation_date, deadline, priority, state
+ * When task is created; id, id_proj, id_author, name, description,
+ * creation_date, deadline, priority, state
  * are written into database.
  */
 function add_task_save()
@@ -1226,12 +1227,9 @@ function del_project()
 
 function edit_project()
 {
-    // prebere podatke o tem tasku
-    // odpre template z vpisanimi podatki
-    // naredis UPDATE v bazi z novimi podatki -> funkcija edit_task
-
     global $smcFunc, $scripturl, $context, $txt;
 
+    // var_dump("test"); die;
     $context['sub_template'] = 'edit_project';
     $context['linktree'][] = array(
         'url' => $scripturl . '?action=delegator;sa=edit_project',
@@ -1243,6 +1241,7 @@ function edit_project()
  * Writes edited project to database.
  *
  * What happens with the coordinator? Do we also change it?
+ * @todo think about coordinator ... 
  */
 function edit_project_save()
 {
@@ -1264,7 +1263,7 @@ function edit_project_save()
         UPDATE {db_prefix}projects
         SET name={string:name}, description={string:description}, start={date:start}, end={date:end}, id_coord={int:id_coord}
         WHERE id = {int:id_proj}',
-                         array('name' => $name, 'description' => $description, 'start' => $start, 'end' => $end, 'id_proj' => $id_proj)
+                         array('name' => $name, 'description' => $description, 'start' => $start, 'end' => $end, 'id_proj' => $id_proj, 'id_coord'=$id_coord)
     );
 
     zapisiLog($id_proj, -1, 'edit_proj');

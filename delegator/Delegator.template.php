@@ -63,18 +63,22 @@ function template_main()
     template_show_list('list_tasks');
 }
 
+
+/**
+ * Add task template
+ *
+ * Querries for projects,
+ */
 function template_add_task()
 {
-	global $smcFunc, $scripturl, $context, $txt;
+	global $scripturl, $context, $txt;
     // id_author, name, description, creation_date, deadline, priority, state
     // dobiti moram projekte: // vir: http://wiki.simplemachines.org/smf/Db_query
 
     $id_proj=(isset($_GET['id_proj']) ? (int) $_GET['id_proj'] : FALSE ) ;
 
-    $request = $smcFunc['db_query']('', '
-             SELECT id, name
-             FROM  {db_prefix}projects  ', array()  ); // pred array je manjkala vejica in je sel cel forum v k
-    // Zgoraj je treba querry tako popravit, da bo prikazoval se ne zakljucene projekte (POGOJ danasnji datum je pred koncem projekta)
+    $projects = list_projects();
+    // @todo maybe we could show not finished projects.
 
 	echo '
 	<div id="container">
@@ -126,15 +130,14 @@ function template_add_task()
 					</dt>
 					<dd>
                        <select name="id_proj">'; // nadomestil navadno vejico
-					    while ($row = $smcFunc['db_fetch_assoc']($request)) {
-                            if ($row['id'] == $id_proj){
-                                    echo '<option value="'.$row['id'].'" selected >--'.$row['name'].'--</option> ';
+					    foreach ($projects as $idp => $name) {
+                            if ($idp == $id_proj){
+                                    echo '<option value="'.$idp.'" selected >--'.$name.'--</option> ';
                                 } else {
-                                    echo '<option value="'.$row['id'].'" > '.$row['name'].'</option> ';
+                                    echo '<option value="'.$idp.'" > '.$name.'</option> ';
                                 }
 
 					        }
-					    $smcFunc['db_free_result']($request);
         				echo '
         				</select>
 					</dd>
@@ -145,9 +148,11 @@ function template_add_task()
 			</div>
             <span class="botslice"><span></span></span>
 		</div>
-		</form>
         ' . generateMemberSuggest("to-add", "user-list", "member_add") . '
+		</form>
 	</div><br />';
+   // @gismoe Tukaj klicemo generateMemberSuggest, ki bi moral kot param dobit
+   // parameter, ki nosi seznam memberjev, ta pa se nikjer ne ustvari ... 
 }
 
 /**
@@ -340,9 +345,6 @@ function template_view_task() // id bi bil kar dober argument
         if (isMemberWorker($id_task) and $row['state']==1) {
             echo '<a href="index.php?action=delegator;sa=end_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
         }
-            // TUKAJ PRIDE GUMBEK ZA SUPER_EDIT
-         // FORA - zakaj pri canceled tasks manjka super_edit???
-        //print_r(isMemberCoordinator($row['id_proj'])); print_r($row['state']);
         if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) {
             echo '<a href="index.php?action=delegator;sa=super_edit;id_task=', $id_task,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
         }
@@ -428,7 +430,7 @@ function template_view_project()
                 echo '<a href="index.php?action=delegator;sa=del_project;id_proj=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a>';
 
                 echo '
-                <a href="index.php?action=delegator;sa=edit_project;id_proj=', $id_proj, '";class="button_submit">', $txt['delegator_edit_project'] ,'</a>&nbsp;
+                <a href="index.php?action=delegator;sa=edit_project;id_proj=', $id_proj, '" class="button_submit">', $txt['delegator_edit_project'] ,'</a>&nbsp;
                 <!-- <a href="'.$scripturl.'?action=delegator;sa=del_project;proj_id=', $id_proj, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_delete_project'] ,'</a> -->
     			</div>
     			<span class="botslice"><span></span></span>
@@ -466,17 +468,9 @@ function template_view_worker()
     global $smcFunc;
 
     $id_member = (int) $_GET['id_member'];
+    $name = member_name($id_member);
 
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.real_name AS name FROM {db_prefix}members T1
-        WHERE T1.id_member={int:id_member}',
-        array('id_member' => $id_member)
-    );
-
-    $row = $smcFunc['db_fetch_assoc']($request);
-    $smcFunc['db_free_result']($request);
-
-    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$row['name']. '</h2>';
+    echo '<h2 style="font-size:1.5em" > '. $txt['delegator_worker'] .': '.$name. '</h2>';
 
     $states = count_states(array (1 => 0, 2 => 0, 3 => 0, 4 => 0), "Worker", $id_member);
     foreach ($states as $status2 => $count){
@@ -498,16 +492,9 @@ function template_my_tasks()
     $id_member = $context['user']['id'];
     $status = getStatus(true);
 
-    $request = $smcFunc['db_query']('', '
-        SELECT T1.real_name AS name FROM {db_prefix}members T1
-        WHERE T1.id_member={int:id_member}',
-        array('id_member' => $id_member)
-    );
+    $name = member_name($id_member);
 
-    $row = $smcFunc['db_fetch_assoc']($request);
-    $smcFunc['db_free_result']($request);
-
-    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$row['name']. '</br>'.$txt['delegator_state_'.$status].'</h2> <hr>';
+    echo '<h2 style="font-size:1.5em" >'.$txt['delegator_my_tasks'].' </br>'. $txt['delegator_worker'] .': '.$name. '</br>'.$txt['delegator_state_'.$status].'</h2> <hr>';
 
     $states = count_states(array (1 => 0, 2 => 0, 3 => 0, 4 => 0), "Worker", $id_member);
     foreach ($states as $status2 => $count){
@@ -650,17 +637,19 @@ function template_edit_task()
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
+                <!-- <input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" /> -->
+                <input type="button" value="Back" onclick="window.location.href='.$_SERVER['HTTP_REFERER'].'" /> 
+                <a href="'.$_SERVER['HTTP_REFERER'].'">Back</a>  
 				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
-		</form>
-    ' . generateMemberSuggest("to-add", "user-list", "member_add") .  '
-	</div><br />';
-}
 
-// en je okrajsava za end task...
-// en is short for end task
+    ' . generateMemberSuggest("to-add", "user-list", "member_add") .  '
+		</form>
+	</div><br />';
+    // @gismoe zamenjal sem vrstni red forme in memberSuggesta. Je to okej?
+}
 
 function template_end_task()
 {
@@ -817,6 +806,11 @@ function template_end_task()
 	</div><br />';
 }
 
+/**
+ * Templete for editing all tasks.
+ *
+ * Needs workers, project and task from database.
+ */
 function template_super_edit() {
     global $smcFunc, $scripturl, $context, $txt;
 
@@ -952,17 +946,14 @@ function template_super_edit() {
 
 function template_edit_project()
 {
-
-    global $scripturl, $context, $txt;
-    global $smcFunc;
+    global $smcFunc, $scripturl, $context, $txt;
 
     ///////////////////////////////////////////////////////////////
     //////// Copied mostly from add_project ///////////////////////
     ///////////////////////////////////////////////////////////////
 
-    $id_proj = (int) $_GET('id_proj');
+    $id_proj = (int) $_GET['id_proj']; // here is the problem!
     $row_p = project_info($id_proj);
-
 
 	echo '
 	<div id="container">
@@ -1003,7 +994,7 @@ function template_edit_project()
 					</dd>
 				</dl>
                 <br />
-                <input type="submit" name="id_coord" value="'.$row_p['id_coord'].'" />
+                <input type="hidden" name="id_coord" value="'.$row_p['id_coord'].'" />
 				<input type="submit" name="submit" value="', $txt['delegator_edit_project'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>

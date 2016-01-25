@@ -41,6 +41,13 @@ function getPriorities($row, $txt) {
 
 // Get status (ce gledas memberja, podas true in gre od 1 naprej)
 // @todo Preveri ali je int ali ni!!!
+
+/**
+ * Get status function
+ *
+ * Helps us find out which state to choose when making
+ * db querries.
+ */
 function getStatus($isMember = false) {
 
     if( isset($_GET['status']) ){
@@ -52,7 +59,24 @@ function getStatus($isMember = false) {
     return $status;
 }
 
-// Lahko bi razsiril to funkcijo, da bi pregledala, ce je uporabnik koordinator - bi bila vec uporabna in povabljiva
+
+/**
+ * Returns name of the member.
+ *
+ * Is used in template_my_tasks, template_view_worker
+ */
+function member_name($id_member){
+    $request = $smcFunc['db_query']('', '
+        SELECT T1.real_name AS name FROM {db_prefix}members T1
+        WHERE T1.id_member={int:id_member}',
+        array('id_member' => $id_member)
+    );
+
+    $row = $smcFunc['db_fetch_assoc']($request);
+    $smcFunc['db_free_result']($request);
+    return $row['name'];
+}
+
 function isMemberWorker($id_task) {
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
@@ -394,7 +418,8 @@ function show_task_list($status) {
                 'value' => $txt['delegator_priority'],
             ),
             'data' => array(
-                // @todo  Use of undefined constant getPriorityIcon - assumed 'getPriorityIcon'
+                // @todo Use of undefined constant getPriorityIcon - assumed 'getPriorityIcon'
+                // @gismoe bi to znal resit
                 'function' => getPriorityIcon,
                 'style' => 'width: 10%; text-align: center;',
             ),
@@ -656,7 +681,7 @@ function project_info($id_proj){
 /**
  * Returns list of projects
  *
- * IN: template_edit_task, template_add_task
+ * IN: template_edit_task, template_add_task, template_super_edit
  */
 
 function list_projects(){
