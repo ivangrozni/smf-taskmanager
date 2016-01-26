@@ -77,6 +77,14 @@ function member_name($id_member){
     return $row['name'];
 }
 
+/**
+ * Checks if specific worker on particular task.
+ *
+ * Actually it works only for active user since
+ * You get the user from inside the function.
+ * It would be nice to make a call with two params
+ * member_id and task_id.
+ */
 function isMemberWorker($id_task) {
     // Pogledamo, id memberja in ga primerjamo s taski v tabeli
     // Funkcija je tudi pogoj za to, da se v templejtu vt pojavi gumb End_task
@@ -324,6 +332,41 @@ function ret_num($status, $what, $value){
 
     return $total_tasks;
 }
+
+/**
+ * Creates string of html for input form.
+ *
+ * Used in add_task, add_project and all of the edit forms.
+ * @param name txt type value size1 size2 class
+ * @txt is string that is in $txt global variable
+ * type: textarea, input-text
+ * in case of textarea: size1=rows size2=cols
+ * in case of input text: size1=size size2=maxlength
+ */
+function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
+    $output = '<dt> <label for="'.$name.'">'.$txt.'</dt><dd>';
+    switch($type){
+    case "textarea":
+        $output .= '<textarea name="'.$name.'" rows="'.$size1.'" cols="'.$size2.'">'.
+                 $value.'</textarea></dd>';
+    case "input-text":
+        $output .= '<input type="text" name="'.$name.'" size="'.$size1.'" class="'.$class.'"maxlength="'.$size2.'" value="'.$value.'" /></dd>'
+                 }
+    return $output;
+}
+
+/**
+ * Creates string of html for view template
+ *
+ * Used in view templates.
+ * @param name, txt, link, class
+ * @todo to be finished ...
+
+function dl_view(){
+
+}
+ */
+
 
 
 // status bi lahko bil argument in glede na to vrnil deadline...
