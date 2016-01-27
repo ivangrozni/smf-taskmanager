@@ -2,7 +2,6 @@
 #+SUBTITLE: random zapiski ob programiranju
 
 * 160113
-
 ** DONE Ureditev delegatorja
    CLOSED: [2016-01-17 Sun 19:00]
    
@@ -55,12 +54,13 @@
    Tole bomo dodali na tem linku:
    [[http://custom.simplemachines.org/mods/][dodaj-mod-na-smf]]
 
-** Random bugi [0/3]
+** Random bugi [0/4]
    
    - [ ] end-date se vnase narobe
    - [ ] view_worker 
    - [ ] my_tasks (najbrž zaradi task_id -> id_task)
      - my_tasks in view_worker bi lahko združili
+   - [ ] member_name
 
 * 160124
   Nadaljujem s prejšnjimi taski.
@@ -101,3 +101,11 @@
      - main
      - view_project
      - view_worker
+
+** narejeno
+   - odpravljenih nekaj bugov
+   - nekaj najdenih novih (member_name)
+   - nova verzija na testforumu
+   - dokumentacija za Subtask
+   - uvajanje funkcije dl_form
+   - git commit/push

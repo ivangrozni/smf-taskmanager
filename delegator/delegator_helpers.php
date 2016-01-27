@@ -64,6 +64,7 @@ function getStatus($isMember = false) {
  * Returns name of the member.
  *
  * Is used in template_my_tasks, template_view_worker
+ * should be the global members table ...
  */
 function member_name($id_member){
     global $smcFunc;
@@ -345,7 +346,7 @@ function ret_num($status, $what, $value){
  * in case of input text: size1=size size2=maxlength
  */
 function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
-    $output = '<dt> <label for="'.$name.'">'.$txt.'</dt><dd>';
+    $output = '<dt> <label for="'.$name.'">'.$txt.'</label></dt><dd>';
     switch($type) {
     case "textarea":
         $output .= '<textarea name="'.$name.'" rows="'.$size1.'" cols="'.$size2.'">'.

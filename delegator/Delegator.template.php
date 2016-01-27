@@ -92,20 +92,21 @@ function template_add_task()
 			<span class="topslice"><span></span></span>
 			<div class="content">
 				<dl class="delegator_edit_task">';
-    echo dl_form("name",$txt['delegator_task_name'], "input-text", "", "", 50, 255 );
+    echo dl_form("name",$txt['delegator_task_name'], "input-text", "", "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_task_desc'], "textarea", "", "", 3, 30);
 	echo '
                    <!-- <dt>
                        <label for="name"> Zadolzitev </label>
 					</dt>
 					<dd>
 						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
-					</dd> -->
+					</dd> 
                     <dt>
 		            	<label for="description">', $txt['delegator_task_desc'], '</label>
  					</dt>
                     <dd>
                 		<textarea name="description" rows="3" cols="30"></textarea>
-                    </dd>
+                    </dd> -->
 					<dt>
                         <label for="duedate">', $txt['delegator_deadline'], '</label>
                     </dt>
