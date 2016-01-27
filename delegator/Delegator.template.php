@@ -487,7 +487,7 @@ function template_view_worker()
 function template_my_tasks()
 {
     // Tukaj mora biti privzeit status 1!!!
-    global $scripturl, $txt;
+    global $scripturl, $txt, $context;
 
     $id_member = $context['user']['id'];
     $status = getStatus(true);
@@ -521,7 +521,7 @@ function template_view_log()
 {
 
     global $scripturl, $context, $txt;
-    global $smcFunc;
+
     $session_var = $context['session_var'];
 	$session_id = $context['session_id'];
 
@@ -550,7 +550,6 @@ function template_edit_task()
 {
 
     global $scripturl, $context, $txt;
-    global $smcFunc;
 
     $id_task = (int) $_GET['id_task'];
 
@@ -652,7 +651,7 @@ function template_edit_task()
 
 function template_end_task()
 {
-	global $smcFunc, $scripturl, $context, $txt, $settings;
+	global $scripturl, $context, $txt, $settings;
 
 	//$session_var = $context['session_var'];
 	//$session_id = $context['session_id'];
@@ -811,7 +810,7 @@ function template_end_task()
  * Needs workers, project and task from database.
  */
 function template_super_edit() {
-    global $smcFunc, $scripturl, $context, $txt;
+    global $scripturl, $context, $txt;
 
     $id_task = (int) $_GET['id_task'];
 
@@ -945,7 +944,7 @@ function template_super_edit() {
 
 function template_edit_project()
 {
-    global $smcFunc, $scripturl, $context, $txt;
+    global $scripturl, $context, $txt;
 
     ///////////////////////////////////////////////////////////////
     //////// Copied mostly from add_project ///////////////////////

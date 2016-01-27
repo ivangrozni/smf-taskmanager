@@ -54,13 +54,13 @@
    Tole bomo dodali na tem linku:
    [[http://custom.simplemachines.org/mods/][dodaj-mod-na-smf]]
 
-** Random bugi [0/4]
+** Random bugi [2/4]
    
    - [ ] end-date se vnase narobe
-   - [ ] view_worker 
+   - [X] view_worker 
    - [ ] my_tasks (najbrž zaradi task_id -> id_task)
      - my_tasks in view_worker bi lahko združili
-   - [ ] member_name
+   - [X] member_name
 
 * 160124
   Nadaljujem s prejšnjimi taski.
