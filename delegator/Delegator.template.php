@@ -94,27 +94,10 @@ function template_add_task()
 				<dl class="delegator_edit_task">';
     echo dl_form("name",$txt['delegator_task_name'], "input-text", "", "input_text", 50, 255 );
     echo dl_form("description", $txt['delegator_task_desc'], "textarea", "", "", 3, 30);
+    echo dl_form("duedate", $txt['delegator_deadline'], "input-text", "", "input_text kalender", 8, 100);
 	echo '
-                   <!-- <dt>
-                       <label for="name"> Zadolzitev </label>
-					</dt>
-					<dd>
-						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
-					</dd> 
-                    <dt>
-		            	<label for="description">', $txt['delegator_task_desc'], '</label>
- 					</dt>
-                    <dd>
-                		<textarea name="description" rows="3" cols="30"></textarea>
-                    </dd> -->
 					<dt>
-                        <label for="duedate">', $txt['delegator_deadline'], '</label>
-                    </dt>
-					<dd>
-						<input type="text" name="duedate" size="8" value="" class="input_text kalender" />
-					</dd>
-					<dt>
-						<label for="user">Delegirani uporabniki</label>
+						<label for="user">'.$txt['delegator_delegates'].'</label>
 					</dt>
 					<dd>
 						<input type="text" name="user" id="to-add">
@@ -176,32 +159,12 @@ function template_add_project()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_edit_task">
-					<dt>
-						<label for="name">', $txt['delegator_project_name'], '</label>
-					</dt>
-					<dd>
-						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
-					</dd>
-
-					<dt>
-						<label for="description">', $txt['delegator_project_desc'], '</label>
-					</dt>
-					<dd>
-					   <textarea name="description" rows="3" cols="30"> </textarea>
-					</dd>
-                    <dt>
-						<label for="start">', $txt['delegator_project_start'], '</label><br />
-					</dt>
-					<dd>
-						<input type="text" name="start" class="input_text kalender" />
-					</dd>
-                    <dt>
-						<label for="end">', $txt['delegator_project_end'], '</label>
-					</dt>
-					<dd>
-						<input type="text" name="end" class="input_text kalender" />
-					</dd>
+				<dl class="delegator_edit_task">';
+    echo dl_form("name", $txt['delegator_project_name'], "input-text", "", "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_project_desc'], "textarea", "", "textarea", 3, 30);
+    echo dl_form("start", $txt['delegator_project_start'], "input-text", "", "input_text kalender", 8, 100);
+    echo dl_form("end", $txt['delegator_project_end'], "input-text", "", "input_text kalender", 8, 100);
+    echo '
 				</dl>
                 <br />
 				<input type="submit" name="submit" value="', $txt['delegator_project_add'], '" class="button_submit" />
@@ -267,7 +230,6 @@ function template_view_task() // id bi bil kar dober argument
 				</dt>
 				<dd>
                     <h3>', $row['task_name'], '</h3>
-					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
 				</dd>
                 <dt>
 					<label for="author">', $txt['delegator_task_author'], '</label>

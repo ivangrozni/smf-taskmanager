@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper functions for Delegator (SMF taskmanager mod)
+ * Helper functions for Delegator (SMF taskmanager mod).
  *
  * Here are most of db querries.
  */
@@ -363,11 +363,20 @@ function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
  * Used in view templates.
  * @param name, txt, link, class
  * @todo to be finished ...
-
-function dl_view(){
-
-}
+ * depending on type - class might also mean value2
  */
+function dl_view($name, $txt, $type, $value, $class){
+    global $scripturl;
+    $output = '<dt><label for="'.$name .'">'.$txt.'</label></dt><dd>';
+    switch ($type) {
+    case "title":
+        $output .= '<h3>'.$value.'</h3></dd>';
+    case "link":
+        $output .= '<a href="'.$scripturl.'?action=delegator;sa="'.$value.'" >'.$class.'</a></dd>';
+    }
+    return $output;
+}
+
 
 
 

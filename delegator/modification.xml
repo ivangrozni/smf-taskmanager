@@ -94,6 +94,7 @@ $txt['delegator_due_time'] = 'Due date';
 $txt['delegator_view'] = 'Can View Delegator';
 $txt['delegator_add_task'] = 'Delegator Basic Editing';
 $txt['delegator_super_edit'] = 'Delegator Total Control';
+$txt['delegator_delegates'] = 'Delegates';
 
 $txt['delegator_due_year'] = 'Due year';
 $txt['delegator_due_month'] = 'Due month';
