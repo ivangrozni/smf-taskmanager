@@ -91,13 +91,15 @@ function template_add_task()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_edit_task">
-					<dt>
+				<dl class="delegator_edit_task">';
+    echo dl_form("name",$txt['delegator_task_name'], "input-text", "", "", 50, 255 );
+	echo '
+                   <!-- <dt>
                        <label for="name"> Zadolzitev </label>
 					</dt>
 					<dd>
 						<input type="text" name="name" value="" size="50" maxlength="255" class="input_text" />
-					</dd>
+					</dd> -->
                     <dt>
 		            	<label for="description">', $txt['delegator_task_desc'], '</label>
  					</dt>
@@ -464,8 +466,7 @@ function template_view_project()
 function template_view_worker()
 {
 
-    global $scripturl, $context, $txt;
-    global $smcFunc;
+    global $scripturl, $txt;
 
     $id_member = (int) $_GET['id_member'];
     $name = member_name($id_member);
@@ -474,21 +475,19 @@ function template_view_worker()
 
     $states = count_states(array (1 => 0, 2 => 0, 3 => 0, 4 => 0), "Worker", $id_member);
     foreach ($states as $status2 => $count){
-         // FUXK ZA COUNT NE SME BIT PRESLEDKA!!!
          echo '<a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status='.$status2.'">'.$txt['delegator_state_'.$status2].'</a>:&nbsp'.$states[$status2].'</br>';
-
     }
     echo '<hr><a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
     echo '<a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
-    template_show_list('list_tasks_of_worker'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    template_show_list('list_tasks_of_worker'); 
 }
 
 function template_my_tasks()
 {
     // Tukaj mora biti privzeit status 1!!!
-    global $scripturl, $context, $txt;
-    global $smcFunc;
+    global $scripturl, $txt;
+
     $id_member = $context['user']['id'];
     $status = getStatus(true);
 
@@ -510,12 +509,11 @@ function template_my_tasks()
 
 function template_view_projects()
 {
-    global $scripturl, $context, $txt;
-    global $smcFunc;
+    global $txt;
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
 
-    template_show_list('list_of_projects'); // ko bomo odkomentirali veliki del v Delegator.php, se odkomentira tudi to in vuala, bodo taski...
+    template_show_list('list_of_projects'); 
 }
 
 function template_view_log()

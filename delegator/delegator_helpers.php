@@ -66,6 +66,7 @@ function getStatus($isMember = false) {
  * Is used in template_my_tasks, template_view_worker
  */
 function member_name($id_member){
+    global $smcFunc;
     $request = $smcFunc['db_query']('', '
         SELECT T1.real_name AS name FROM {db_prefix}members T1
         WHERE T1.id_member={int:id_member}',
@@ -345,13 +346,13 @@ function ret_num($status, $what, $value){
  */
 function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
     $output = '<dt> <label for="'.$name.'">'.$txt.'</dt><dd>';
-    switch($type){
+    switch($type) {
     case "textarea":
         $output .= '<textarea name="'.$name.'" rows="'.$size1.'" cols="'.$size2.'">'.
                  $value.'</textarea></dd>';
     case "input-text":
-        $output .= '<input type="text" name="'.$name.'" size="'.$size1.'" class="'.$class.'"maxlength="'.$size2.'" value="'.$value.'" /></dd>'
-                 }
+        $output .= '<input type="text" name="'.$name.'" size="'.$size1.'" class="'.$class.'"maxlength="'.$size2.'" value="'.$value.'" /></dd>';
+    }
     return $output;
 }
 

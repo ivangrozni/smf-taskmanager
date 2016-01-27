@@ -24,17 +24,17 @@
 
    // phpDoc lahko s tabom raztegnem v zacetek dokumentacije.
 
-** TODO Edit/delete project [0/2]
+** TODO Edit/delete project [1/2]
    SCHEDULED: <2016-01-24 Sun>
    V Delegator.php dodaj funkciji.
 
    V Delegator.templates.php dodaj gumbke. K Project_view (gumbek edit-proj in del-proj).
    Fora pa je, da naj jih vidi samo administrator.
 
-   - [ ] delete-project
+   - [X] delete-project
    - [ ] edit project
 
-** TODO Coding guidelines [1/3]
+** TODO Coding guidelines [2/3]
 
    Gremo kodo spravit v obliko, kakržno zahteva ljudi na SMFju.
    [[http://wiki.simplemachines.org/smf/Coding_Guidelines][smf-coding-guidelines]]
@@ -48,17 +48,19 @@
 
    - [X] rename functions: ~add~ -> task, ~vt~ -> view-task, ~et~ -> edit-task
    - [ ] list of all database queries
-   - [ ] remove database queries from template files
+   - [X] remove database queries from template files
      
 ** TODO Commit v mod database
    
    Tole bomo dodali na tem linku:
    [[http://custom.simplemachines.org/mods/][dodaj-mod-na-smf]]
 
-** Random bugi [0/2]
+** Random bugi [0/3]
    
    - [ ] end-date se vnase narobe
-   - [ ] opomba polje v log (kamor se bo zapisalo ime taska oz projekta)
+   - [ ] view_worker 
+   - [ ] my_tasks (najbrž zaradi task_id -> id_task)
+     - my_tasks in view_worker bi lahko združili
 
 * 160124
   Nadaljujem s prejšnjimi taski.
@@ -75,3 +77,27 @@
    - funkcija project_info
    - funkcija task_info (edit_task, super_edit_task, view_task)
    - iz template datoteke prenašam poizvedbe
+
+* 160127
+
+** TODO Subtasks
+
+   K taskom bi lahko dodajali še subtaske. Subtask ima naslednje atribute:
+   - id_task
+   - ime
+   - opis
+   - NOT DONE/DONE
+
+   Ideja je, da bi bili podtaski zelo preprosti. Lahko bi imeli samo enega
+   izvajalca, če že (da ni treba delata many-to-many relacije).
+
+   Subtaski bi imeli naslednje view-je, oziroma bi se videli v templejtih:
+   - view_subtask
+   - view-task
+     - polje opravljenih taskov
+     - tabela subtaskov
+   - povsod, kjer je tabela taskov, se doda stolpec subtask, ki prikazuje
+     koliko od kolikih subtaskov je končanih.
+     - main
+     - view_project
+     - view_worker
