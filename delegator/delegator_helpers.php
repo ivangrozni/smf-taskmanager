@@ -31,7 +31,7 @@ function getPriorities($row, $txt) {
         $checked = ($i == $row["priority"]) ? "checked" : "";
         $priorities .= '
             <li>
-                <input type="radio" name="priority" id="priority_' . $i . '" value="' . $i . '" class="input_radio" class="input_radio"' . $checked . '/>
+                <input type="radio" name="priority" id="priority_' . $i . '" value="' . $i . '" class="input_radio" ' . $checked . '/>
                 ' . $txt['delegator_priority_' . $i] . '
             </li>
         ';
@@ -346,33 +346,46 @@ function ret_num($status, $what, $value){
  * in case of input text: size1=size size2=maxlength
  */
 function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
-    $output = '<dt> <label for="'.$name.'">'.$txt.'</label></dt><dd>';
+    $output = "\n\t".'<dt> <label for="'.$name.'">'.$txt.'</label></dt>'."\n\t".'<dd>';
     switch($type) {
     case "textarea":
         $output .= '<textarea name="'.$name.'" rows="'.$size1.'" cols="'.$size2.'">'.
-                 $value.'</textarea></dd>';
+                 $value.'</textarea></dd>'."\n";
+        break;
     case "input-text":
-        $output .= '<input type="text" name="'.$name.'" size="'.$size1.'" class="'.$class.'"maxlength="'.$size2.'" value="'.$value.'" /></dd>';
+        $output .= '<input type="text" name="'.$name.'" size="'.$size1.'" class="'.$class.'"'."\t".' maxlength="'.$size2.'"  value="'.$value.'" /></dd>'."\n";
+        break;
     }
     return $output;
 }
 
 /**
- * Creates string of html for view template
+ * Creates string of html for view template - descriptive list.
  *
  * Used in view templates.
- * @param name, txt, link, class
- * @todo to be finished ...
+ * @param name, txt, type, value, class
  * depending on type - class might also mean value2
  */
 function dl_view($name, $txt, $type, $value, $class){
     global $scripturl;
-    $output = '<dt><label for="'.$name .'">'.$txt.'</label></dt><dd>';
+    
+    $output = "\n".'<dt><label for="'.$name .'">'.$txt.'</label></dt>'."\n".'<dd>';
     switch ($type) {
     case "title":
-        $output .= '<h3>'.$value.'</h3></dd>';
+        $output .= '<h3>'.$value.'</h3></dd>'."\n";
+        break;
     case "link":
-        $output .= '<a href="'.$scripturl.'?action=delegator;sa="'.$value.'" >'.$class.'</a></dd>';
+        $output .= '<a href="'.$scripturl.'?action=delegator;sa='.$value.'" >'.$class.'</a></dd>'."\n";
+        break;
+    case "date":
+        $output .= '<span class="'.$class.'">'.$value.'</span></dd>'."\n";
+        break;
+    case "description": // also delegates
+        $output .= $value.'</dd>'."\n";
+        break;
+    case "priority":
+        $output .= '<img src="'. $value . '" />'.$class.'</dd>'."\n";
+        break;
     }
     return $output;
 }

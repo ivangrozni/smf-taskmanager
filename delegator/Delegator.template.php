@@ -92,9 +92,9 @@ function template_add_task()
 			<span class="topslice"><span></span></span>
 			<div class="content">
 				<dl class="delegator_edit_task">';
-    echo dl_form("name",$txt['delegator_task_name'], "input-text", "", "input_text", 50, 255 );
-    echo dl_form("description", $txt['delegator_task_desc'], "textarea", "", "", 3, 30);
-    echo dl_form("duedate", $txt['delegator_deadline'], "input-text", "", "input_text kalender", 8, 100);
+    echo dl_form("name",$txt['delegator_task_name'], "input-text", '""', "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_task_desc'], "textarea", '""', '""', 3, 30);
+    echo dl_form("duedate", $txt['delegator_deadline'], "input-text", '""', "input_text kalender", 8, 100);
 	echo '
 					<dt>
 						<label for="user">'.$txt['delegator_delegates'].'</label>
@@ -200,21 +200,22 @@ function template_view_task() // id bi bil kar dober argument
 
     if (isMemberWorker($id_task)) {
 		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;id_task=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
-    } else {
+    } 
+    else {
     	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;id_task=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
     }
 
     $workers = workers_on_task($id_task);
-
+    
 	$delegates = "&nbsp;&nbsp; (\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
-	if (count($workers)) {
-        $delegates = ' ';
-        foreach ($workers as $id_member => $real_name) {
-            $delegates = $delegates . "<a href=$scripturl?action=delegator;sa=view_worker;id_member=$id_member\">$real_name</a>&nbsp;";
-        }
-	}
 
-    echo '
+if (count($workers)) {
+$delegates = ' ';
+foreach ($workers as $id_member => $real_name) {
+    $delegates = $delegates . "<a href=$scripturl?action=delegator;sa=view_worker;id_member=$id_member\">$real_name</a>&nbsp;";
+}}
+
+echo '
     <div id="container">
     <div class="cat_bar">
 		<h3 class="catbg"><span class="left"></span>
@@ -224,95 +225,37 @@ function template_view_task() // id bi bil kar dober argument
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_edit_task">
-				<dt>
-					<label for="name">', $txt['delegator_task_name'], '</label>
-				</dt>
-				<dd>
-                    <h3>', $row['task_name'], '</h3>
-				</dd>
-                <dt>
-					<label for="author">', $txt['delegator_task_author'], '</label>
-				</dt>
-				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'], '"> ', $row['author'], '</a>
-				</dd>
-                <dt>
-					<label for="project_name">', $txt['delegator_project_name'], '</label>
-				</dt>
-				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_project;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
-				</dd>
-                <dt>
-					<label for="creation_date">', $txt['delegator_creation_date'], '</label>
-				</dt>
-				<dd>
-                    <span class="format-time">', $row['creation_date'] ,'</span>
-				</dd>
-                <dt>
-					<label for="deadline">', $txt['delegator_deadline'], '</label>
-				</dt>
-				<dd>
-					<span class="relative-time">', $row['deadline'], '</span> (<span class="format-time">' , $row['deadline'], '</span>)
-				</dd>
-				<dt>
-					<label for="delegates">', $txt['delegator_task_delegates'], '</label>
-				</dt>
-				<dd>
-					', $delegates, '
-				</dd>
-                <dt>
-					<label for="description">', $txt['delegator_task_desc'], '</label>
-				</dt>
-				<dd>
-                    ', $row['description'], '
-				</dd>
-                <dt>
-					<label for="priority">', $txt['delegator_priority'], '</label>
-				</dt>
-				<dd>
-                    <img src="', $settings['images_url'], '/', $pimage, '.gif" /> ', $txt['delegator_priority_' . $row['priority']] ,'
-				</dd>
-                <dt>
-					<label for="state">', $txt['delegator_state'], '</label>
-				</dt>
-				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
-                    ', $row['state'], '
-    			</dd>'
-                ;
+			<dl class="delegator_edit_task">';
+    // echo "nekaj";
+    echo dl_view("name", $txt['delegator_task_name'], "title", $row['task_name'], "");
+    echo dl_view("author", $txt['delegator_task_author'], "link", "view_worker;id_member=".$row['id_author'] , $row['author']);
+    echo dl_view("project_name", $txt['delegator_project_name'], "link", 'view_project;id_proj='.$row['id_proj'] , $row['project_name']);
+    echo dl_view("creation_date", $txt['delegator_creation_date'], "date", $row['creation_date'] , "format-time");
+    echo dl_view("deadline", $txt['delegator_deadline'], "date", $row['deadline'] , "relative-time");
+    echo dl_view("delegates", $txt['delegator_task_delegates'], "description", $delegates, "");
+    echo dl_view("description", $txt['delegator_task_desc'], "description", $row['description'], "");
+    echo dl_view("priority", $txt['delegator_priority'], "priority", $settings['images_url'].'/'.$pimage .'.gif', $txt['delegator_priority_' . $row['priority']]);
+    echo dl_view("state", $txt['delegator_state'], "description", $row['state'] , "");
 
-                if ($row['state'] > 1) {
-                    echo '
-                        <dt>
-        					<label for="end_date">', $txt['delegator_task_end_date'], '</label>
-        				</dt>
-        				<dd>
-                            ', $row['end_date'], '
-                        </dd>
-                         <dt>
-        					<label for="end_comment">', $txt['delegator_task_end_comment'], '</label>
-        				</dt>
-        				<dd>
-                            ', $row['end_comment'], '
-                        </dd>'
-                    ;
-                }
+    if ($row['state'] > 1) {
+        echo dl_view("end_date", $txt['delegator_task_end_date'], "date", $row['end_date'] , "format_time");
+        echo dl_view("end_comment", $txt['delegator_task_end_comment'], "description", $row['end_comment'] , "");
+    }
 
-			echo '</dl><br />';
+    echo '</dl><br />';
 
-            if ($row['state'] < 2) {
-                echo $claimButton, '&nbsp;
+    if ($row['state'] < 2) {
+        echo $claimButton, '&nbsp;
                     <a href="index.php?action=delegator;sa=edit_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_edit_task'], '</a>&nbsp;
-                    <a href="index.php?action=delegator;sa=del_task;id_task=', $id_task, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>
-                ';
-            }
+                    <a href="index.php?action=delegator;sa=del_task;id_task=', $id_task, ';', $session_var, '=', $session_id, '" class="button_submit">', $txt['delegator_del_task'] ,'</a>';
+     }
 
-        if (isMemberWorker($id_task) and $row['state']==1) {
-            echo '<a href="index.php?action=delegator;sa=end_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
-        }
-        if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) {
-            echo '<a href="index.php?action=delegator;sa=super_edit;id_task=', $id_task,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
-        }
+    if (isMemberWorker($id_task) and $row['state']==1) {
+        echo '<a href="index.php?action=delegator;sa=end_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
+    }
+    if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) {
+        echo '<a href="index.php?action=delegator;sa=super_edit;id_task=', $id_task,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
+}
 
     echo '
 		</div>
@@ -353,37 +296,15 @@ function template_view_project()
     	<div class="windowbg">
     		<span class="topslice"><span></span></span>
     		<div class="content">
-    			<dl class="delegator_edit_task">
-    				<dt>
-    					<label for="name">', $txt['delegator_project_name'], '</label>
-    				</dt>
-    				<dd>
-                        ', $row['proj_name'], '
-    				</dd>
-                    <dt>
-    					<label for="coordinator">', $txt['delegator_project_coord'], '</label>
-    				</dt>
-    				<dd>
-                        <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_coord'] ,'"> ',$row['coord_name'],'</a>
-    				</dd>
-                    <dt>
-    					<label for="start">', $txt['delegator_project_start'], '</label>
-    				</dt>
-    				<dd>
-                        <span class="format-date">', $row['start'], '</span>
-    				</dd>
-                    <dt>
-    					<label for="end">', $txt['delegator_project_end'], '</label>
-    				</dt>
-    				<dd>
-                        <span class="format-date">', $row['end'] ,'</span>
-    				</dd>
-                    <dt>
-    					<label for="description">', $txt['delegator_project_desc'], '</label>
-    				</dt>
-    				<dd>
-                        ', $row['description'], '
-    				</dd>
+    			<dl class="delegator_edit_task">';
+
+     echo dl_view("name", $txt['delegator_project_name'], "title", $row['proj_name'] , '""');
+     echo dl_view("coordinator", $txt['delegator_project_coord'], "link", 'view_worker;id='.$row['id_coord'] , $row['coord_name']);
+     echo dl_view("start", $txt['delegator_project_start'], "date", $row['start'] , 'format-date');
+     echo dl_view("end", $txt['delegator_project_end'], "date", $row['end'] , 'format-date');
+     echo dl_view("description", $txt['delegator_project_desc'], "description", $row['description'] , '""');
+
+        echo	'
     			</dl>
                 <br />
     			<a href="index.php?action=delegator;sa=add_task;id_proj=',$id_proj,'" class="button_submit">', $txt['delegator_task_add'] ,'</a>&nbsp;
@@ -538,30 +459,16 @@ function template_edit_task()
 			</h3>
 		</div>
 		<form action="', $scripturl, '?action=delegator;sa=edit_task_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_edit_task">
+        <input type="hidden" name="id_task" value ="'.$id_task.'" />
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-                <dl class="delegator_edit_task">
-					<dt>
-                        <label for="name">', $txt['delegator_task_name'], '</label>
-					</dt>
-					<dd>
-						<input type="text" name="name" value="'.$row_task['task_name'].'" size="50" maxlength="255" class="input_text" />
-                        <input type="hidden" name="id_task" value ="'.$id_task.'" />
-					</dd>
-                    <dt>
-               		    <label for="description">', $txt['delegator_task_desc'], '</label>
- 					</dt>
-                    <dd>
-               			<textarea name="description" rows="3" cols="30" > '.$row_task['description'].' </textarea>
-                    </dd>
-					<dt>
-			    		<label for="deadline">', $txt['delegator_deadline'], '</label>
-					</dt>
-					<dd>
-						<input class="kalender" type="text" name="deadline" value="' . $row_task['deadline'] . '"/>
-                    </dd>
-					<dt>
+                <dl class="delegator_edit_task">';
+    echo dl_form("name",$txt['delegator_task_name'], "input-text", $row_task['task_name'], "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_task_desc'], "textarea", $row_task['description'], "", 3, 30);
+    echo dl_form("deadline", $txt['delegator_deadline'], "input-text", $row_task['deadline'], "input_text kalender", 8, 100);
+
+    echo '			<dt>
 						<label for="user">', $txt['delegator_task_delegates'], '</label>
 					</dt>
 					<dd>
@@ -744,7 +651,6 @@ function template_end_task()
 					</dd>
                     <dt>
 		            	<label for="state"> End state (nacin zakljucka) </label>
-                        <!-- tukaj bo dolartxt spremenljivka -->
  					</dt>
                     <dd>
                     	<ul class="reset">
@@ -955,6 +861,7 @@ function template_edit_project()
 				</dl>
                 <br />
                 <input type="hidden" name="id_coord" value="'.$row_p['id_coord'].'" />
+                <input type="hidden" name="id_proj" value="'.$id_proj.'" />
 				<input type="submit" name="submit" value="', $txt['delegator_edit_project'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>

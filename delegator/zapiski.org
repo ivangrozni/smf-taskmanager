@@ -33,7 +33,8 @@
    - [X] delete-project
    - [ ] edit project
 
-** TODO Coding guidelines [2/3]
+** DONE Coding guidelines [2/3]
+   CLOSED: [2016-01-28 Thu 10:02]
 
    Gremo kodo spravit v obliko, kakržno zahteva ljudi na SMFju.
    [[http://wiki.simplemachines.org/smf/Coding_Guidelines][smf-coding-guidelines]]
@@ -109,3 +110,10 @@
    - dokumentacija za Subtask
    - uvajanje funkcije dl_form
    - git commit/push
+     
+* 160128
+** narejeno
+* 160130
+** narejeno
+   - edit_project
+   - okrajšava in olepšava kode: template_view_task, template_edit_task, template_add_project, template_add_task, template_add_project

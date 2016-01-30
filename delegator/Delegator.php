@@ -1258,7 +1258,7 @@ function edit_project_save()
     $description = strtr($smcFunc['htmlspecialchars']($_POST['description']), array("\r" => '', "\n" => '', "\t" => ''));
     $start = strtr($smcFunc['htmlspecialchars']($_POST['start']), array("\r" => '', "\n" => '', "\t" => ''));
     $end = strtr($smcFunc['htmlspecialchars']($_POST['end']), array("\r" => '', "\n" => '', "\t" => ''));
-
+    //var_dump($id_proj, $id_coord, $name, $description, $start, $end);die;
     $smcFunc['db_query']('','
         UPDATE {db_prefix}projects
         SET name={string:name}, description={string:description}, start={date:start}, end={date:end}, id_coord={int:id_coord}
