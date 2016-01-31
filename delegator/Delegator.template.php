@@ -92,11 +92,13 @@ function template_add_task()
 			<span class="topslice"><span></span></span>
 			<div class="content">
 				<dl class="delegator_edit_task">';
-    echo dl_form("name",$txt['delegator_task_name'], "input-text", '""', "input_text", 50, 255 );
-    echo dl_form("description", $txt['delegator_task_desc'], "textarea", '""', '""', 3, 30);
-    echo dl_form("duedate", $txt['delegator_deadline'], "input-text", '""', "input_text kalender", 8, 100);
+    echo dl_form("name",$txt['delegator_task_name'], "input-text", "", "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_task_desc'], "textarea", "", "", 3, 30);
+    echo dl_form("duedate", $txt['delegator_deadline'], "input-text", "", "input_text kalender", 8, 100);
+    echo dl_form("user", $txt['delegator_delegates'], "delegates", "", "");
+    echo dl_form("priority", $txt['delegator_priority'], "priority", getPriorities($row, $txt), "reset", "", "");
 	echo '
-					<dt>
+		<!--		<dt>
 						<label for="user">'.$txt['delegator_delegates'].'</label>
 					</dt>
 					<dd>
@@ -110,7 +112,7 @@ function template_add_task()
 						<ul class="reset">
 							' . getPriorities($row, $txt) . '
 						</ul>
-					</dd>
+					</dd> -->
                     <dt>
 						<label for="id_proj">', $txt['delegator_project_name'], '</label>
 					</dt>
@@ -209,11 +211,11 @@ function template_view_task() // id bi bil kar dober argument
     
 	$delegates = "&nbsp;&nbsp; (\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
 
-if (count($workers)) {
-$delegates = ' ';
-foreach ($workers as $id_member => $real_name) {
-    $delegates = $delegates . "<a href=$scripturl?action=delegator;sa=view_worker;id_member=$id_member\">$real_name</a>&nbsp;";
-}}
+    if (count($workers)) {
+        $delegates = ' ';
+        foreach ($workers as $id_member => $real_name) {
+            $delegates = $delegates . "<a href=\"$scripturl?action=delegator;sa=view_worker;id_member=$id_member\">$real_name</a>&nbsp;";
+        }}
 
 echo '
     <div id="container">
@@ -251,9 +253,11 @@ echo '
      }
 
     if (isMemberWorker($id_task) and $row['state']==1) {
+        echo '&nbsp';
         echo '<a href="index.php?action=delegator;sa=end_task;id_task=', $id_task, '" class="button_submit">', $txt['delegator_end_task'] ,'</a>';
     }
     if(isMemberCoordinator($row['id_proj']) and $row['state'] > 1) {
+        echo '&nbsp';
         echo '<a href="index.php?action=delegator;sa=super_edit;id_task=', $id_task,';" class="button_submit">', $txt['delegator_super_edit'] ,'</a>';
 }
 
@@ -298,8 +302,8 @@ function template_view_project()
     		<div class="content">
     			<dl class="delegator_edit_task">';
 
-     echo dl_view("name", $txt['delegator_project_name'], "title", $row['proj_name'] , '""');
-     echo dl_view("coordinator", $txt['delegator_project_coord'], "link", 'view_worker;id='.$row['id_coord'] , $row['coord_name']);
+     echo dl_view("name", $txt['delegator_project_name'], "title", $row['proj_name'] , "");
+     echo dl_view("coordinator", $txt['delegator_project_coord'], "link", 'view_worker;id_member='.$row['id_coord'] , $row['coord_name']);
      echo dl_view("start", $txt['delegator_project_start'], "date", $row['start'] , 'format-date');
      echo dl_view("end", $txt['delegator_project_end'], "date", $row['end'] , 'format-date');
      echo dl_view("description", $txt['delegator_project_desc'], "description", $row['description'] , '""');
@@ -467,8 +471,9 @@ function template_edit_task()
     echo dl_form("name",$txt['delegator_task_name'], "input-text", $row_task['task_name'], "input_text", 50, 255 );
     echo dl_form("description", $txt['delegator_task_desc'], "textarea", $row_task['description'], "", 3, 30);
     echo dl_form("deadline", $txt['delegator_deadline'], "input-text", $row_task['deadline'], "input_text kalender", 8, 100);
-
-    echo '			<dt>
+    echo dl_form("user", $txt['delegator_task_delegates'], "delegates", $delegates, "div");
+    echo dl_form("priority", $txt['delegator_priority'], "priority", getPriorities($row, $txt), "reset");
+    echo '	<!--	<dt>
 						<label for="user">', $txt['delegator_task_delegates'], '</label>
 					</dt>
 					<dd>
@@ -484,7 +489,7 @@ function template_edit_task()
 						<ul class="reset">
 							' . getPriorities($row, $txt) . '
 						</ul>
-					</dd>
+					</dd> -->
                     <dt>
                         <label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
                     </dt>
@@ -543,7 +548,7 @@ function template_end_task()
 
         
 
-	if (count($worker)) {
+	if (count($workers)) {
 		$delegates = implode(", ", $workers);
 	}
 
@@ -561,65 +566,20 @@ function template_end_task()
 	<div class="windowbg">
 		<span class="topslice"><span></span></span>
 		<div class="content">
-			<dl class="delegator_vt">
-				<dt>
-					<label for="name">', $txt['delegator_task_name'], '</label>
-				</dt>
-				<dd>
-                    <h3>', $row['task_name'], '</h3>
-					<!-- <input type="text" name="name" value="" size="50" maxlength="255" class="input_text" /> -->
-				</dd>
-                <dt>
-					<label for="author">', $txt['delegator_task_author'], '</label>
-				</dt>
-				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_worker;id_member=', $row['id_author'] ,'"> ',$row['author'],'</a>
-				</dd>
-                <dt>
-					<label for="project_name">', $txt['delegator_project_name'], '</label>
-				</dt>
-				<dd>
-                    <a href="', $scripturl ,'?action=delegator;sa=view_project;id_proj=', $row['id_proj'] ,'">', $row['project_name'], '</a>
-				</dd>
-                <dt>
-					<label for="creation_date">', $txt['delegator_creation_date'], '</label>
-				</dt>
-				<dd>
-                    <span class="format-time">', $row['creation_date'] ,'</span>
-				</dd>
-                <dt>
-					<label for="deadline">', $txt['delegator_deadline'], '</label>
-				</dt>
-				<dd>
-					<span class="relative-time">', $row['deadline'], '</span> (<span class="format-time">' , $row['deadline'], '</span>)
-				</dd>
-				<dt>
-					<label for="delegates">', $txt['delegator_task_delegates'], '</label>
-				</dt>
-				<dd>
-					', $delegates, '
-				</dd>
-                <dt>
-					<label for="description">', $txt['delegator_task_desc'], '</label>
-				</dt>
-				<dd>
-                    ', $row['description'] ,'
-				</dd>
-                <dt>
-					<label for="priority">', $txt['delegator_priority'], '</label>
-				</dt>
-				<dd>
-                    <img src="', $settings['images_url'], '/', $pimage, '.gif" /> ', $txt['delegator_priority_' . $row['priority']] ,'
-				</dd>
-                <dt>
-					<label for="state">', $txt['delegator_state'], '</label>
-				</dt>
-				<dd> <!-- Stanje in priority je treba se spremenit... da bo kazalo tekst -->
-                   ', $row['state'] ,'
-				</dd>
+			<dl class="delegator_edit_task">';
+    echo dl_view("name", $txt['delegator_task_name'], "title", $row['task_name'], "");
+    echo dl_view("author", $txt['delegator_task_author'], "link", "view_worker;id_member=".$row['id_author'] , $row['author']);
+    echo dl_view("project_name", $txt['delegator_project_name'], "link", 'view_project;id_proj='.$row['id_proj'] , $row['project_name']);
+    echo dl_view("creation_date", $txt['delegator_creation_date'], "date", $row['creation_date'] , "format-time");
+    echo dl_view("deadline", $txt['delegator_deadline'], "date", $row['deadline'] , "relative-time");
+    echo dl_view("delegates", $txt['delegator_task_delegates'], "description", $delegates, "");
+    echo dl_view("description", $txt['delegator_task_desc'], "description", $row['description'], "");
+    echo dl_view("priority", $txt['delegator_priority'], "priority", $settings['images_url'].'/'.$pimage .'.gif', $txt['delegator_priority_' . $row['priority']]);
+    echo dl_view("state", $txt['delegator_state'], "description", $row['state'] , "");
+
+	echo	'
 			 </dl>
 			 <br />
-            <!-- teh gumbkov ni vec, ker smo ze v end_task -->
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
@@ -638,19 +598,14 @@ function template_end_task()
 			</h3>
 		</div>
 		<form action="', $scripturl, '?action=delegator;sa=end_task_save" method="post" accept-charset="', $context['character_set'], '" name="delegator_end_task">
+        <input type="hidden" name="id_task" value ="'.$id_task.'" />
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_edit_task">
-					<dt> <!-- tukaj more priti dolartxt[name]-->
-                       <label for="name"> End Comment</label>
-					</dt>
-					<dd>
-                         <textarea name="end_comment" rows="3" cols="30"></textarea>
-                         <input type="hidden" name="id_task" value ="'.$id_task.'" />
-					</dd>
-                    <dt>
-		            	<label for="state"> End state (nacin zakljucka) </label>
+				<dl class="delegator_edit_task">';
+    echo dl_form("name", $txt['delegator_end_task_comment'], "textarea", "", "textarea", 3, 30);
+	echo '          <dt>
+		            	<label for="state">'.$txt['delegator_end_task_state'].' </label>
  					</dt>
                     <dd>
                     	<ul class="reset">
@@ -667,8 +622,8 @@ function template_end_task()
 			</div>
             <span class="botslice">&nbsp;</span>
 		</div>
-		</form>
         ' . generateMemberSuggest('to-add', 'user-list',  'member_add') . '
+		</form>
 	</div><br />';
 }
 
@@ -682,7 +637,7 @@ function template_super_edit() {
 
     $id_task = (int) $_GET['id_task'];
 
-    $row = task_info($id_task);
+    $row_task = task_info($id_task);
 
     // Delegirani uporabniki
     $workers = workers_on_task($id_task);
@@ -697,8 +652,6 @@ function template_super_edit() {
             </div>';
     }
 
-    $projects = list_of_projects();
-
 	echo '
 	<div id="container">
 		<div class="cat_bar">
@@ -710,27 +663,14 @@ function template_super_edit() {
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-					<dl class="delegator_edit_task">
-						<dt>
-                            <label for="name">', $txt['delegator_task_name'], '</label>
-						</dt>
-						<dd>
-							<input type="text" name="name" value="'.$row['task_name'].'" size="50" maxlength="255" class="input_text" />
-                            <input type="hidden" name="id_task" value ="'.$id_task.'" />
-						</dd>
-                        <dt>
-                		    <label for="description">', $txt['delegator_task_desc'], '</label>
- 						</dt>
-                        <dd>
-                			<textarea name="description" rows="3" cols="30" > '.$row['description'].' </textarea>
-                        </dd>
-						<dt>
-							<label for="deadline">', $txt['delegator_deadline'], '</label>
-						</dt>
-						<dd>
-							<input class="kalender" type="text" name="deadline" value="' . $row['deadline'] . '"/>
-                        </dd>
-						<dt>
+					<dl class="delegator_edit_task">';
+    echo dl_form("name",$txt['delegator_task_name'], "input-text", $row_task['task_name'], "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_task_desc'], "textarea", $row_task['description'], "", 3, 30);
+    echo dl_form("deadline", $txt['delegator_deadline'], "input-text", $row_task['deadline'], "input_text kalender", 8, 100);
+    echo dl_form("user", $txt['delegator_task_delegates'], "delegates", $delegates, "div");
+    echo dl_form("priority", $txt['delegator_priority'], "priority", getPriorities($row_task, $txt), "reset");
+    /* echo '
+				<!--	<dt>
 							<label for="user">', $txt['delegator_task_delegates'], '</label>
 						</dt>
 						<dd>
@@ -747,14 +687,14 @@ function template_super_edit() {
 								' . getPriorities($row, $txt) . '
 							</ul>
 						</dd>
-					</dl>
+					</dl> 
                     <dt>
 						<label for="id_proj"><b>', $txt['delegator_project_name'], '</b></label>
 					</dt>
 					<dd>
                     	<select name="id_proj">'; // nadomestil navadno vejico
     foreach ($projects as $id_proj => $proj_name){
-        if ($id_proj == $row['id_proj']) {
+        if ($id_proj == $row_task['id_proj']) {
             echo '<option value="'.$id_proj.'" selected >--'.$proj_name.'--</option> ';
         }
         else {
@@ -771,33 +711,37 @@ function template_super_edit() {
 					<dd>
                         <select name="state">';
                             for ($i = 0; $i <= 5; $i++) {
-                                if ($row['state'] == $i) {
+                                if ($row_task['state'] == $i) {
                                     echo '<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> ';
                                 } else {
                                     echo '<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ';
                                 }
                             }
-                        echo
-                        '</select>
-                    </dd>
-					<dt>
+    echo    '</select>
+    </dd> -->'; */
+    echo dl_form("id_proj", $txt['delegator_project_name'], "projects", $row_task['id_proj'], "");
+    echo dl_form("state", $txt['delegator_state'], "state", $row_task['state'], "");
+    echo dl_form("start_date", $txt['delegator_task_start_date'], "input-text", $row_task['start_date'], "kalender", 8, 100);
+    echo dl_form("end_date", $txt['delegator_task_end_date'], "input-text", $row_task['end_date'], "kalender", 8, 100);
+    echo dl_form("description", $txt['delegator_end_comment'], "textarea", $row_task['end_comment'], "", 3, 30);
+    echo '<!--	<dt>
 						<label for="start_date">', $txt['delegator_task_start_date'], '</label>
 					</dt>
 					<dd>
-						<input class="kalender" type="text" name="start_date" value="' . $row['start_date'] . '"/>
+						<input class="kalender" type="text" name="start_date" value="' . $row_task['start_date'] . '"/>
                     </dd>
                     <dt>
 						<label for="end_date">', $txt['delegator_task_end_date'], '</label>
 					</dt>
 					<dd>
-						<input class="kalender" type="text" name="end_date" value="'. $row['end_date'] . '"/>
+						<input class="kalender" type="text" name="end_date" value="'. $row_task['end_date'] . '"/>
                     </dd>
                     <dt>
             		    <label for="description">', $txt['delegator_end_comment'], '</label>
 					</dt>
                     <dd>
-            			<textarea name="end_comment" rows="3" cols="30" > '.$row['end_comment'].' </textarea>
-                    </dd>
+            			<textarea name="end_comment" rows="3" cols="30" > '.$row_task['end_comment'].' </textarea>
+                    </dd> -->
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
@@ -805,8 +749,8 @@ function template_super_edit() {
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
-		</form>
         ' . generateMemberSuggest('to-add', 'user-list', 'member_add') . '
+		</form>
 	</div><br />';
 }
 
@@ -832,8 +776,13 @@ function template_edit_project()
 		<div class="windowbg">
 			<span class="topslice"><span></span></span>
 			<div class="content">
-				<dl class="delegator_edit_task">
-					<dt>
+				<dl class="delegator_edit_task">';
+    echo dl_form("name", $txt['delegator_project_name'], "input-text", $row_p['proj_name'], "input_text", 50, 255 );
+    echo dl_form("description", $txt['delegator_project_desc'], "textarea", $row_p['description'], "textarea", 3, 30);
+    echo dl_form("start", $txt['delegator_project_start'], "input-text", $row_p['start'], "input_text kalender", 8, 100);
+    echo dl_form("end", $txt['delegator_project_end'], "input-text", $row_p['end'], "input_text kalender", 8, 100);		
+
+    echo	'<!-- <dt>
 						<label for="name">', $txt['delegator_project_name'], '</label>
 					</dt>
 					<dd>
@@ -857,7 +806,7 @@ function template_edit_project()
 					</dt>
 					<dd>
 						<input type="text" name="end" class="input_text kalender" value="'.$row_p['end'].'" />
-					</dd>
+					</dd> -->
 				</dl>
                 <br />
                 <input type="hidden" name="id_coord" value="'.$row_p['id_coord'].'" />

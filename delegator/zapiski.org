@@ -116,4 +116,21 @@
 * 160130
 ** narejeno
    - edit_project
-   - okrajšava in olepšava kode: template_view_task, template_edit_task, template_add_project, template_add_task, template_add_project
+   - okrajšava in olepšava kode:
+     - template_view_task,
+     - template_edit_task,
+     - template_add_project,
+     - template_add_task,
+     - template_add_project
+     
+
+* 160131
+  - functions:
+    - view_start, view_end
+    - form_start, from_end
+** narejeno
+   - okrajsava kode
+     - template_add_task (2 funkciji, delegates, priority)
+     - template_edit_project
+     - template_end_task
+   - dl_form - projects, state

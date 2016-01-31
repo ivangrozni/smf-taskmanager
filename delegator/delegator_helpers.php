@@ -345,8 +345,11 @@ function ret_num($status, $what, $value){
  * in case of textarea: size1=rows size2=cols
  * in case of input text: size1=size size2=maxlength
  */
-function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
-    $output = "\n\t".'<dt> <label for="'.$name.'">'.$txt.'</label></dt>'."\n\t".'<dd>';
+function dl_form($name, $text, $type, $value, $class, $size1=0, $size2=0){
+
+    global $txt;
+
+    $output = "\n\t".'<dt> <label for="'.$name.'">'.$text.'</label></dt>'."\n\t".'<dd>';
     switch($type) {
     case "textarea":
         $output .= '<textarea name="'.$name.'" rows="'.$size1.'" cols="'.$size2.'">'.
@@ -354,6 +357,30 @@ function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
         break;
     case "input-text":
         $output .= '<input type="text" name="'.$name.'" size="'.$size1.'" class="'.$class.'"'."\t".' maxlength="'.$size2.'"  value="'.$value.'" /></dd>'."\n";
+        break;
+    case "delegates": // drgac za add_task in druge ...
+        $output .= '<input id="to-add" type="text" name="'.$name.'" >';
+        if (strlen($class)) $output .= '<div id="user-list" >'.$value .'</div></dd>'."\n";
+        else $output .= "\t\t".'<span id="user-list"></span></dd>'."\n";
+                      
+    case "priority":
+        $output .= '<ul class="'.$class.'">'.$vualue.'</ul></dd>'."\n";
+        break;
+    case "projects":
+        $output .= '<select name="id_proj">';
+        $projects = list_projects();
+        foreach ($projects as $id_proj => $proj_name){
+            if ($id_proj == $value) $output .= "\t\t".'<option value="'.$id_proj.'" selected >--'.$proj_name.'--</option> ."\n"';
+            else $output .= "\t\t".'<option value="'.$id_proj.'" > '.$proj_name.'</option> ."\n"';}
+        $output .= "\t".'</select></dd>'."/n";
+        break;
+    case "state":
+        $output .= '<select name="'.$name.'">'."\n";
+        for ($i = 0; $i <= 5; $i++) {
+            if ($value == $i) $output .= "\t\t".'<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> '."\n";
+            else $output .= "\t\t".'<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ' . "\n";
+        }
+        $output .= "\t".'</select></dd>'."\n";
         break;
     }
     return $output;
@@ -366,10 +393,10 @@ function dl_form($name, $txt, $type, $value, $class, $size1=0, $size2=0){
  * @param name, txt, type, value, class
  * depending on type - class might also mean value2
  */
-function dl_view($name, $txt, $type, $value, $class){
+function dl_view($name, $text, $type, $value, $class){
     global $scripturl;
     
-    $output = "\n".'<dt><label for="'.$name .'">'.$txt.'</label></dt>'."\n".'<dd>';
+    $output = "\n".'<dt><label for="'.$name .'">'.$text.'</label></dt>'."\n".'<dd>';
     switch ($type) {
     case "title":
         $output .= '<h3>'.$value.'</h3></dd>'."\n";
