@@ -128,6 +128,11 @@
   - functions:
     - view_start, view_end
     - form_start, from_end
+    - view_delegates (namesto, da jih vsakič posebej sestavljamo ... )
+  - end_project funkcija
+    - projekti dobijo stanje
+  - delegator_sidebar naj kliče helper funkcije in ne direkt v bazo!
+  - preimenuj tabele od baze, da bodo imele {db_prefix}_delegator_tasks ...
 ** narejeno
    - okrajsava kode
      - template_add_task (2 funkciji, delegates, priority)

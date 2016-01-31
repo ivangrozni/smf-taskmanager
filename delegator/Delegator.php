@@ -1101,7 +1101,10 @@ function super_edit()
         'name' => $txt['delegator_edit_task']
     );
 }
-
+/**
+ * super_edit_save is used to edit finished tasks.
+ *
+ */
 function super_edit_save()
 {
     global $smcFunc, $context;
@@ -1110,7 +1113,7 @@ function super_edit_save()
     $id_author = $context['user']['id'];
     $id_task = (int) $_POST['id_task'];
     $id_proj = (int) $_POST['id_proj'];
-
+    // var_dump($id_author, $id_task, $id_proj); die;
     if (isMemberCoordinator($id_proj)){
         $members = $_POST["member_add"];
 

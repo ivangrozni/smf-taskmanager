@@ -362,21 +362,21 @@ function dl_form($name, $text, $type, $value, $class, $size1=0, $size2=0){
         $output .= '<input id="to-add" type="text" name="'.$name.'" >';
         if (strlen($class)) $output .= '<div id="user-list" >'.$value .'</div></dd>'."\n";
         else $output .= "\t\t".'<span id="user-list"></span></dd>'."\n";
-                      
+        break;
     case "priority":
-        $output .= '<ul class="'.$class.'">'.$vualue.'</ul></dd>'."\n";
+        $output .= '<ul class="'.$class.'">'.$value.'</ul></dd>'."\n";
         break;
     case "projects":
         $output .= '<select name="id_proj">';
         $projects = list_projects();
         foreach ($projects as $id_proj => $proj_name){
-            if ($id_proj == $value) $output .= "\t\t".'<option value="'.$id_proj.'" selected >--'.$proj_name.'--</option> ."\n"';
-            else $output .= "\t\t".'<option value="'.$id_proj.'" > '.$proj_name.'</option> ."\n"';}
-        $output .= "\t".'</select></dd>'."/n";
+            if ($id_proj == $value) $output .= "\t\t".'<option value="'.$id_proj.'" selected >--'.$proj_name.'--</option>' ."\n";
+            else $output .= "\t\t".'<option value="'.$id_proj.'" > '.$proj_name.'</option>' ."\n";}
+        $output .= "\t".'</select></dd>'."\n";
         break;
-    case "state":
+    case "state": // $class represents starting state
         $output .= '<select name="'.$name.'">'."\n";
-        for ($i = 0; $i <= 5; $i++) {
+        for ($i = $class; $i <= 5; $i++) {
             if ($value == $i) $output .= "\t\t".'<option value="'.$i.'" selected >--'.$txt['delegator_state_'.$i].'--</option> '."\n";
             else $output .= "\t\t".'<option value="'.$i.'">'.$txt['delegator_state_'.$i].'</option> ' . "\n";
         }
@@ -416,9 +416,6 @@ function dl_view($name, $text, $type, $value, $class){
     }
     return $output;
 }
-
-
-
 
 // status bi lahko bil argument in glede na to vrnil deadline...
 // @todo function show_task_list($finished=false) {
@@ -805,7 +802,7 @@ function list_projects(){
  */
 function task_info($id_task){
     
-    global $smcFunc, $txt, $scripturl, $context;
+    global $smcFunc;
 
     $request = $smcFunc['db_query']('', '
         SELECT T1.id, T1.name AS task_name,  T1.deadline,
