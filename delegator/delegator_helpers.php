@@ -142,7 +142,7 @@ function workers_on_task($id_task){
         WHERE T1.id_task = {int:id_task}',
         array('id_task' => $id_task)
     );
-    
+
     $delegates = array();
     while ($member = $smcFunc['db_fetch_assoc']($request)){
         $delegates[$member["id_member"]] = $member["real_name"];
@@ -395,7 +395,7 @@ function dl_form($name, $text, $type, $value, $class, $size1=0, $size2=0){
  */
 function dl_view($name, $text, $type, $value, $class){
     global $scripturl;
-    
+
     $output = "\n".'<dt><label for="'.$name .'">'.$text.'</label></dt>'."\n".'<dd>';
     switch ($type) {
     case "title":
@@ -609,8 +609,8 @@ function generateMemberSuggest ($input, $container, $param) {
  * @var: array(states), string(what), (int)value
  * $what = [None, Project, Worker]
  * @return: list of tasks (as $row)
- * 
- * @todo case statement 
+ *
+ * @todo case statement
  */
 function count_states($states, $what, $value){
     //dobi tabelo stanj in jo dopolni...
@@ -657,10 +657,11 @@ function count_states($states, $what, $value){
     return $states;
 }
 
-function delegator_send_mail(){
+function delegator_send_mail($type, $members, $data){
 
     global $smcFunc, $txt, $scripturl, $context;
 
+    /*
 	$request = $smcFunc['db_query']('', '
         SELECT T2.real_name AS member, T2.email_address AS email, T3.name AS project_name,
             T4.name AS task_name, T4.description AS description
@@ -702,12 +703,29 @@ function delegator_send_mail(){
 
     // @TODO test? nevem ce dela to sploh.
 	sendmail($emaili, $subject, $body, null, null, false, 5);
-    /*
     var_dump($emaili);
     var_dump($subject);
     var_dump($body);
     die();
     */
+
+    switch ($type) {
+        // Email for delegation
+        case "delegate":
+            $subject = "Delegiran si bil na opravilo " . $data["name"];
+            $body =
+                "Delegiran si bil na task" . $data["name"] . "\n" .
+                "Opis:\n" .
+                $data["description"] . "\n" .
+                "Prioriteta: " . $data["priority"] .
+                "Delegiral te je: " . $data["delegator"] .
+                "Link: <a href=\"". $scripturl .'?action=delegator;sa=view_task;id_task=' .
+                $data['id_task'] . '">' . $data['name'] . '</a>';
+
+            sendmail($members, $subject, $body, null, null, false, 5);
+
+            break;
+    }
 
 
     // @TODO pošlji tudi koordinatorju (ne samo delavcem)
@@ -761,7 +779,7 @@ function project_info($id_proj){
 		LEFT JOIN {db_prefix}members T2 on T1.id_coord = T2.id_member
 		WHERE T1.id = {int:id_proj}', array('id_proj' => $id_proj)
     ); // pred array je manjkala vejica in je sel cel forum v kT1.state =0
-    
+
     $row = $smcFunc['db_fetch_assoc']($request);
 
     $smcFunc['db_free_result']($request);
@@ -782,14 +800,14 @@ function list_projects(){
         SELECT id, name
         FROM  {db_prefix}projects'
     );
-    
+
     $projects = array();
-    
+
     while ($row_p = $smcFunc['db_fetch_assoc']($request_p)) {
         $projects[$row_p["id"]] = $row_p["name"];
     }
     $smcFunc['db_free_result']($request_p);
-    
+
     return $projects;
 }
 
@@ -801,7 +819,7 @@ function list_projects(){
  * @return task info as (array)row.
  */
 function task_info($id_task){
-    
+
     global $smcFunc;
 
     $request = $smcFunc['db_query']('', '
@@ -820,4 +838,3 @@ function task_info($id_task){
     $smcFunc['db_free_result']($request);
     return $row;
 }
-

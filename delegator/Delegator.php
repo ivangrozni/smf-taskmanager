@@ -110,8 +110,8 @@ function Delegator()
 // This action's template(s) will display the contents of $context.
 /**
  * Main delegator function.
- * 
- * Shows unclaimed (unfinished) tasks. 
+ *
+ * Shows unclaimed (unfinished) tasks.
  */
 function delegator_main() //glavna funkcija - prikaze taske
 {
@@ -768,6 +768,16 @@ function edit_task_save()
     }
 
     zapisiLog($id_proj, $id_task, 'edit_task');
+
+    // Send emails to delegated members
+    delegator_send_mail('delegate', $members, [
+        "id_task" => $id_task,
+        "name" => $name,
+        "description" => $description,
+        "deadline" => $deadline,
+        "delegator" => $id_author
+    ]);
+
     redirectexit("action=delegator;sa=view_task&id_task=$id_task");
 }
 
@@ -1244,7 +1254,7 @@ function edit_project()
  * Writes edited project to database.
  *
  * What happens with the coordinator? Do we also change it?
- * @todo think about coordinator ... 
+ * @todo think about coordinator ...
  */
 function edit_project_save()
 {
