@@ -770,6 +770,7 @@ function edit_task_save()
     zapisiLog($id_proj, $id_task, 'edit_task');
 
     // Send emails to delegated members
+    /*
     delegator_send_mail('delegate', $members, [
         "id_task" => $id_task,
         "name" => $name,
@@ -777,6 +778,7 @@ function edit_task_save()
         "deadline" => $deadline,
         "delegator" => $id_author
     ]);
+    */
 
     redirectexit("action=delegator;sa=view_task&id_task=$id_task");
 }
