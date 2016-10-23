@@ -139,3 +139,21 @@
      - template_edit_project
      - template_end_task
    - dl_form - projects, state
+
+* 161023
+  - zaključki delegatorja 1.0 - pravzaprav bomo glede na readme
+    skočili na 1.8 verzijo
+** za narest
+   - resetiraj testforum
+   - zbuildamo branch ciscenje
+     - potestiramo
+     - search&destroy mishion na napakah
+     - nove funkcionalnosti vpišemo v seznam sprejemljivih napak IN obratno
+   - preverimo, če lahko uredimo mailanje
+   - dopolnimo dokumentacijo
+   - (delno) uskladimo s SMF smernicami
+   - objavimo med SMF moduli
+   - proslavimo rojstvo
+
+*** bugz
+    - back button

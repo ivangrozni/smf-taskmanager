@@ -97,7 +97,7 @@ function template_add_task()
     echo dl_form("duedate", $txt['delegator_deadline'], "input-text", "", "input_text kalender", 8, 100);
     echo dl_form("user", $txt['delegator_delegates'], "delegates", "", "");
     echo dl_form("priority", $txt['delegator_priority'], "priority", getPriorities($row, $txt), "reset", "", "");
-    echo dl_form("id_proj", $txt['delegator_project_name'], "projects", "", "");
+    echo dl_form("id_proj", $txt['delegator_project_name'], "projects", $id_proj, "");
 	echo '</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
@@ -445,10 +445,9 @@ function template_edit_task()
     echo '</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
-                <!-- <input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" /> -->
-                <input type="button" value="Back" onclick="window.location.href='.$_SERVER['HTTP_REFERER'].'" /> 
+                <input type="button" value="Back" onclick="window.location.href='.$_SERVER['HTTP_REFERER'].'" class="button_submit" /> 
                 <a href="'.$_SERVER['HTTP_REFERER'].'">Back</a>  
-				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
+		<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
