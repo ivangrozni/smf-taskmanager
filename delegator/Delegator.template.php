@@ -109,7 +109,7 @@ function template_add_task()
 		</form>
 	</div><br />';
    // @gismoe Tukaj klicemo generateMemberSuggest, ki bi moral kot param dobit
-   // parameter, ki nosi seznam memberjev, ta pa se nikjer ne ustvari ... 
+   // parameter, ki nosi seznam memberjev, ta pa se nikjer ne ustvari ...
 }
 
 /**
@@ -171,13 +171,13 @@ function template_view_task() // id bi bil kar dober argument
 
     if (isMemberWorker($id_task)) {
 		$claimButton = '<a href="index.php?action=delegator;sa=unclaim_task;id_task=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_unclaim_task'] . '</a>';
-    } 
+    }
     else {
     	$claimButton = '<a href="index.php?action=delegator;sa=claim_task;id_task=' . $id_task . ';' . $session_var . '=' . $session_id . '" class="button_submit">' . $txt['delegator_claim_task'] . '</a>';
     }
 
     $workers = workers_on_task($id_task);
-    
+
 	$delegates = "&nbsp;&nbsp; (\_/)<br />=(^.^)= &#268;upi<br />&nbsp;(\")_(\")";
 
     if (count($workers)) {
@@ -338,7 +338,7 @@ function template_view_worker()
     echo '<hr><a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=unfinished">'.$txt['delegator_state_unfinished'].'</a>:&nbsp;'.$states[1].'</br>';
     echo '<a href="'.$scripturl.'?action=delegator;sa=view_worker;id_member='.$id_member.';status=finished">'.$txt['delegator_state_finished'].'</a>:&nbsp;'.($states[2]+$states[3]+$states[4]).'</br><hr>';
 
-    template_show_list('list_tasks_of_worker'); 
+    template_show_list('list_tasks_of_worker');
 }
 
 function template_my_tasks()
@@ -371,7 +371,7 @@ function template_view_projects()
 
     echo '<h2 style="font-size:1.5em" > '. $txt['delegator_view_projects'] .' </h2>';
 
-    template_show_list('list_of_projects'); 
+    template_show_list('list_of_projects');
 }
 
 function template_view_log()
@@ -445,9 +445,8 @@ function template_edit_task()
     echo '</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<br />
-                <input type="button" value="Back" onclick="window.location.href='.$_SERVER['HTTP_REFERER'].'" class="button_submit" /> 
-                <a href="'.$_SERVER['HTTP_REFERER'].'">Back</a>  
-		<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
+        <a href="'.$_SERVER['HTTP_REFERER'].'">Back</a>
+				<input type="submit" name="submit" value="', $txt['delegator_edit_task'], '" class="button_submit" />
 			</div>
 			<span class="botslice"><span></span></span>
 		</div>
@@ -550,7 +549,7 @@ function template_end_task()
 							<li><input type="radio" name="state"  value="3" class="input_radio" /> ', $txt['delegator_state_3'], '</li>
 							<li><input type="radio" name="state"  value="4" class="input_radio" /> ', $txt['delegator_state_4'], '</li>
 						</ul>
-                    </dd> 
+                    </dd>
 
 				</dl>
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -651,7 +650,7 @@ function template_edit_project()
     echo dl_form("name", $txt['delegator_project_name'], "input-text", $row_p['proj_name'], "input_text", 50, 255 );
     echo dl_form("description", $txt['delegator_project_desc'], "textarea", $row_p['description'], "textarea", 3, 30);
     echo dl_form("start", $txt['delegator_project_start'], "input-text", $row_p['start'], "input_text kalender", 8, 100);
-    echo dl_form("end", $txt['delegator_project_end'], "input-text", $row_p['end'], "input_text kalender", 8, 100);		
+    echo dl_form("end", $txt['delegator_project_end'], "input-text", $row_p['end'], "input_text kalender", 8, 100);
 
     echo	'	</dl>
                 <br />
