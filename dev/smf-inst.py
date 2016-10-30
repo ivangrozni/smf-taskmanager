@@ -41,30 +41,42 @@ class smfInst:
         funame.send_keys(self.uname)
         fpassw.send_keys(self.passwd)
         self.browser.find_element_by_xpath("//form[@id='guest_form']/input[@class='button_submit']").click()
+        # ce naredim login(), logout(), login() - ne dela
         
 
     def logout(self):
         if (len(self.browser.find_elements_by_id("button_logout")) > 0):
             self.browser.find_element_by_id("button_logout").click()
 
+    def go_packages(self):
+        # url2="?action=admin;area=packages"
+        self.browser.find_element_by_xpath("//li[@id='button_admin']/a[contains(@href, 'action=admin')]").click()
+        self.browser.find_element_by_xpath("//h5/a[contains(@href, 'area=packages')]").click()
+        
     def check(self):
         """ Returns states:
             0 - no module
             1 - only uploaded
             2 - uploaded and installed"""
-        url2="?action=admin;area=packages"
-        self.browser.get(self.url+url2)
-        # fino bi bilo pogledat ce je Delegator
-        # installiran in njegovo stanje
         try:
             td = selfbrowser.find_element_by_xpath("//td[text()='Delegator']")
         except: # NoSuchElementError:
             return 0
-        td = self.browser.find_elements_by_xpath("//tr/td/a[contains(@href, 'package="+self.modname.lower()+".zip')]")
-        return td - 1
+        td = len(self.browser.find_elements_by_xpath("//tr/td/a[contains(@href, 'sa=install;package="+self.modname.lower()+".zip')]"))
+        if td == True: return 1
+        else: return 2
 
     def uninst(self):
-        url2="?action=admin;area=packages"
-        self.browser.get(self.url+url2)
-        td = self.browser.find_element_by_xpath("//tr/td/a[contains(@href, 'sa=uninstall;package="+self.modname.lower()+".zip')]")
-        td.click()
+        # preveri se, ce obstajajo kaki testi, ki so failali
+        self.browser.find_element_by_xpath("//tr/td/a[contains(@href, 'sa=uninstall;package="+self.modname.lower()+".zip')]").click()
+        self.browser.find_element_by_xpath("//form/input[@class='button_submit']").click()
+
+    def delete(self):
+        self.browser.find_element_by_xpath("//tr/td/a[contains(@href, 'sa=remove;package="+self.modname.lower()+".zip')]").click()
+        self.browser.find_element_by_xpath("//form/input[@class='button_submit']").click()        
+
+
+# tako se dela delay, al kaj        
+#             gumb = wdw(self.browser, 5).until(
+#                EC.presence_of_element_located((By.CLASS_NAME, 'comment-show-hide'))
+#            )        
