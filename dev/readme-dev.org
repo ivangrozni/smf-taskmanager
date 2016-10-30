@@ -1,0 +1,13 @@
+#+TITLE: Readme for dev
+
+* Intro
+  Testing simple machines forum's costumization module takes quite
+  some time if you don't have ssh connection to the server.
+
+  We are writting few routines that can automate removal and
+  installation of costumization module.
+
+* tasks
+  - log in
+  - remove costumization module
+  - install costumization module
