@@ -7,7 +7,19 @@
   We are writting few routines that can automate removal and
   installation of costumization module.
 
-* tasks
+* Goals of selenium python script
   - log in
   - remove costumization module
   - install costumization module
+
+* Usage
+  It is very simple to use this script.
+
+  You replace the variables at the begining of the script
+  with your own need, then you run functions, such as
+  login, remove_mod, install_mod.
+
+  You need to have selenium server up and running. You get it at
+  [[http://docs.seleniumhq.org/download/][docs.seleniumhq.org]]
+
+  
