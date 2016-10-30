@@ -127,5 +127,19 @@ def new_version(self):
     a.login()
     a.go_packages()
     s = a.check_state()
-    
-
+    if s==0:
+        a.upload()
+        s.install()
+    elif s==1:
+        a.delete()
+        a.upload()
+        s.install()
+    elif s==2:
+        a.uninst()
+        a.delete()
+        a.upload()
+        s.install()
+    else:
+        print "Unkown state!\nAborting operation."
+    a.browser.quit()
+    return None
