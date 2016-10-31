@@ -15,11 +15,11 @@ from selenium.webdriver.support import expected_conditions as EC
 # remove module
 # install module
 
-uname = "bratovsek"
-passwd = "baba"
-url = "http://www.studentska-iskra.org/testforum"
-modname="Delegator"
-path = "/home/len/Documents/WORK/ISKRA/programiranje/hek_sek/taskmanager/delegator.zip" # path to zip fajl
+uname = ""
+passwd = ""
+url = ""
+modname=""
+path = "" # path to zip fajl
 
 
 class smfInst:
@@ -129,16 +129,16 @@ def new_version(self):
     s = a.check_state()
     if s==0:
         a.upload()
-        s.install()
+        a.install()
     elif s==1:
         a.delete()
         a.upload()
-        s.install()
+        a.install()
     elif s==2:
         a.uninst()
         a.delete()
         a.upload()
-        s.install()
+        a.install()
     else:
         print "Unkown state!\nAborting operation."
     a.browser.quit()
