@@ -53,7 +53,106 @@ but it is intended to become a standalone app with SMF mode implementation.
     - SMF implementation mod
 
 *** Conflicts
-     - Member suggest doesn't work when the Simple Portal Advanced Unread extension mod (version 1.4). To fix it, you have to edit Sources/PortalUnread.php and comment out line 117, "window.onload=regenerateUnreadPosters". What exactly this does is not known yet.
+     - Member suggest doesn't work when the Simple Portal Advanced
+       Unread extension mod (version 1.4). To fix it, you have to edit
+       Sources/PortalUnread.php and comment out line 117,
+       "window.onload=regenerateUnreadPosters". What exactly this does
+       is not known yet.
+**** With SMF team
+     Here is mail correspondation:
+***** on 28th october SMF team wrote:     
+     You have just been sent a personal message by SMF Customization Team on Simple Machines Community Forum.
+
+     IMPORTANT: Remember, this is just a notification. Please do not reply to this email.
+
+     The message they sent you was:
+
+     Hello passiveuser,
+
+     We have removed your customization from the approval queue for
+     now because we believe it isn't ready yet for the customization
+     site.
+
+     Please take a look at the links below. The information contained
+     in them will be a great resource for you, in order to get your
+     customization ready for the approval process.
+     http://wiki.simplemachines.org/smf/Customization_approval_guidelines
+     http://wiki.simplemachines.org/smf/Coding_Guidelines
+
+     Also, Simple Machine members are a mixed group of individuals of
+     many nationalities and ethnicities. We feel that some of the
+     content in your customization may be a little offensive to some
+     members of our software community. We suggest that you look over
+     portions of the customization that may offend and make
+     appropriate changes for consideration in the approval process.
+
+     We're looking forward to your updated work so please reply to this
+     message when you've had time to update the customization and it will
+     be added back to the queue!
+
+     Reply to this Personal Message here:
+     http://www.simplemachines.org/community/index.php?action=pm;sa=send;f=inbox;pmsg=569976;quote;u=1
+
+***** on 29th october ISKRA replied
+
+     Thank you, for your reply. Our developing team carefully read the
+     coding guidelines and customization approval guidelines and they
+     are a little bit vague, so we would kindly ask for some more
+     explanation regarding the reasons for your removal of the module
+     delegator - spread communism from the approval queue.
+
+     In regards to your other comment regarding the mixed groups of
+     individuals and beeing offensive to them I would like to reply
+     that I found it the most offensive thing I was told in quite some
+     time. you would not guess but some programmers are also communist
+     and would like their opinion on things to matter. The clear
+     objectivity of liberal democracy is what brought into power
+     people like Henry Kissinger, Richard Nixon, George Bush and many
+     other war criminals that spread death and destruction through
+     whole world. If you are afraid of communism I would suggest you
+     to read some books. Maybe it is the best to start with Bertold
+     Brecht since you get a gentle introduction through art. Then to
+     get a first grip there is a Communist Manifesto from Karl Marx -
+     the father scientific socialism. But still it is a vulgar
+     explanation of communistic theory. You should then proceed with
+     Marx's Kapital (don't bother with the Pickety's one - he is in
+     best case a Kaynesian). Still Marx did not live to finish his
+     work, which was then enriched by many other writers. I will
+     mention Vladimir Ilijič Lenin who is still vulgar in his
+     description of marxist theory, but managed to create the biggest
+     known revolution of our times (for reasons why and how it failed
+     you should read Lebowitz's The Contradictions of "Real
+     Socialism": The Conductor and the Conducted - which is, such as
+     many other literature available on gen.lib.rus.ec). There are
+     also many other brilliant authors such as Rosa Luxembourg,
+     Antonio Gramsci, Clara Zetkin and many others. Take a look at
+     this page: https://www.marxists.org/
+
+     Our Marxist-Leninist developers group looks forward to your
+     apology. We also don't blame you to much since you are a citizen
+     of western capitalistic and imperialistic nation. You were born
+     and raised into ideology of white supremacy, chauvinism,
+     colonialism ... The (capitalistic) system is very good at
+     reproduction of its own ideology which is masked as objective, as
+     natural (Luis Althuser wrote an extraordinary peace on that topic
+     called Ideology and ideological apparatus of state). It is a
+     postion of power and it is comfortable position to speak about
+     objectivity and liberalism but on the other hand it is also very
+     ignorant point of view. So if I conclude, you are the one who is
+     not accepting the other people's opinion (although it seems
+     opposite to you - that is because you were thought not to (or not
+     thought to) reflect your own social position). We hope our
+     arguments are understood.
+
+     We are looking forward to improve our smf costumization and also
+     to enrich smf itself. The code is not very nice and easy to
+     understand but this is what we have and what we are working with.
+
+     Regards,
+     Technology work commitee of Iskra
+
+
+
 ** SLO
 *** Splošne informacije
     Delegator je sloni na To Do list modu za SMF forum, ki ga je ustvaril grafitus - slava mu. Je zelo preprost program za projektno vodenje.
